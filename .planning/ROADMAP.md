@@ -10,7 +10,7 @@
 ## Phases
 
 - [x] **Phase 1: Foundation** - Database, OAuth2 authentication, two-user authorization model
-- [ ] **Phase 2: Core Event Management** - Event CRUD operations and calendar grid/list views  
+- [x] **Phase 2: Core Event Management** - Event CRUD operations and calendar grid/list views  
 - [ ] **Phase 3: Recurring Events** - RFC5545 RRULE support with timezone/DST handling
 - [ ] **Phase 4: Google Calendar Sync** - Push-based sync to Google Calendar with token management
 - [ ] **Phase 5: Natural Language Input** - dateparser-based event creation from text descriptions
@@ -69,7 +69,12 @@
 **Pitfalls Addressed:**
 - Concurrent edit conflicts: implement `last_edited_at` + `last_editor_id` fields for future conflict detection UI
 
-**Plans:** TBD
+**Plans:** 4/4 complete
+
+- [x] 02-01-PLAN.md - Event domain contracts, repository, service
+- [x] 02-02-PLAN.md - Authenticated event CRUD APIs + tests
+- [x] 02-03-PLAN.md - Month/day calendar views + navigation
+- [x] 02-04-PLAN.md - Interactive UI CRUD integration + integration tests
 
 ---
 
@@ -179,12 +184,12 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|---|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-03-18 |
-| 2. Core Event Management | 0/4 | Not started | — |
+| 2. Core Event Management | 4/4 | Complete | 2026-03-18 |
 | 3. Recurring Events | 0/2 | Not started | — |
 | 4. Google Calendar Sync | 0/3 | Not started | — |
 | 5. Natural Language Input | 0/2 | Not started | — |
 | 6. Image / OCR | 0/2 | Not started | — |
-| **TOTAL** | **3/16** | **In progress** | 2026-03-18 |
+| **TOTAL** | **7/16** | **In progress** | 2026-03-18 |
 
 ---
 
@@ -201,16 +206,16 @@
 | **Auth** | AUTH-01: Sign in with Google OAuth2 | Phase 1 | Complete |
 | | AUTH-02: Two users linked to shared calendar | Phase 1 | Complete |
 | | AUTH-03: Session persists across refresh | Phase 1 | Complete |
-| **Events** | EVT-01: Create one-time event | Phase 2 | Pending |
+| **Events** | EVT-01: Create one-time event | Phase 2 | Complete |
 | | EVT-02: Create recurring event | Phase 3 | Pending |
-| | EVT-03: Edit event | Phase 2 | Pending |
-| | EVT-04: Delete event | Phase 2 | Pending |
-| | EVT-05: View upcoming events (day) | Phase 2 | Pending |
-| | EVT-06: View upcoming events (month) | Phase 2 | Pending |
+| | EVT-03: Edit event | Phase 2 | Complete |
+| | EVT-04: Delete event | Phase 2 | Complete |
+| | EVT-05: View upcoming events (day) | Phase 2 | Complete |
+| | EVT-06: View upcoming events (month) | Phase 2 | Complete |
 | | EVT-07: Both users see shared events | Phase 1 | Complete |
-| **Views** | VIEW-01: Month calendar grid | Phase 2 | Pending |
-| | VIEW-02: Navigate months | Phase 2 | Pending |
-| | VIEW-03: Events show title/time | Phase 2 | Pending |
+| **Views** | VIEW-01: Month calendar grid | Phase 2 | Complete |
+| | VIEW-02: Navigate months | Phase 2 | Complete |
+| | VIEW-03: Events show title/time | Phase 2 | Complete |
 | **Sync** | SYNC-01: Export month to Google Calendar | Phase 4 | Pending |
 | | SYNC-02: Auto-push new events | Phase 4 | Pending |
 | | SYNC-03: Reflected deletions | Phase 4 | Pending |
@@ -225,4 +230,4 @@
 ---
 
 *Roadmap created: 2026-03-18 by roadmapper*  
-*Next step: `/gsd-plan-phase 2`*
+*Next step: `/gsd-plan-phase 3`*
