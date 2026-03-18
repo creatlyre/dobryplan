@@ -9,7 +9,7 @@
 
 ## Phases
 
-- [ ] **Phase 1: Foundation** - Database, OAuth2 authentication, two-user authorization model
+- [x] **Phase 1: Foundation** - Database, OAuth2 authentication, two-user authorization model
 - [ ] **Phase 2: Core Event Management** - Event CRUD operations and calendar grid/list views  
 - [ ] **Phase 3: Recurring Events** - RFC5545 RRULE support with timezone/DST handling
 - [ ] **Phase 4: Google Calendar Sync** - Push-based sync to Google Calendar with token management
@@ -26,7 +26,7 @@
 **Requirements Covered:** AUTH-01, AUTH-02, AUTH-03, EVT-07 (4 total)
 
 **Entry Conditions:**
-- Project scaffolding complete (FastAPI, SQLAlchemy, SQLite initialized)
+- Project scaffolding complete (FastAPI, SQLAlchemy, Supabase PostgreSQL initialized)
 - Google OAuth2 credentials created in Google Cloud Console
 
 **Success Criteria:**
@@ -39,7 +39,11 @@
 **Pitfalls Addressed:**
 - OAuth2 refresh token exhaustion: store one token per user permanently; implement token reuse + error handling for `invalid_grant`
 
-**Plans:** TBD
+**Plans:** 3/3 complete
+
+- [x] 01-01-PLAN.md - FastAPI scaffold + Supabase ORM models
+- [x] 01-02-PLAN.md - OAuth2 login + JWT session middleware
+- [x] 01-03-PLAN.md - Two-user invitations + shared household flow + tests
 
 ---
 
@@ -174,13 +178,13 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---|--------|-----------|
-| 1. Foundation | 0/3 | Not started | — |
+| 1. Foundation | 3/3 | Complete | 2026-03-18 |
 | 2. Core Event Management | 0/4 | Not started | — |
 | 3. Recurring Events | 0/2 | Not started | — |
 | 4. Google Calendar Sync | 0/3 | Not started | — |
 | 5. Natural Language Input | 0/2 | Not started | — |
 | 6. Image / OCR | 0/2 | Not started | — |
-| **TOTAL** | **0/16** | **Not started** | — |
+| **TOTAL** | **3/16** | **In progress** | 2026-03-18 |
 
 ---
 
@@ -194,16 +198,16 @@
 
 | Category | Requirement | Phase | Status |
 |----------|-------------|-------|--------|
-| **Auth** | AUTH-01: Sign in with Google OAuth2 | Phase 1 | Pending |
-| | AUTH-02: Two users linked to shared calendar | Phase 1 | Pending |
-| | AUTH-03: Session persists across refresh | Phase 1 | Pending |
+| **Auth** | AUTH-01: Sign in with Google OAuth2 | Phase 1 | Complete |
+| | AUTH-02: Two users linked to shared calendar | Phase 1 | Complete |
+| | AUTH-03: Session persists across refresh | Phase 1 | Complete |
 | **Events** | EVT-01: Create one-time event | Phase 2 | Pending |
 | | EVT-02: Create recurring event | Phase 3 | Pending |
 | | EVT-03: Edit event | Phase 2 | Pending |
 | | EVT-04: Delete event | Phase 2 | Pending |
 | | EVT-05: View upcoming events (day) | Phase 2 | Pending |
 | | EVT-06: View upcoming events (month) | Phase 2 | Pending |
-| | EVT-07: Both users see shared events | Phase 1 | Pending |
+| | EVT-07: Both users see shared events | Phase 1 | Complete |
 | **Views** | VIEW-01: Month calendar grid | Phase 2 | Pending |
 | | VIEW-02: Navigate months | Phase 2 | Pending |
 | | VIEW-03: Events show title/time | Phase 2 | Pending |
@@ -221,4 +225,4 @@
 ---
 
 *Roadmap created: 2026-03-18 by roadmapper*  
-*Ready for planning: `/gsd-plan-phase 1`*
+*Next step: `/gsd-plan-phase 2`*

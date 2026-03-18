@@ -1,3 +1,16 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: unknown
+last_updated: "2026-03-18T19:55:17.863Z"
+progress:
+  total_phases: 6
+  completed_phases: 1
+  total_plans: 16
+  completed_plans: 3
+---
+
 # State: CalendarPlanner
 
 **Project:** CalendarPlanner v1.0  
@@ -8,20 +21,14 @@
 
 ## Current Position
 
-| Metric | Value |
-|--------|-------|
-| **Current Phase** | 0 (Not started) |
-| **Total Phases** | 6 |
-| **Requirements Covered** | 23/23 |
-| **Progress** | 0% |
-
----
+Phase: 01 (foundation) — COMPLETE
+Plan: 3 of 3
 
 ## Phase Status
 
 | Phase | Status | Progress | Last Updated |
 |-------|--------|----------|--------------|
-| 1. Foundation | Not started | 0% | 2026-03-18 |
+| 1. Foundation | Complete | 100% | 2026-03-18 |
 | 2. Core Event Management | Not started | 0% | 2026-03-18 |
 | 3. Recurring Events | Not started | 0% | 2026-03-18 |
 | 4. Google Calendar Sync | Not started | 0% | 2026-03-18 |
@@ -36,7 +43,7 @@
 A shared calendar both partners can edit that stays in sync with Google Calendar, so the family schedule is always current everywhere — on the web and on their phones.
 
 **Current Focus:**  
-Roadmap complete. Ready to plan Phase 1 (Foundation: Database, OAuth2, two-user model).
+Phase 02 planning/execution prep — core event management
 
 **Current Milestone:**  
 v1.0 — Foundation through Image OCR (6 phases, 23 requirements)
@@ -50,7 +57,7 @@ v1.0 — Foundation through Image OCR (6 phases, 23 requirements)
 | Python + FastAPI backend | User's stated tech preference; async-first, fast | Approved |
 | Two-user household model | Simplest scope that covers target use case | Approved |
 | Push-only Google Sync (v1) | Reduces complexity; users read on phone via Google | Approved |
-| SQLite (not PostgreSQL) | Perfect for 2-user scope; file-based, zero ops | Approved |
+| Supabase PostgreSQL | Workspace-connected, production-ready, MCP-compatible | Approved |
 | Server-rendered (Jinja2 + HTMX) | No SPA complexity; instant render, HTMX for forms | Approved |
 | EasyOCR (not Cloud Vision) | Privacy (local processing); offline; cost-effective | Approved |
 
@@ -61,21 +68,25 @@ v1.0 — Foundation through Image OCR (6 phases, 23 requirements)
 ### Critical Pitfalls (Per Research)
 
 #### 1. Refresh Token Exhaustion (Phase 4)
+
 - **Prevention:** Store one refresh token per user permanently; reuse for all API calls
 - **Monitoring:** Catch `invalid_grant` errors; flag user for re-auth but don't crash
 - **Testing:** Use "Production" OAuth consent screen from day one
 
 #### 2. Timezone/DST Disasters (Phase 3)
+
 - **Prevention:** Always store times in UTC internally; render to user's timezone only at UI
 - **Testing:** Hard-test DST boundaries (Nov 5 spring-forward, Mar 9 fall-back in US)
 - **Edge Case:** When user enters "March 15 2pm", ask timezone explicitly if not in profile
 
 #### 3. Concurrent Edit Conflicts (Phase 2/Early)
+
 - **Prevention:** Implement optimistic locking—store `last_edited_at` + `last_editor_id` with each event
 - **Approach:** When saving, check if event changed; if yes, show conflict dialog to user
 - **Future:** Phase X conflict resolution UI ("Use yours" / "Use theirs" / "Merge")
 
 #### 4. OCR Accuracy (Phase 6)
+
 - **Prevention:** Never auto-add OCR results; always require human review
 - **UI:** Show confidence indicator per field; highlight <75% in yellow
 - **Fallback:** If OCR fails, show raw text + manual form entry
@@ -95,24 +106,27 @@ v1.0 — Foundation through Image OCR (6 phases, 23 requirements)
 
 | Title | Area | Phase | Priority |
 |-------|------|-------|----------|
-| Switch database to Supabase with MCP integration | database | 01-foundation | high |
+| None | — | — | — |
 
 ---
 
 ## Session Continuity
 
 **What was done:**
+
 - Roadmap created: 6 phases, 23 requirements, 100% coverage
 - Major pitfalls identified: token exhaustion, DST, conflicts, OCR accuracy
 - Phase success criteria defined with observable user behaviors
 - Phase 1 plans created (3 plans, 2 waves, ready for execution)
-- Captured todo: Consider switching SQLite → Supabase PostgreSQL (free, MCP-integrated, better for multi-device sync)
+- Phase 1 executed: FastAPI scaffold, Supabase-ready schema, OAuth2/JWT auth, two-user household flow
+- Automated validation: `python -m pytest tests/test_users.py tests/test_auth.py -q` (6 passed)
 
 **What comes next:**
+
 ```
-Next Action: `/gsd-plan-phase 1`
+Next Action: `/gsd-plan-phase 2`
 Command to run:
-node "$HOME/.copilot/get-shit-done/bin/gsd-tools.cjs" plan 1
+node "$HOME/.copilot/get-shit-done/bin/gsd-tools.cjs" plan 2
 ```
 
 ---
