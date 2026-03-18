@@ -21,6 +21,7 @@ class EventRepository:
             start_at=payload.start_at,
             end_at=payload.end_at,
             timezone=payload.timezone,
+            rrule=payload.rrule,
         )
         self.db.add(event)
         self.db.commit()
@@ -67,6 +68,7 @@ class EventRepository:
                 and_(
                     Event.calendar_id == calendar_id,
                     Event.is_deleted.is_(False),
+                    Event.rrule.is_(None),
                     extract("year", Event.start_at) == year,
                     extract("month", Event.start_at) == month,
                     extract("day", Event.start_at) == day,
@@ -83,8 +85,24 @@ class EventRepository:
                 and_(
                     Event.calendar_id == calendar_id,
                     Event.is_deleted.is_(False),
+                    Event.rrule.is_(None),
                     extract("year", Event.start_at) == year,
                     extract("month", Event.start_at) == month,
+                )
+            )
+            .order_by(Event.start_at.asc())
+            .all()
+        )
+
+    def list_recurrence_roots_until(self, calendar_id: str, range_end: datetime) -> list[Event]:
+        return (
+            self.db.query(Event)
+            .filter(
+                and_(
+                    Event.calendar_id == calendar_id,
+                    Event.is_deleted.is_(False),
+                    Event.rrule.is_not(None),
+                    Event.start_at <= range_end,
                 )
             )
             .order_by(Event.start_at.asc())

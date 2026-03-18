@@ -52,6 +52,9 @@ function resetEventForm() {
   document.getElementById('event-description').value = '';
   document.getElementById('event-start').value = '';
   document.getElementById('event-end').value = '';
+  document.getElementById('event-repeat').value = '';
+  document.getElementById('event-repeat-count').value = '';
+  document.getElementById('event-repeat-until').value = '';
 }
 
 function prefillEvent(id, title, description, startAt, endAt) {
@@ -60,6 +63,26 @@ function prefillEvent(id, title, description, startAt, endAt) {
   document.getElementById('event-description').value = description;
   document.getElementById('event-start').value = startAt;
   document.getElementById('event-end').value = endAt;
+}
+
+function buildRRule() {
+  const freq = document.getElementById('event-repeat').value;
+  const count = document.getElementById('event-repeat-count').value;
+  const until = document.getElementById('event-repeat-until').value;
+
+  if (!freq) {
+    return null;
+  }
+
+  const parts = [`FREQ=${freq}`];
+  if (count) {
+    parts.push(`COUNT=${parseInt(count, 10)}`);
+  }
+  if (until) {
+    const compact = until.replaceAll('-', '');
+    parts.push(`UNTIL=${compact}T235959Z`);
+  }
+  return parts.join(';');
 }
 
 async function refreshPanels() {
@@ -75,7 +98,8 @@ async function submitEventForm(event) {
     description: document.getElementById('event-description').value || null,
     start_at: new Date(document.getElementById('event-start').value).toISOString(),
     end_at: new Date(document.getElementById('event-end').value).toISOString(),
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+    rrule: buildRRule()
   };
 
   const method = eventId ? 'PUT' : 'POST';

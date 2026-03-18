@@ -10,6 +10,7 @@ class EventCreate(BaseModel):
     start_at: datetime
     end_at: datetime
     timezone: str = "UTC"
+    rrule: Optional[str] = None
 
 
 class EventUpdate(BaseModel):
@@ -18,6 +19,7 @@ class EventUpdate(BaseModel):
     start_at: Optional[datetime] = None
     end_at: Optional[datetime] = None
     timezone: Optional[str] = None
+    rrule: Optional[str] = None
 
 
 class EventResponse(BaseModel):
@@ -30,5 +32,6 @@ class EventResponse(BaseModel):
     end_at: datetime
     timezone: str
     is_deleted: bool
+    rrule: Optional[str] = None
 
     model_config = {"from_attributes": True}
