@@ -3,7 +3,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable
 
-from fastapi import Request
+from fastapi import Request, Response
 
 DEFAULT_LOCALE = "pl"
 SUPPORTED_LOCALES = {"pl", "en"}
@@ -89,3 +89,23 @@ def inject_template_i18n(request: Request, context: dict[str, Any]) -> dict[str,
     context["locale_bcp47"] = to_bcp47(locale)
     context["t"] = get_translator(locale)
     return context
+
+
+def set_locale_cookie_if_param(response: Response, request: Request) -> None:
+    """
+    Set locale cookie if ?lang=xx query param is present and valid.
+    
+    Called after locale has been resolved and page rendered.
+    Sets httpOnly cookie with 365-day expiry and lax sameSite policy.
+    """
+    lang_param = request.query_params.get("lang")
+    if lang_param:
+        normalized = normalize_locale(lang_param)
+        if normalized in SUPPORTED_LOCALES:
+            response.set_cookie(
+                "locale",
+                normalized,
+                httpOnly=True,
+                sameSite="lax",
+                max_age=31536000,  # 365 days in seconds
+            )

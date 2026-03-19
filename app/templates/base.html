@@ -212,9 +212,31 @@
     <nav class="glass sticky top-0 z-40 border-b border-white/10">
         <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
             <h1 class="text-xl font-bold tracking-wide drop-shadow">✦ {{ t('app.name') }}</h1>
-            <form method="post" action="/auth/logout" class="inline">
-              <button type="submit" class="glass-btn-secondary rounded-xl px-4 py-2 text-sm font-medium">{{ t('nav.logout') }}</button>
-            </form>
+            <div class="flex items-center gap-2">
+                <!-- Language Switcher -->
+                <div class="relative inline-block group">
+                    <button id="locale-switcher" class="glass-btn-secondary rounded-xl px-3 py-1.5 text-sm font-medium flex items-center gap-1" title="Switch language">
+                        {% if locale == 'en' %}
+                            🇬🇧 English
+                        {% else %}
+                            🇵🇱 Polski
+                        {% endif %}
+                    </button>
+                    <div class="absolute right-0 mt-1 hidden w-32 rounded-lg bg-black/80 border border-white/20 py-1 shadow-lg group-hover:block">
+                        <button type="button" onclick="switchLocale('pl')" class="w-full text-left px-4 py-1.5 hover:bg-white/10 text-sm">
+                            🇵🇱 Polski
+                        </button>
+                        <button type="button" onclick="switchLocale('en')" class="w-full text-left px-4 py-1.5 hover:bg-white/10 text-sm">
+                            🇬🇧 English
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Logout -->
+                <form method="post" action="/auth/logout" class="inline">
+                    <button type="submit" class="glass-btn-secondary rounded-xl px-4 py-2 text-sm font-medium">{{ t('nav.logout') }}</button>
+                </form>
+            </div>
         </div>
     </nav>
 
@@ -223,6 +245,18 @@
     </main>
 
     <script>
+      // ── Language switcher ──────────────────────────────────────
+      function switchLocale(locale) {
+        // Write to localStorage for unauthenticated users
+        localStorage.setItem('locale', locale);
+        
+        // Reload page with ?lang=xx query param
+        // Server-side resolve_locale() will read it, set cookie, and render page
+        const url = new URL(window.location);
+        url.searchParams.set('lang', locale);
+        window.location.href = url.toString();
+      }
+
       // ── Theme persistence ────────────────────────────────────
       const htmlRoot = document.getElementById('html-root');
       const themeToggle = document.getElementById('theme-toggle');

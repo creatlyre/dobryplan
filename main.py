@@ -10,7 +10,7 @@ from fastapi.templating import Jinja2Templates
 from app.auth.dependencies import get_current_user
 from app.auth.routes import router as auth_router
 from app.events.routes import router as events_router
-from app.i18n import inject_template_i18n
+from app.i18n import inject_template_i18n, set_locale_cookie_if_param
 from app.middleware.auth_middleware import SessionValidationMiddleware
 from app.sync.routes import router as sync_router
 from app.users.routes import router as users_router
@@ -43,10 +43,12 @@ async def root(request: Request, user=Depends(get_current_user)):
             "now": datetime.utcnow(),
         },
     )
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         "calendar.html",
         context,
     )
+    set_locale_cookie_if_param(response, request)
+    return response
 
 
 @app.get("/invite", response_class=HTMLResponse)
@@ -58,10 +60,12 @@ async def invite_page(request: Request, user=Depends(get_current_user)):
             "user": user,
         },
     )
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         "invite.html",
         context,
     )
+    set_locale_cookie_if_param(response, request)
+    return response
 
 
 @app.get("/health")
