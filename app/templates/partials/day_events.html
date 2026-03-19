@@ -13,7 +13,7 @@
                     <div class="text-xs text-white/50 mt-0.5">{{ event.start_at.strftime('%H:%M') }} – {{ event.end_at.strftime('%H:%M') }}</div>
                 </div>
                 <div class="flex gap-2 ml-2 shrink-0">
-                    <button class="glass-btn-info rounded-lg px-2.5 py-1 text-xs font-medium" onclick="prefillEvent('{{ event.id }}', '{{ event.title|e }}', '{{ (event.description or '')|e }}', '{{ event.start_at.strftime('%Y-%m-%dT%H:%M') }}', '{{ event.end_at.strftime('%Y-%m-%dT%H:%M') }}')">Edit</button>
+                    <button class="glass-btn-info rounded-lg px-2.5 py-1 text-xs font-medium" onclick="prefillEvent('{{ event.id }}', '{{ event.title|e }}', '{{ (event.description or '')|e }}', '{{ event.start_at.strftime('%Y-%m-%dT%H:%M') }}', '{{ event.end_at.strftime('%Y-%m-%dT%H:%M') }}', '{{ event.visibility|default("shared") }}')">Edit</button>
                     <button class="glass-btn-danger rounded-lg px-2.5 py-1 text-xs font-medium" onclick="deleteEvent('{{ event.id }}')">Delete</button>
                 </div>
             </div>

@@ -234,6 +234,22 @@
           />
         </div>
 
+        <!-- Visibility -->
+        <div>
+          <label for="qa-parsed-visibility"
+                 class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
+            Visibility
+          </label>
+          <select
+            id="qa-parsed-visibility"
+            class="glass-input"
+          >
+            <option value="shared">Shared (household)</option>
+            <option value="private">Private (only me)</option>
+          </select>
+          <p class="mt-1 text-xs text-white/40">Shared events appear for all household members. Private events are only visible to you.</p>
+        </div>
+
         <!-- Save inline error -->
         <div id="qa-save-error" class="hidden rounded-xl border border-red-400/30 bg-red-900/20 px-3 py-2 text-xs text-red-300" role="alert"></div>
 

@@ -33,6 +33,15 @@
         <textarea id="event-entry-description" class="glass-input" rows="2" style="resize:vertical"></textarea>
       </div>
 
+      <div>
+        <label for="event-entry-visibility" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">Visibility</label>
+        <select id="event-entry-visibility" class="glass-input">
+          <option value="shared">Shared (household)</option>
+          <option value="private">Private (only me)</option>
+        </select>
+        <p class="mt-1 text-xs text-white/40">Shared events appear for all household members. Private events are only visible to you.</p>
+      </div>
+
       <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <div>
           <label for="event-entry-start-date" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">Start Date</label>

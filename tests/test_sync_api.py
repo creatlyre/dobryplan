@@ -108,6 +108,7 @@ def test_event_body_includes_default_popup_reminder(test_db):
         end_at=datetime(2026, 3, 20, 10, 0, 0),
         timezone="UTC",
         rrule=None,
+        created_by_user_id="user-1",
     )
 
     body = service._event_body(event)
@@ -129,7 +130,62 @@ def test_event_body_uses_per_event_reminder_minutes(test_db):
         timezone="UTC",
         rrule=None,
         reminder_minutes=5,
+        created_by_user_id="user-2",
     )
 
     body = service._event_body(event)
     assert body["reminders"]["overrides"][0]["minutes"] == 5
+
+
+# ── Phase 8 visibility-aware sync ─────────────────────────────────────────
+
+
+def test_event_body_includes_visibility_metadata(test_db):
+    service = GoogleSyncService(test_db)
+    event = SimpleNamespace(
+        id="evt-vis-1",
+        title="Private meeting",
+        description="",
+        start_at=datetime(2026, 3, 20, 9, 0, 0),
+        end_at=datetime(2026, 3, 20, 10, 0, 0),
+        timezone="UTC",
+        rrule=None,
+        visibility="private",
+        created_by_user_id="owner-123",
+    )
+    body = service._event_body(event)
+    ext_private = body["extendedProperties"]["private"]
+    assert ext_private["cp_event_id"] == "evt-vis-1"
+    assert ext_private["cp_visibility"] == "private"
+    assert ext_private["cp_owner_id"] == "owner-123"
+
+
+def test_event_body_defaults_visibility_to_shared(test_db):
+    service = GoogleSyncService(test_db)
+    event = SimpleNamespace(
+        id="evt-vis-2",
+        title="No visibility field",
+        description="",
+        start_at=datetime(2026, 3, 20, 9, 0, 0),
+        end_at=datetime(2026, 3, 20, 10, 0, 0),
+        timezone="UTC",
+        rrule=None,
+        created_by_user_id="owner-456",
+    )
+    body = service._event_body(event)
+    assert body["extendedProperties"]["private"]["cp_visibility"] == "shared"
+
+
+def test_extract_cp_visibility_valid():
+    ge = {"extendedProperties": {"private": {"cp_visibility": "private"}}}
+    assert GoogleSyncService._extract_cp_visibility(ge) == "private"
+
+
+def test_extract_cp_visibility_unknown_defaults_shared():
+    ge = {"extendedProperties": {"private": {"cp_visibility": "unknown"}}}
+    assert GoogleSyncService._extract_cp_visibility(ge) == "shared"
+
+
+def test_extract_cp_visibility_missing_defaults_shared():
+    assert GoogleSyncService._extract_cp_visibility({}) == "shared"
+    assert GoogleSyncService._extract_cp_visibility({"extendedProperties": {}}) == "shared"

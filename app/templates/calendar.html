@@ -137,6 +137,7 @@ const eventEntrySaveError = document.getElementById('event-entry-save-error');
 const eventEntryIdInput = document.getElementById('event-entry-id');
 const eventEntryTitleInput = document.getElementById('event-entry-title-input');
 const eventEntryDescriptionInput = document.getElementById('event-entry-description');
+const eventEntryVisibilityInput = document.getElementById('event-entry-visibility');
 const eventEntryStartDateInput = document.getElementById('event-entry-start-date');
 const eventEntryStartTimeInput = document.getElementById('event-entry-start-time');
 const eventEntryEndTimeInput = document.getElementById('event-entry-end-time');
@@ -247,11 +248,12 @@ function populateEventEntryFromDateTimeLocal(startAt, endAt) {
   }
 }
 
-function prefillEvent(eventId, title, description, startAt, endAt) {
+function prefillEvent(eventId, title, description, startAt, endAt, visibility) {
   resetEventEntryForm();
   eventEntryIdInput.value = eventId || '';
   eventEntryTitleInput.value = title || '';
   eventEntryDescriptionInput.value = description || '';
+  eventEntryVisibilityInput.value = visibility || 'shared';
   populateEventEntryFromDateTimeLocal(startAt, endAt);
   setEventEntryDateLocked(false);
   updateEventEntryValidation();
@@ -338,7 +340,8 @@ async function submitEventEntry(keepOpen) {
     start_at: startDate.toISOString(),
     end_at: endDate.toISOString(),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-    rrule: buildEventEntryRRule()
+    rrule: buildEventEntryRRule(),
+    visibility: eventEntryVisibilityInput.value
   };
 
   const eventId = eventEntryIdInput.value;
@@ -751,6 +754,8 @@ loadSyncStatus();
     });
     const rep = document.getElementById('qa-parsed-repeat');
     if (rep) rep.value = '';
+    const vis = document.getElementById('qa-parsed-visibility');
+    if (vis) vis.value = 'shared';
   }
 
   function toDatetimeLocal(isoString) {
@@ -858,11 +863,12 @@ loadSyncStatus();
     const startVal = document.getElementById('qa-parsed-start').value;
     const endVal   = document.getElementById('qa-parsed-end').value;
     return {
-      title:    document.getElementById('qa-parsed-title').value.trim(),
-      start_at: startVal ? new Date(startVal).toISOString() : null,
-      end_at:   endVal   ? new Date(endVal).toISOString()   : null,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-      rrule:    buildQARRule()
+      title:      document.getElementById('qa-parsed-title').value.trim(),
+      start_at:   startVal ? new Date(startVal).toISOString() : null,
+      end_at:     endVal   ? new Date(endVal).toISOString()   : null,
+      timezone:   Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+      rrule:      buildQARRule(),
+      visibility: document.getElementById('qa-parsed-visibility').value
     };
   }
 

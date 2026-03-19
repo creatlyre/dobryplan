@@ -149,7 +149,13 @@ class GoogleSyncService:
             "end": {"dateTime": event.end_at.isoformat(), "timeZone": event.timezone or "UTC"},
             "recurrence": [f"RRULE:{event.rrule}"] if event.rrule else [],
             "reminders": reminders,
-            "extendedProperties": {"private": {"cp_event_id": event.id}},
+            "extendedProperties": {
+                "private": {
+                    "cp_event_id": event.id,
+                    "cp_visibility": getattr(event, "visibility", "shared") or "shared",
+                    "cp_owner_id": event.created_by_user_id,
+                }
+            },
         }
 
     @staticmethod
@@ -195,6 +201,15 @@ class GoogleSyncService:
         if isinstance(cp_event_id, str) and cp_event_id.strip():
             return cp_event_id.strip()
         return None
+
+    @staticmethod
+    def _extract_cp_visibility(google_event: dict) -> str:
+        ext = google_event.get("extendedProperties") or {}
+        private = ext.get("private") or {}
+        vis = private.get("cp_visibility")
+        if vis in ("shared", "private"):
+            return vis
+        return "shared"
 
     def _find_local_event_by_google_id(self, calendar_id: str, google_event_id: str) -> Event | None:
         rows = self.db.select(
@@ -289,6 +304,7 @@ class GoogleSyncService:
                 "end_at": end_at.isoformat(),
                 "timezone": timezone,
                 "rrule": rrule,
+                "visibility": self._extract_cp_visibility(google_event),
                 "google_event_id": google_event_id,
                 "google_sync_at": datetime.utcnow().isoformat(),
                 "is_deleted": False,
@@ -305,8 +321,19 @@ class GoogleSyncService:
         )
         return items[0] if items else None
 
-    def sync_event_for_household(self, event: Event, deleted: bool = False) -> SyncResult:
+    def _sync_recipients(self, event: Event) -> list[User]:
+        """Return the list of users who should receive this event via Google sync.
+
+        Shared events go to all household users. Private events go only to the owner.
+        """
         users = self._household_users(event.calendar_id)
+        visibility = getattr(event, "visibility", "shared") or "shared"
+        if visibility == "private":
+            return [u for u in users if u.id == event.created_by_user_id]
+        return users
+
+    def sync_event_for_household(self, event: Event, deleted: bool = False) -> SyncResult:
+        users = self._sync_recipients(event)
         synced_users = 0
         synced_events = 0
         errors: list[str] = []

@@ -386,3 +386,43 @@ def test_invite_back_link_present(authenticated_client):
     assert 'href="/calendar"' in html
     assert "Back to Calendar" in html
     assert "focus-visible:ring-cyan-300" in html
+
+
+# ── Phase 8 visibility controls ───────────────────────────────────────────
+
+
+def test_event_entry_visibility_control_present(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert 'id="event-entry-visibility"' in html
+    assert "Shared (household)" in html
+    assert "Private (only me)" in html
+    assert 'value="shared"' in html
+    assert 'value="private"' in html
+
+
+def test_quick_add_visibility_control_present(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert 'id="qa-parsed-visibility"' in html
+    assert "Shared (household)" in html
+    assert "Private (only me)" in html
+
+
+def test_event_entry_submit_includes_visibility(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert "visibility: eventEntryVisibilityInput.value" in html
+
+
+def test_quick_add_payload_includes_visibility(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert "visibility: document.getElementById('qa-parsed-visibility').value" in html
+
+
+def test_quick_add_clear_review_resets_visibility(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert "qa-parsed-visibility" in html
+    assert "vis.value = 'shared'" in html
+
+
+def test_prefill_event_accepts_visibility(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert "eventEntryVisibilityInput.value = visibility || 'shared'" in html
