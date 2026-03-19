@@ -45,7 +45,7 @@ Plans:
 **Goal:** Ensure NLP and OCR event parsing supports Polish language input (including diacritics) with parity to existing English parsing flows.
 **Requirements**: I18N-07
 **Depends on:** Phase 8, Phase 9
-**Plans:** 0/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 10-01-PLAN.md - Add locale-aware NLP/OCR parsing contracts for Polish text and diacritics

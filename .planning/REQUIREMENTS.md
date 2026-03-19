@@ -56,7 +56,7 @@
 - [ ] **I18N-04**: Calendar, auth, events, sync, NLP, and OCR user-facing labels/messages are available in both Polish and English
 - [ ] **I18N-05**: Date and time presentation follows selected locale conventions (Polish vs English)
 - [ ] **I18N-06**: Automated test coverage verifies Polish default and English switching behavior on key user flows
-- [ ] **I18N-07**: NLP and OCR parsing accept Polish phrases and diacritics (ą, ć, ę, ł, ń, ó, ś, ź, ż) with behavior parity to English parsing flows
+- [x] **I18N-07**: NLP and OCR parsing accept Polish phrases and diacritics (ą, ć, ę, ł, ń, ó, ś, ź, ż) with behavior parity to English parsing flows
 
 ## v2 Requirements
 
