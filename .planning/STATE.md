@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-19T12:18:36.929Z"
+last_updated: "2026-03-19T14:04:44.335Z"
 progress:
   total_phases: 6
-  completed_phases: 5
-  total_plans: 17
-  completed_plans: 17
+  completed_phases: 6
+  total_plans: 18
+  completed_plans: 18
 ---
 
 # State: CalendarPlanner
@@ -21,8 +21,8 @@ progress:
 
 ## Current Position
 
-Phase: 05 (natural-language-input) — COMPLETE
-Plan: 5 of 5 (all complete)
+Phase: 06 (image-ocr-event-extraction) — COMPLETE
+Plan: 1 of 1 (all complete)
 
 ## Phase Status
 
@@ -33,7 +33,7 @@ Plan: 5 of 5 (all complete)
 | 3. Recurring Events | Complete | 100% | 2026-03-18 |
 | 4. Google Calendar Sync | Complete | 100% | 2026-03-18 |
 | 5. Natural Language Input | Complete | 100% | 2026-03-19 |
-| 6. Image / OCR | Not started | 0% | 2026-03-18 |
+| 6. Image / OCR | Complete | 100% | 2026-03-19 |
 
 ---
 
@@ -43,7 +43,7 @@ Plan: 5 of 5 (all complete)
 A shared calendar both partners can edit that stays in sync with Google Calendar, so the family schedule is always current everywhere — on the web and on their phones.
 
 **Current Focus:**  
-Phase 05 — natural-language-input
+Milestone wrap-up (audit, complete, cleanup)
 
 **Current Milestone:**  
 v1.0 — Foundation through Image OCR (6 phases, 23 requirements)
@@ -66,6 +66,8 @@ v1.0 — Foundation through Image OCR (6 phases, 23 requirements)
 | 05-04 parse timezone source | Parse endpoint now resolves timezone from authenticated user/calendar context with UTC fallback | Approved |
 | 05-05 year disambiguation rule | ambiguous flag emitted only when month/day is still in future (both years plausible); past month/day silently picks next year | Approved |
 | 05-05 disambiguation gate | _ambiguityPending gates saveEvent; year choice dynamically rendered from year_candidates; selectAmbiguousYear clones parsed data and applies setFullYear | Approved |
+| 06-01 OCR runtime strategy | EasyOCR remains optional at runtime; endpoint returns actionable OCR-unavailable error instead of breaking app startup | Approved |
+| 06-01 OCR review path | OCR parse result always enters review/fallback flow before save; no auto-save behavior | Approved |
 
 ---
 
@@ -138,11 +140,14 @@ v1.0 — Foundation through Image OCR (6 phases, 23 requirements)
 - Automated validation: `.venv\\Scripts\\python.exe -m pytest -q tests/test_calendar_views.py` (13 passed)
 - Phase 5 plan 04 executed: NLP parser regressions fixed (plain weekday anchors, `in N days` hour semantics, recurrence-only anchor defaults) and parse timezone propagation wired from user/calendar context
 - Automated validation: `.venv\\Scripts\\python.exe -m pytest -q tests/test_nlp.py tests/test_events_api.py` (34 passed)
+- Phase 5 roadmap drift reconciled: roadmap phase status, plan checklist, and traceability statuses aligned with completed Phase 5 summaries
+- Phase 6 discuss/plan/execute completed: OCR service and `/api/events/ocr-parse` endpoint, quick-add Scan Image flow, confidence-aware review, fallback with raw OCR text
+- Automated validation: `.venv\\Scripts\\python.exe -m pytest -q tests/test_events_api.py tests/test_calendar_views.py tests/test_nlp.py` (57 passed)
 
 **What comes next:**
 
 ```
-Next Action: `/gsd-next`
+Next Action: `/gsd-complete-milestone`
 Command to run:
 node "$HOME/.copilot/get-shit-done/bin/gsd-tools.cjs" next
 ```
