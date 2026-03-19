@@ -170,8 +170,10 @@ fetch('/api/users/household')
   const qaErrorInline = document.getElementById('qa-error-inline');
   const qaSaveError   = document.getElementById('qa-save-error');
   const qaSrStatus    = document.getElementById('qa-sr-status');
+  const qaLiveRegion  = document.getElementById('qa-live-region');
 
   let _saveInFlight = false;
+  let qaParseFailures = 0;
 
   // ── Open / Close helpers ────────────────────────────────────────────────
   function openModal() {
@@ -191,6 +193,7 @@ fetch('/api/users/household')
   function resetModal() {
     showPhase('text-entry');
     qaTextInput.value = '';
+    qaParseFailures = 0;  // Reset failure counter
     hideError();
     hideSaveError();
     clearReviewFields();
@@ -202,9 +205,10 @@ fetch('/api/users/household')
     qaLoading.classList.toggle('hidden', phase !== 'loading');
     qaLoading.setAttribute('aria-hidden', phase !== 'loading' ? 'true' : 'false');
     qaReview.classList.toggle('hidden', phase !== 'review');
+    document.getElementById('qa-fallback-phase').classList.toggle('hidden', phase !== 'fallback');
   }
 
-  // ── Error display ────────────────────────────────────────────────────────
+  // ── Error display with user-friendly "What + Why + Fix" format ──────────
   function showError(message, examples) {
     qaErrorInline.classList.remove('hidden');
     document.getElementById('qa-error-summary').textContent = message;
@@ -217,6 +221,60 @@ fetch('/api/users/household')
       examplesEl.classList.add('hidden');
     }
     qaSrStatus.textContent = message;
+  }
+  
+  function showQAError(errorType, details = '') {
+    // Map error types to user-friendly "What + Why + Fix" messages
+    const errorMessages = {
+      'past_date': {
+        what: 'The date is in the past',
+        why: 'We can only create events for today or future dates.',
+        fix: 'Edit "last Friday" to "next Friday" or pick a future date.'
+      },
+      'no_anchor': {
+        what: 'I couldn\'t figure out the date',
+        why: 'You said when (like "2pm") but not which day.',
+        fix: 'Add a date or day: "Tuesday at 2pm" or "March 15 at 2pm".'
+      },
+      'conflicting_date': {
+        what: 'The date description is confusing',
+        why: 'You said two different dates (e.g., "March 15 or April 20").',
+        fix: 'Pick one date or rephrase: "March 15 at 2pm".'
+      },
+      'no_title': {
+        what: 'I didn\'t catch what the event is about',
+        why: 'You said when but not what.',
+        fix: 'Add an event name: "dentist Thursday 2pm".'
+      },
+      'network_error': {
+        what: 'Network error',
+        why: 'Could not reach the server.',
+        fix: 'Check your connection and try again.'
+      },
+      'parse_failed': {
+        what: 'Parse failed',
+        why: 'Could not understand the text.',
+        fix: 'Try rephrasing more clearly or use manual entry.'
+      }
+    };
+
+    const msg = errorMessages[errorType] || {
+      what: details || 'Parse failed',
+      why: 'Unknown error occurred.',
+      fix: 'Try rephrasing or switch to manual entry.'
+    };
+
+    const errorSummary = document.getElementById('qa-error-summary');
+    const errorWhy = document.getElementById('qa-error-why');
+    
+    errorSummary.textContent = msg.what;
+    errorWhy.innerHTML = `<strong>Why:</strong> ${msg.why}<br/><strong>Fix:</strong> ${msg.fix}`;
+    
+    qaErrorInline.classList.remove('hidden');
+    
+    // Live region announcement for screen readers
+    qaLiveRegion.setAttribute('role', 'alert');
+    qaLiveRegion.textContent = `Error: ${msg.what}. ${msg.fix}`;
   }
 
   function hideError() {
@@ -239,7 +297,11 @@ fetch('/api/users/household')
     ['qa-parsed-title', 'qa-parsed-start', 'qa-parsed-end',
      'qa-parsed-count', 'qa-parsed-until'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.value = '';
+      if (el) {
+        el.value = '';
+        el.classList.remove('border-yellow-500', 'bg-yellow-50');
+        el.removeAttribute('aria-describedby');
+      }
     });
     const rep = document.getElementById('qa-parsed-repeat');
     if (rep) rep.value = '';
@@ -257,9 +319,30 @@ fetch('/api/users/household')
 
   function populateReview(originalText, parsed) {
     document.getElementById('qa-review-original-text').textContent = originalText;
-    document.getElementById('qa-parsed-title').value  = parsed.title || '';
-    document.getElementById('qa-parsed-start').value  = toDatetimeLocal(parsed.start_at);
+    
+    const titleField = document.getElementById('qa-parsed-title');
+    const startField = document.getElementById('qa-parsed-start');
+    
+    titleField.value  = parsed.title || '';
+    startField.value  = toDatetimeLocal(parsed.start_at);
     document.getElementById('qa-parsed-end').value    = toDatetimeLocal(parsed.end_at);
+
+    // Apply yellow highlight to low-confidence fields (< 0.9)
+    if (parsed.confidence_title < 0.9) {
+      titleField.classList.add('border-yellow-500', 'bg-yellow-50');
+      titleField.setAttribute('aria-describedby', 'qa-check-title-label');
+    } else {
+      titleField.classList.remove('border-yellow-500', 'bg-yellow-50');
+      titleField.removeAttribute('aria-describedby');
+    }
+
+    if (parsed.confidence_date < 0.9) {
+      startField.classList.add('border-yellow-500', 'bg-yellow-50');
+      startField.setAttribute('aria-describedby', 'qa-check-date-label');
+    } else {
+      startField.classList.remove('border-yellow-500', 'bg-yellow-50');
+      startField.removeAttribute('aria-describedby');
+    }
 
     // Highlight auto-picked date note
     const noteEl = document.getElementById('qa-review-note');
@@ -281,6 +364,15 @@ fetch('/api/users/household')
           parsed.recurrence.until.split('T')[0];
       }
     }
+    
+    // Live region announcement
+    const confidenceNote = [];
+    if (parsed.confidence_date < 0.9) confidenceNote.push('Date is uncertain, please check.');
+    if (parsed.confidence_title < 0.9) confidenceNote.push('Title may need correction.');
+    
+    const announcement = `Parsed: ${parsed.title || 'no title'} on ${new Date(parsed.start_at).toLocaleDateString()}. ${confidenceNote.join(' ')}`;
+    qaLiveRegion.setAttribute('role', 'status');
+    qaLiveRegion.textContent = announcement;
   }
 
   // ── Build rrule string from review fields ─────────────────────────────
@@ -321,8 +413,7 @@ fetch('/api/users/household')
   qaParseBtn.addEventListener('click', async () => {
     const text = qaTextInput.value.trim();
     if (!text) {
-      showError('Please enter some text to parse.',
-        ['dentist Thursday 14:00', 'meeting next Friday 10am', 'weekly standup Monday 09:00']);
+      showQAError('no_title');
       return;
     }
     hideError();
@@ -341,15 +432,15 @@ fetch('/api/users/household')
       });
 
       if (!res.ok) {
-        let errMsg = 'Could not parse that text.';
-        try {
-          const data = await res.json();
-          if (data.detail) errMsg = data.detail;
-          else if (Array.isArray(data.errors)) errMsg = data.errors[0] || errMsg;
-        } catch (_) {}
+        qaParseFailures++;
+        const data = await res.json().catch(() => ({}));
         showPhase('text-entry');
-        showError(errMsg,
-          ['dentist Thursday 14:00', 'meeting next Friday 10am']);
+        showQAError('parse_failed', data.detail || 'Could not parse that text.');
+        
+        // After 2+ failures, offer fallback form
+        if (qaParseFailures >= 2) {
+          showQAFallbackOption();
+        }
         return;
       }
 
@@ -357,21 +448,161 @@ fetch('/api/users/household')
 
       // NLPService may return errors inside a 200 response
       if (parsed.errors && parsed.errors.length > 0) {
+        qaParseFailures++;
         showPhase('text-entry');
-        showError(parsed.errors[0],
-          ['dentist Thursday 14:00', 'meeting next Friday 10am']);
+        // Try to categorize the error type from the error message
+        const errorMsg = parsed.errors[0];
+        let errorType = 'parse_failed';
+        if (errorMsg.includes('past')) errorType = 'past_date';
+        else if (errorMsg.includes('date') || errorMsg.includes('anchor')) errorType = 'no_anchor';
+        else if (errorMsg.includes('conflicting')) errorType = 'conflicting_date';
+        else if (errorMsg.includes('title') || errorMsg.includes('event')) errorType = 'no_title';
+        
+        showQAError(errorType, errorMsg);
+        
+        // After 2+ failures, offer fallback form
+        if (qaParseFailures >= 2) {
+          showQAFallbackOption();
+        }
         return;
       }
 
+      qaParseFailures = 0;  // Reset on successful parse
       populateReview(text, parsed);
       showPhase('review');
       document.getElementById('qa-parsed-title').focus();
       qaSrStatus.textContent = 'Parsed. Review your event details.';
 
-    } catch (_) {
+    } catch (err) {
+      qaParseFailures++;
       showPhase('text-entry');
-      showError('Network error — check your connection and try again.', []);
+      showQAError('network_error');
     }
+  });
+
+  // ── Fallback Form Handlers ──────────────────────────────────────────────
+  function showQAFallbackOption() {
+    // Add "Try manual entry instead" button to error area
+    const existingBtn = document.getElementById('qa-fallback-try-btn');
+    if (existingBtn) return; // Already added
+    
+    const fallbackBtn = document.createElement('button');
+    fallbackBtn.id = 'qa-fallback-try-btn';
+    fallbackBtn.type = 'button';
+    fallbackBtn.className = 'w-full rounded bg-yellow-500 px-4 py-2 text-sm text-gray-900 hover:bg-yellow-600 mt-2 font-medium';
+    fallbackBtn.textContent = 'Try manual entry instead';
+    fallbackBtn.addEventListener('click', showQAFallback);
+    
+    qaErrorInline.appendChild(fallbackBtn);
+  }
+
+  function showQAFallback() {
+    showPhase('fallback');
+    
+    // Prefill fallback form with original text and default values
+    const originalText = qaTextInput.value || '';
+    document.getElementById('qa-fallback-original-text').textContent = originalText;
+    
+    // Try to extract title from first few words
+    const titleGuess = originalText.split(' ').slice(0, 3).join(' ');
+    document.getElementById('qa-fallback-title').value = titleGuess;
+    
+    // Prefill with current time and +1 hour default
+    const now = new Date();
+    const end = new Date(now.getTime() + 3600000); // +1 hour
+    
+    document.getElementById('qa-fallback-start').value = 
+      now.toLocaleString('sv-SE', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+      }).replace(' ', 'T');
+    
+    document.getElementById('qa-fallback-end').value = 
+      end.toLocaleString('sv-SE', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+      }).replace(' ', 'T');
+    
+    // Focus on title field
+    document.getElementById('qa-fallback-title').focus();
+    
+    // Announce via live region
+    qaLiveRegion.textContent = 'Using manual entry form. Fill in the event details.';
+  }
+
+  document.getElementById('qa-fallback-save-btn').addEventListener('click', async () => {
+    const title = document.getElementById('qa-fallback-title').value.trim();
+    const startStr = document.getElementById('qa-fallback-start').value;
+    const endStr = document.getElementById('qa-fallback-end').value;
+    const description = document.getElementById('qa-fallback-description').value.trim();
+    const repeat = document.getElementById('qa-fallback-repeat').value;
+    const count = document.getElementById('qa-fallback-count').value;
+    const until = document.getElementById('qa-fallback-until').value;
+    
+    // Validation
+    if (!title) {
+      alert('Event name is required.');
+      return;
+    }
+    if (!startStr) {
+      alert('Start date/time is required.');
+      return;
+    }
+    if (!endStr) {
+      alert('End date/time is required.');
+      return;
+    }
+    
+    _saveInFlight = true;
+    document.getElementById('qa-fallback-save-btn').disabled = true;
+    document.getElementById('qa-fallback-cancel-btn').disabled = true;
+    
+    try {
+      // Build RRULE if repeat is selected
+      let rrule = null;
+      if (repeat) {
+        const parts = [`FREQ=${repeat}`];
+        if (count) parts.push(`COUNT=${parseInt(count, 10)}`);
+        if (until) parts.push(`UNTIL=${until.replaceAll('-', '')}T235959Z`);
+        rrule = parts.join(';');
+      }
+      
+      const payload = {
+        title,
+        description: description || undefined,
+        start_at: new Date(startStr).toISOString(),
+        end_at: new Date(endStr).toISOString(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+        rrule: rrule
+      };
+      
+      const res = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err.detail || 'Failed to save event.');
+        return;
+      }
+      
+      showToast('Event saved');
+      closeModal();
+      await refreshPanels();
+    } catch (error) {
+      alert('Network error: ' + error.message);
+    } finally {
+      _saveInFlight = false;
+      document.getElementById('qa-fallback-save-btn').disabled = false;
+      document.getElementById('qa-fallback-cancel-btn').disabled = false;
+    }
+  });
+
+  document.getElementById('qa-fallback-cancel-btn').addEventListener('click', () => {
+    showPhase('text-entry');
+    qaTextInput.focus();
   });
 
   // ── Save ─────────────────────────────────────────────────────────────────
@@ -448,6 +679,53 @@ fetch('/api/users/household')
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !qaModal.classList.contains('hidden') && !_saveInFlight) {
       closeModal();
+    }
+  });
+
+  // ── Focus Trap & Keyboard Navigation (WCAG 2.1 AA) ──────────────────────
+  const qaFocusableSelector = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  
+  function getVisibleFocusableElements() {
+    const all = Array.from(qaModal.querySelectorAll(qaFocusableSelector));
+    // Filter to only visible elements (not hidden by display: none or hidden class)
+    return all.filter(el => {
+      const rect = el.getBoundingClientRect();
+      const style = window.getComputedStyle(el);
+      const parentHidden = el.closest('[style*="display: none"]') || 
+                          el.closest('.hidden');
+      const selfHidden = style.display === 'none' || 
+                         style.visibility === 'hidden' ||
+                         el.hasAttribute('aria-hidden');
+      return (rect.width > 0 || rect.height > 0) && !selfHidden && !parentHidden;
+    });
+  }
+  
+  // Enhanced Tab/Shift+Tab handling for focus trap
+  document.addEventListener('keydown', (e) => {
+    if (qaModal.classList.contains('hidden') || _saveInFlight) return;
+    
+    if (e.key === 'Tab') {
+      const focusableElements = getVisibleFocusableElements();
+      if (focusableElements.length === 0) return;
+      
+      const activeEl = document.activeElement;
+      const activeIndex = focusableElements.indexOf(activeEl);
+      
+      if (e.shiftKey) {
+        // Shift+Tab: move focus backward
+        if (activeIndex <= 0) {
+          // Wrap to last element
+          focusableElements[focusableElements.length - 1].focus();
+          e.preventDefault();
+        }
+      } else {
+        // Tab: move focus forward
+        if (activeIndex >= focusableElements.length - 1) {
+          // Wrap to first element
+          focusableElements[0].focus();
+          e.preventDefault();
+        }
+      }
     }
   });
 

@@ -43,16 +43,28 @@
         aria-describedby="qa-error-summary"
       />
 
-      <!-- Inline error area (hidden by default) -->
-      <div id="qa-error-inline" class="mt-2 hidden" role="alert" aria-live="assertive">
-        <p id="qa-error-summary" class="text-xs font-medium text-red-600"></p>
-        <p id="qa-error-examples" class="mt-1 hidden text-xs text-gray-500">
-          Try: <span id="qa-examples-list"></span>
-        </p>
+      <!-- Inline error area (hidden by default) - structured "What + Why + Fix" -->
+      <div id="qa-error-inline" class="mt-2 hidden p-3 bg-red-50 border border-red-200 rounded" role="alert" aria-live="assertive">
+        <p id="qa-error-summary" class="text-sm text-red-800 font-medium"></p>
+        <p id="qa-error-why" class="text-xs text-red-700 mt-1"></p>
+        <button id="qa-error-retry-link" type="button" class="text-xs text-red-600 hover:underline mt-2 hidden">
+          Try again
+        </button>
       </div>
 
       <!-- Status region for screen readers -->
       <div id="qa-sr-status" aria-live="polite" class="sr-only"></div>
+      
+      <!-- Live region for parse review announcements -->
+      <div id="qa-live-region" role="region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+      
+      <!-- Hidden labels for yellow-highlighted uncertain fields -->
+      <div id="qa-check-title-label" class="sr-only">
+        This field was uncertain in parsing. Please review.
+      </div>
+      <div id="qa-check-date-label" class="sr-only">
+        This date was uncertain in parsing. Please review.
+      </div>
 
       <div class="mt-4 flex gap-2">
         <button
@@ -214,6 +226,9 @@
       </div>
     </div>
 
+    <!-- ── Fallback Phase (manual entry) ────────────────────────────────── -->
+    {% include 'partials/fallback_form.html' %}
+
   </div>
 </div>
 
@@ -225,6 +240,42 @@
       max-height: 100vh;
       min-height: 100vh;
       border-radius: 0;
+    }
+  }
+  
+  /* Screen reader only content */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  
+  /* Yellow highlight for uncertain fields */
+  .qa-uncertain {
+    @apply border-yellow-500 bg-yellow-50;
+  }
+  
+  /* High contrast mode support */
+  @media (prefers-contrast: more) {
+    #qa-error-inline {
+      border-width: 2px;
+    }
+    .qa-uncertain {
+      border-width: 2px;
+      font-weight: 500;
+    }
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    #qa-loading {
+      animation: none;
     }
   }
 </style>
