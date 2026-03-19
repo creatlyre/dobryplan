@@ -98,105 +98,128 @@ def test_day_view_ignores_malformed_recurrence_rule(authenticated_client, test_u
 
 # ── Quick Add modal (server-rendered HTML presence) ───────────────────────────
 
-def test_quick_add_button_present_on_calendar_page(authenticated_client):
-    """Quick Add button is rendered in the Event Editor card."""
+def _calendar_html(authenticated_client):
     response = authenticated_client.get("/")
     assert response.status_code == 200
-    assert 'id="qa-open-btn"' in response.text
+    return response.text
 
 
-def test_quick_add_modal_markup_present(authenticated_client):
-    """Modal container and key phases are present in the page HTML."""
-    response = authenticated_client.get("/")
-    assert response.status_code == 200
-    html = response.text
-    assert 'id="quick-add-modal"' in html
-    assert 'id="qa-text-entry"' in html
-    assert 'id="qa-text-input"' in html
-    assert 'id="qa-parse-btn"' in html
-    assert 'id="qa-review-phase"' in html
-    assert 'id="qa-loading"' in html
+def test_quick_add_modal_opens_on_button_click(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert 'id="qa-open-btn"' in html
+    assert "addEventListener('click', openModal)" in html
+    assert "qaModal.classList.remove('hidden')" in html
+    assert "qaTextInput.focus()" in html
 
 
-def test_quick_add_review_form_fields_present(authenticated_client):
-    """Review form contains all required input fields."""
-    response = authenticated_client.get("/")
-    assert response.status_code == 200
-    html = response.text
-    assert 'id="qa-parsed-title"' in html
-    assert 'id="qa-parsed-start"' in html
-    assert 'id="qa-parsed-end"' in html
-    assert 'id="qa-parsed-repeat"' in html
-    assert 'id="qa-parsed-count"' in html
-    assert 'id="qa-parsed-until"' in html
-    assert 'id="qa-save-btn"' in html
-    assert 'id="qa-save-another-btn"' in html
-    assert 'id="qa-back-btn"' in html
-
-
-def test_quick_add_parse_endpoint_reachable(authenticated_client):
-    """POST /api/events/parse returns a valid ParseResult for a simple phrase."""
-    from datetime import date
+def test_quick_add_parse_successful(authenticated_client):
     response = authenticated_client.post(
         "/api/events/parse",
-        json={"text": "dentist tomorrow", "context_date": date.today().isoformat()},
+        json={"text": "dentist tomorrow 2pm", "context_date": "2026-03-19"},
     )
     assert response.status_code == 200
     data = response.json()
-    assert "title" in data
-    assert "start_at" in data
+    assert data["title"]
+    assert data["start_at"] is not None
+    assert "errors" in data
+
+    html = _calendar_html(authenticated_client)
+    assert "populateReview(text, parsed)" in html
+    assert "showPhase('review')" in html
+    assert 'id="qa-parsed-title"' in html
+    assert 'id="qa-parsed-start"' in html
+    assert 'id="qa-parsed-end"' in html
 
 
-def test_quick_add_error_area_markup_present(authenticated_client):
-    """Inline error area and 'Edit text' link are present in the modal HTML."""
-    response = authenticated_client.get("/")
+def test_quick_add_parse_error_handling(authenticated_client):
+    response = authenticated_client.post(
+        "/api/events/parse",
+        json={"text": "meeting at 2pm", "context_date": "2026-03-19"},
+    )
     assert response.status_code == 200
-    html = response.text
+    data = response.json()
+    assert "errors" in data
+    assert isinstance(data["errors"], list)
+
+    html = _calendar_html(authenticated_client)
     assert 'id="qa-error-inline"' in html
     assert 'id="qa-error-summary"' in html
-    assert 'id="qa-save-error"' in html
+    assert "showQAError(" in html
+    assert "showPhase('text-entry')" in html
 
 
-def test_quick_add_save_event_via_api(authenticated_client):
-    """Saving a quick-add event via POST /api/events works end-to-end."""
-    from datetime import datetime, timedelta
+def test_quick_add_save_event(authenticated_client):
     now = datetime.utcnow().replace(microsecond=0)
     response = authenticated_client.post(
         "/api/events",
         json={
-            "title": "Quick add test event",
+            "title": "Quick add save",
             "start_at": (now + timedelta(hours=2)).isoformat(),
             "end_at": (now + timedelta(hours=3)).isoformat(),
             "timezone": "UTC",
         },
     )
     assert response.status_code == 201
-    data = response.json()
-    assert data["title"] == "Quick add test event"
+    assert response.json()["title"] == "Quick add save"
+
+    html = _calendar_html(authenticated_client)
+    assert "showToast('Event saved')" in html
+    assert "closeModal();" in html
+    assert "await refreshPanels();" in html
 
 
-def test_quick_add_js_orchestration_present(authenticated_client):
-    """JavaScript for quick-add orchestration is embedded in the page."""
-    response = authenticated_client.get("/")
-    assert response.status_code == 200
-    html = response.text
-    # Core JS function names from the orchestration block
-    assert "qa-parse-btn" in html
-    assert "/api/events/parse" in html
-    assert "saveEvent" in html
-    assert "resetModal" in html
+def test_quick_add_save_and_add_another(authenticated_client):
+    now = datetime.utcnow().replace(microsecond=0)
+    response = authenticated_client.post(
+        "/api/events",
+        json={
+            "title": "Quick add save another",
+            "start_at": (now + timedelta(hours=4)).isoformat(),
+            "end_at": (now + timedelta(hours=5)).isoformat(),
+            "timezone": "UTC",
+        },
+    )
+    assert response.status_code == 201
+
+    html = _calendar_html(authenticated_client)
+    assert "if (keepOpen)" in html
+    assert "resetModal();" in html
+    assert "qaTextInput.focus();" in html
 
 
-def test_quick_add_escape_guard_code_present(authenticated_client):
-    """Escape-key guard (no close during in-flight save) is in page JS."""
-    response = authenticated_client.get("/")
-    assert response.status_code == 200
-    assert "_saveInFlight" in response.text
+def test_quick_add_escape_closes_modal(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert "if (e.key === 'Escape'" in html
+    assert "!_saveInFlight" in html
+    assert "closeModal();" in html
 
 
-def test_quick_add_mobile_css_present(authenticated_client):
-    """Mobile full-screen CSS override for modal is in the page."""
-    response = authenticated_client.get("/")
-    assert response.status_code == 200
-    assert "max-width: 640px" in response.text
-    assert "qa-modal-panel" in response.text
+def test_quick_add_back_button(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert "qa-back-btn" in html
+    assert "addEventListener('click', () =>" in html
+    assert "showPhase('text-entry')" in html
+    assert "qaTextInput.focus();" in html
+
+
+def test_quick_add_edit_review_fields(authenticated_client):
+    now = datetime.utcnow().replace(microsecond=0)
+    response = authenticated_client.post(
+        "/api/events",
+        json={
+            "title": "dentist appointment",
+            "start_at": (now + timedelta(days=1, hours=1)).isoformat(),
+            "end_at": (now + timedelta(days=1, hours=2)).isoformat(),
+            "timezone": "UTC",
+            "rrule": "FREQ=WEEKLY;COUNT=3",
+        },
+    )
+    assert response.status_code == 201
+    event = response.json()
+    assert event["title"] == "dentist appointment"
+    assert event["rrule"] == "FREQ=WEEKLY;COUNT=3"
+
+    html = _calendar_html(authenticated_client)
+    assert 'id="qa-parsed-title"' in html
+    assert 'id="qa-parsed-repeat"' in html
+    assert 'id="qa-save-btn"' in html
