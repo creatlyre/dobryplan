@@ -1,9 +1,9 @@
 <!-- Fallback Form: Manual event entry after 2+ failed parse attempts -->
 <div id="qa-fallback-phase" class="hidden px-6 py-4">
   <div class="mb-4">
-    <h3 class="font-medium text-white">Manual Event Entry</h3>
+    <h3 class="font-medium text-white">{{ t('qa.manual_entry') }}</h3>
     <p class="text-xs text-white/60 mt-1">
-      We couldn't figure out your text. Here's what you typed, and a form to fill in manually:
+      {{ t('qa.manual_announce') }}
     </p>
     <div class="mt-3 p-3 bg-white/5 rounded-xl border border-white/15">
       <p class="font-mono text-xs text-white/70">
@@ -16,13 +16,13 @@
     <!-- Title -->
     <div>
       <label for="qa-fallback-title" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-        Event Name <span class="text-red-400">*</span>
+        {{ t('qa.title') }} <span class="text-red-400">*</span>
       </label>
       <input 
         id="qa-fallback-title" 
         type="text" 
         class="glass-input" 
-        placeholder="e.g., Dentist appointment"
+        placeholder="{{ t('qa.placeholder') }}"
         required
       />
     </div>
@@ -31,7 +31,7 @@
     <div class="grid grid-cols-2 gap-2">
       <div>
         <label for="qa-fallback-start" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-          Start Date/Time <span class="text-red-400">*</span>
+          {{ t('qa.start') }} <span class="text-red-400">*</span>
         </label>
         <input 
           id="qa-fallback-start" 
@@ -42,7 +42,7 @@
       </div>
       <div>
         <label for="qa-fallback-end" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-          End Date/Time <span class="text-red-400">*</span>
+          {{ t('qa.end') }} <span class="text-red-400">*</span>
         </label>
         <input 
           id="qa-fallback-end" 
@@ -56,7 +56,7 @@
     <!-- Description -->
     <div>
       <label for="qa-fallback-description" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-        Description (optional)
+        {{ t('event_entry.description') }}
       </label>
       <textarea 
         id="qa-fallback-description" 
@@ -70,22 +70,22 @@
     <div class="grid grid-cols-2 gap-2">
       <div>
         <label for="qa-fallback-repeat" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-          Repeat
+          {{ t('qa.repeat') }}
         </label>
         <select 
           id="qa-fallback-repeat" 
           class="glass-input"
         >
-          <option value="">No repeat</option>
-          <option value="DAILY">Daily</option>
-          <option value="WEEKLY">Weekly</option>
-          <option value="MONTHLY">Monthly</option>
-          <option value="YEARLY">Yearly</option>
+          <option value="">{{ t('qa.no_repeat') }}</option>
+          <option value="DAILY">{{ t('qa.repeat_daily') }}</option>
+          <option value="WEEKLY">{{ t('qa.repeat_weekly') }}</option>
+          <option value="MONTHLY">{{ t('qa.repeat_monthly') }}</option>
+          <option value="YEARLY">{{ t('qa.repeat_yearly') }}</option>
         </select>
       </div>
       <div>
         <label for="qa-fallback-count" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-          Count (optional)
+          {{ t('qa.count') }}
         </label>
         <input 
           id="qa-fallback-count" 
@@ -100,7 +100,7 @@
     <!-- Until -->
     <div>
       <label for="qa-fallback-until" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-        Repeat until (optional)
+        {{ t('qa.repeat_until') }}
       </label>
       <input 
         id="qa-fallback-until" 
@@ -116,14 +116,14 @@
         type="button"
         class="flex-1 glass-btn-primary rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-50"
       >
-        Save Event
+        {{ t('qa.save_event') }}
       </button>
       <button 
         type="button" 
         id="qa-fallback-cancel-btn" 
         class="flex-1 glass-btn-secondary rounded-xl px-4 py-2 text-sm"
       >
-        Cancel
+        {{ t('qa.cancel') }}
       </button>
     </div>
   </div>

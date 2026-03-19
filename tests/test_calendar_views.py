@@ -4,6 +4,12 @@ from datetime import datetime, timedelta
 from app.database.models import Event
 
 
+def assert_contains_any(text: str, *candidates: str) -> None:
+    assert any(candidate in text for candidate in candidates), (
+        f"Expected one of {candidates} to be present"
+    )
+
+
 def test_month_view_renders_event_title_and_time(authenticated_client):
     now = datetime.utcnow().replace(microsecond=0)
     authenticated_client.post(
@@ -163,7 +169,7 @@ def test_quick_add_save_event(authenticated_client):
     assert response.json()["title"] == "Quick add save"
 
     html = _calendar_html(authenticated_client)
-    assert "showToast('Event saved')" in html
+    assert "showToast(I18N.eventSaved)" in html
     assert "closeModal();" in html
     assert "await refreshPanels();" in html
 
@@ -278,7 +284,7 @@ def test_quick_add_ocr_controls_present(authenticated_client):
     html = _calendar_html(authenticated_client)
     assert 'id="qa-ocr-btn"' in html
     assert 'id="qa-ocr-input"' in html
-    assert "Scan Image" in html
+    assert_contains_any(html, "Scan Image", "Skanuj obraz")
 
 
 def test_quick_add_ocr_endpoint_wiring(authenticated_client):
@@ -290,7 +296,7 @@ def test_quick_add_ocr_endpoint_wiring(authenticated_client):
 
 def test_quick_add_ocr_fallback_on_errors(authenticated_client):
     html = _calendar_html(authenticated_client)
-    assert "parsed.raw_text || 'No readable text extracted.'" in html
+    assert "parsed.raw_text ||" in html
     assert "showPhase('fallback')" in html
 
 
@@ -298,7 +304,7 @@ def test_quick_add_ocr_fallback_on_errors(authenticated_client):
 
 def test_google_sync_panel_present(authenticated_client):
     html = _calendar_html(authenticated_client)
-    assert "Google Sync" in html
+    assert_contains_any(html, "Google Sync", "Synchronizacja Google")
     assert 'id="sync-status"' in html
     assert 'id="sync-last-success"' in html
     assert 'id="sync-refresh-btn"' in html
@@ -375,7 +381,7 @@ def test_day_click_opens_event_entry_for_selected_day(authenticated_client):
 
     html = _calendar_html(authenticated_client)
     assert "function openEventEntryForDay(year, month, day)" in html
-    assert "Date locked to selected calendar day." in html
+    assert_contains_any(html, "Date locked to selected calendar day.", "Data zablokowana na wybranym dniu kalendarza.")
     assert "setEventEntryDateLocked(true)" in html
 
 
@@ -384,7 +390,7 @@ def test_invite_back_link_present(authenticated_client):
     assert response.status_code == 200
     html = response.text
     assert 'href="/calendar"' in html
-    assert "Back to Calendar" in html
+    assert_contains_any(html, "Back to Calendar", "Powrot do kalendarza")
     assert "focus-visible:ring-cyan-300" in html
 
 
@@ -394,8 +400,8 @@ def test_invite_back_link_present(authenticated_client):
 def test_event_entry_visibility_control_present(authenticated_client):
     html = _calendar_html(authenticated_client)
     assert 'id="event-entry-visibility"' in html
-    assert "Shared (household)" in html
-    assert "Private (only me)" in html
+    assert_contains_any(html, "Shared (household)", "Wspolne (domownicy)")
+    assert_contains_any(html, "Private (only me)", "Prywatne (tylko ja)")
     assert 'value="shared"' in html
     assert 'value="private"' in html
 
@@ -403,8 +409,8 @@ def test_event_entry_visibility_control_present(authenticated_client):
 def test_quick_add_visibility_control_present(authenticated_client):
     html = _calendar_html(authenticated_client)
     assert 'id="qa-parsed-visibility"' in html
-    assert "Shared (household)" in html
-    assert "Private (only me)" in html
+    assert_contains_any(html, "Shared (household)", "Wspolne (domownicy)")
+    assert_contains_any(html, "Private (only me)", "Prywatne (tylko ja)")
 
 
 def test_event_entry_submit_includes_visibility(authenticated_client):

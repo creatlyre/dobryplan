@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Request, UploadFile, status
 from pydantic import BaseModel
 
 from app.auth.dependencies import get_current_user
@@ -11,6 +11,7 @@ from app.events.ocr import OCRService
 from app.events.repository import EventRepository
 from app.events.schemas import EventCreate, EventResponse, EventUpdate
 from app.events.service import EventService
+from app.i18n import resolve_locale, translate
 from app.sync.service import GoogleSyncService
 from app.users.repository import UserRepository
 
@@ -58,6 +59,10 @@ def _service(db) -> EventService:
     return EventService(EventRepository(db))
 
 
+def _msg(user_locale: str, key: str, **kwargs) -> str:
+    return translate(key, user_locale, **kwargs)
+
+
 def _resolve_timezone(user, db) -> str:
     """Resolve timezone from authenticated user context with safe UTC fallback."""
     user_timezone = getattr(user, "timezone", None)
@@ -77,15 +82,16 @@ def _resolve_timezone(user, db) -> str:
 
 
 @router.post("/parse", response_model=ParseEventResponse)
-async def parse_event(payload: ParseEventRequest, user=Depends(get_current_user), db=Depends(get_db)):
+async def parse_event(payload: ParseEventRequest, request: Request, user=Depends(get_current_user), db=Depends(get_db)):
     """Parse natural language text into structured event data."""
     # Determine context date
     context_date = None
+    user_locale = resolve_locale(request)
     if payload.context_date:
         try:
             context_date = datetime.fromisoformat(payload.context_date)
         except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid context_date format, use ISO 8601") from None
+            raise HTTPException(status_code=400, detail=_msg(user_locale, "events.invalid_context_date")) from None
     
     timezone = _resolve_timezone(user, db)
     
@@ -111,22 +117,24 @@ async def parse_event(payload: ParseEventRequest, user=Depends(get_current_user)
 
 @router.post("/ocr-parse", response_model=OCRParseResponse)
 async def parse_event_from_image(
+    request: Request,
     image: UploadFile = File(...),
     context_date: Optional[str] = None,
     user=Depends(get_current_user),
     db=Depends(get_db),
 ):
     """Parse event details from uploaded image text using OCR + NLP."""
+    user_locale = resolve_locale(request)
     image_bytes = await image.read()
     if not image_bytes:
-        raise HTTPException(status_code=400, detail="Uploaded image is empty")
+        raise HTTPException(status_code=400, detail=_msg(user_locale, "events.upload_empty"))
 
     parsed_context = None
     if context_date:
         try:
             parsed_context = datetime.fromisoformat(context_date)
         except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid context_date format, use ISO 8601") from None
+            raise HTTPException(status_code=400, detail=_msg(user_locale, "events.invalid_context_date")) from None
 
     timezone = _resolve_timezone(user, db)
     result = OCRService().parse_image(image_bytes, timezone, parsed_context)
@@ -176,7 +184,7 @@ async def update_event(event_id: str, payload: EventUpdate, user=Depends(get_cur
 
 
 @router.delete("/{event_id}")
-async def delete_event(event_id: str, user=Depends(get_current_user), db=Depends(get_db)):
+async def delete_event(event_id: str, request: Request, user=Depends(get_current_user), db=Depends(get_db)):
     service = _service(db)
     try:
         event = service.delete_event(event_id, user.calendar_id, user.id)
@@ -187,7 +195,7 @@ async def delete_event(event_id: str, user=Depends(get_current_user), db=Depends
         GoogleSyncService(db).sync_event_for_household(event, deleted=True)
     except Exception:
         pass
-    return {"message": "deleted"}
+    return {"message": _msg(resolve_locale(request), "events.deleted")}
 
 
 @router.get("/day", response_model=list[EventResponse])

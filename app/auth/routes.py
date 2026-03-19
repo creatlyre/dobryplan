@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
+import json
 import uuid
 
 import jwt
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel, EmailStr
 
@@ -17,6 +18,7 @@ from app.auth.supabase_auth import (
 from app.auth.utils import encrypt_token
 from app.database.database import get_db
 from app.database.models import User
+from app.i18n import resolve_locale, translate
 from app.users.repository import UserRepository
 from app.users.service import UserService
 from config import Settings
@@ -34,6 +36,10 @@ class AuthSessionPayload(BaseModel):
 class PasswordAuthPayload(BaseModel):
     email: EmailStr
     password: str
+
+
+def _msg(request: Request, key: str, **kwargs) -> str:
+    return translate(key, resolve_locale(request), **kwargs)
 
 
 def _set_session_cookie(response: Response, session_token: str) -> None:
@@ -132,6 +138,7 @@ async def login():
 
 @router.get("/callback")
 async def oauth_callback(
+    request: Request,
     code: str | None = None,
     state: str | None = None,
     error: str | None = None,
@@ -140,47 +147,49 @@ async def oauth_callback(
     settings = Settings()
 
     if error:
-        raise HTTPException(status_code=400, detail=f"OAuth callback failed: {error}")
+        raise HTTPException(status_code=400, detail=_msg(request, "auth.oauth_callback_failed", error=error))
 
     if not code:
         # Supabase OAuth implicit flow delivers tokens in URL fragment; JS forwards them to /auth/session.
+        locale = get_request_locale(request)
+        unknown_error = json.dumps(_msg(request, "sync.unknown"))
         return HTMLResponse(
-            """
+            f"""
 <!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Signing in...</title></head>
+<html lang=\"{locale}\">
+<head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>{_msg(request, "auth.signing_in")}</title></head>
 <body>
-  <p>Finalizing sign-in...</p>
+  <p>{_msg(request, "auth.finalizing_sign_in")}</p>
   <script>
-    (async function () {
-      try {
+    (async function () {{
+      try {{
         const hash = window.location.hash.startsWith('#') ? window.location.hash.substring(1) : '';
         const params = new URLSearchParams(hash);
-        const payload = {
+        const payload = {{
           access_token: params.get('access_token'),
           refresh_token: params.get('refresh_token'),
           provider_token: params.get('provider_token'),
           provider_refresh_token: params.get('provider_refresh_token')
-        };
-        if (!payload.access_token) {
-          document.body.innerHTML = '<p>Missing OAuth access token. Please try /auth/login again.</p>';
+        }};
+        if (!payload.access_token) {{
+          document.body.innerHTML = '<p>{_msg(request, "auth.missing_oauth_access_token")}</p>';
           return;
-        }
-        const response = await fetch('/auth/session', {
+        }}
+        const response = await fetch('/auth/session', {{
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {{ 'Content-Type': 'application/json' }},
           body: JSON.stringify(payload)
-        });
-        if (!response.ok) {
-          const data = await response.json().catch(() => ({}));
-          document.body.innerHTML = `<p>Sign-in failed: ${data.detail || 'unknown error'}</p>`;
+        }});
+        if (!response.ok) {{
+          const data = await response.json().catch(() => ({{}}));
+          document.body.innerHTML = `<p>{_msg(request, "auth.sign_in_failed")}: ${{data.detail || {unknown_error}}}</p>`;
           return;
-        }
+        }}
         window.location.href = '/';
-      } catch (err) {
-        document.body.innerHTML = `<p>Sign-in failed: ${String(err)}</p>`;
-      }
-    })();
+      }} catch (err) {{
+        document.body.innerHTML = `<p>{_msg(request, "auth.sign_in_failed")}: ${{String(err)}}</p>`;
+      }}
+    }})();
   </script>
 </body>
 </html>
@@ -191,11 +200,11 @@ async def oauth_callback(
     try:
         tokens = exchange_code_for_token(code, state or "")
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"OAuth callback failed: {exc}") from exc
+        raise HTTPException(status_code=500, detail=_msg(request, "auth.oauth_callback_failed", error=str(exc))) from exc
 
     user_info = tokens["user_info"]
     if not user_info.get("email") or not user_info.get("google_id"):
-        raise HTTPException(status_code=400, detail="Google profile data is incomplete")
+        raise HTTPException(status_code=400, detail=_msg(request, "auth.missing_google_profile"))
 
     user = _upsert_local_user_from_profile(
         db=db,
@@ -221,14 +230,14 @@ async def oauth_callback(
 
 
 @router.post("/session")
-async def create_supabase_session(payload: AuthSessionPayload, db=Depends(get_db)):
+async def create_supabase_session(request: Request, payload: AuthSessionPayload, db=Depends(get_db)):
     profile = await fetch_supabase_user(payload.access_token)
     if not profile:
-        raise HTTPException(status_code=401, detail="Invalid Supabase session token")
+        raise HTTPException(status_code=401, detail=_msg(request, "auth.invalid_supabase_session"))
 
     email = (profile.get("email") or "").lower()
     if not email:
-        raise HTTPException(status_code=400, detail="Supabase profile missing email")
+        raise HTTPException(status_code=400, detail=_msg(request, "auth.supabase_profile_missing_email"))
 
     metadata = profile.get("user_metadata") or {}
     name = metadata.get("full_name") or metadata.get("name") or email
@@ -247,8 +256,10 @@ async def create_supabase_session(payload: AuthSessionPayload, db=Depends(get_db
     except Exception:
         db_warning = "Authenticated via Supabase, but local database is unavailable right now."
 
-    body = '{"message":"session created"}' if not db_warning else '{"message":"session created","warning":"local_db_unavailable"}'
-    response = Response(content=body, media_type="application/json")
+    body = {"message": _msg(request, "auth.session_created")}
+    if db_warning:
+        body["warning"] = "local_db_unavailable"
+    response = Response(content=json.dumps(body), media_type="application/json")
     _set_session_cookie(response, payload.access_token)
     if payload.refresh_token:
         _set_refresh_cookie(response, payload.refresh_token)
@@ -256,10 +267,10 @@ async def create_supabase_session(payload: AuthSessionPayload, db=Depends(get_db
 
 
 @router.post("/register")
-async def register_with_password(payload: PasswordAuthPayload, db=Depends(get_db)):
+async def register_with_password(request: Request, payload: PasswordAuthPayload, db=Depends(get_db)):
     settings = Settings()
     if not is_supabase_auth_enabled(settings):
-        raise HTTPException(status_code=400, detail="Supabase auth is not configured")
+        raise HTTPException(status_code=400, detail=_msg(request, "auth.supabase_not_configured"))
 
     try:
         data = await supabase_sign_up(payload.email, payload.password)
@@ -280,13 +291,15 @@ async def register_with_password(payload: PasswordAuthPayload, db=Depends(get_db
     if not access_token:
         if db_warning:
             return {
-                "message": "Registration created. Confirm your email to sign in.",
+                "message": _msg(request, "auth.registration_created"),
                 "warning": db_warning,
             }
-        return {"message": "Registration created. Confirm your email to sign in."}
+        return {"message": _msg(request, "auth.registration_created")}
 
-    body = '{"message":"registered"}' if not db_warning else '{"message":"registered","warning":"registered_but_local_db_unavailable"}'
-    response = Response(content=body, media_type="application/json")
+    body = {"message": _msg(request, "auth.registered")}
+    if db_warning:
+        body["warning"] = "registered_but_local_db_unavailable"
+    response = Response(content=json.dumps(body), media_type="application/json")
     _set_session_cookie(response, access_token)
     if data.get("refresh_token"):
         _set_refresh_cookie(response, data["refresh_token"])
@@ -294,10 +307,10 @@ async def register_with_password(payload: PasswordAuthPayload, db=Depends(get_db
 
 
 @router.post("/password-login")
-async def login_with_password(payload: PasswordAuthPayload, db=Depends(get_db)):
+async def login_with_password(request: Request, payload: PasswordAuthPayload, db=Depends(get_db)):
     settings = Settings()
     if not is_supabase_auth_enabled(settings):
-        raise HTTPException(status_code=400, detail="Supabase auth is not configured")
+        raise HTTPException(status_code=400, detail=_msg(request, "auth.supabase_not_configured"))
 
     try:
         data = await supabase_password_sign_in(payload.email, payload.password)
@@ -306,11 +319,11 @@ async def login_with_password(payload: PasswordAuthPayload, db=Depends(get_db)):
 
     access_token = data.get("access_token")
     if not access_token:
-        raise HTTPException(status_code=401, detail="Supabase did not return an access token")
+        raise HTTPException(status_code=401, detail=_msg(request, "auth.no_access_token"))
 
     supabase_profile = await fetch_supabase_user(access_token)
     if not supabase_profile:
-        raise HTTPException(status_code=401, detail="Unable to fetch Supabase user profile")
+        raise HTTPException(status_code=401, detail=_msg(request, "auth.profile_fetch_failed"))
 
     email = (supabase_profile.get("email") or payload.email).lower()
     metadata = supabase_profile.get("user_metadata") or {}
@@ -322,8 +335,10 @@ async def login_with_password(payload: PasswordAuthPayload, db=Depends(get_db)):
     except Exception:
         db_warning = "logged_in_but_local_db_unavailable"
 
-    body = '{"message":"logged in"}' if not db_warning else '{"message":"logged in","warning":"logged_in_but_local_db_unavailable"}'
-    response = Response(content=body, media_type="application/json")
+    body = {"message": _msg(request, "auth.logged_in")}
+    if db_warning:
+        body["warning"] = "logged_in_but_local_db_unavailable"
+    response = Response(content=json.dumps(body), media_type="application/json")
     _set_session_cookie(response, access_token)
     if data.get("refresh_token"):
         _set_refresh_cookie(response, data["refresh_token"])
@@ -331,7 +346,7 @@ async def login_with_password(payload: PasswordAuthPayload, db=Depends(get_db)):
 
 
 @router.post("/logout")
-async def logout(response: Response):
+async def logout(request: Request, response: Response):
     response.delete_cookie("session")
     response.delete_cookie("supabase_refresh")
-    return {"message": "Logged out"}
+    return {"message": _msg(request, "auth.logged_out")}

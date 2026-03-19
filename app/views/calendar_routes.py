@@ -9,6 +9,7 @@ from app.auth.dependencies import get_current_user
 from app.database.database import get_db
 from app.events.repository import EventRepository
 from app.events.service import EventService
+from app.i18n import inject_template_i18n
 
 router = APIRouter(prefix="/calendar", tags=["calendar"])
 templates = Jinja2Templates(directory="app/templates")
@@ -39,8 +40,8 @@ async def month_grid(
     prev_dt = (datetime(year, month, 1) - timedelta(days=1)).replace(day=1)
     next_dt = (datetime(year, month, 28) + timedelta(days=4)).replace(day=1)
 
-    return templates.TemplateResponse(
-        "partials/month_grid.html",
+    context = inject_template_i18n(
+        request,
         {
             "request": request,
             "weeks": days,
@@ -56,6 +57,8 @@ async def month_grid(
         },
     )
 
+    return templates.TemplateResponse("partials/month_grid.html", context)
+
 
 @router.get("/day", response_class=HTMLResponse)
 async def day_events(
@@ -69,11 +72,13 @@ async def day_events(
     service = _service(db)
     events = service.list_day_expanded(user.calendar_id, year, month, day, requesting_user_id=user.id)
 
-    return templates.TemplateResponse(
-        "partials/day_events.html",
+    context = inject_template_i18n(
+        request,
         {
             "request": request,
             "events": events,
             "date_label": f"{year:04d}-{month:02d}-{day:02d}",
         },
     )
+
+    return templates.TemplateResponse("partials/day_events.html", context)

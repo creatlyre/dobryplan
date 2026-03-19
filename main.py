@@ -10,6 +10,7 @@ from fastapi.templating import Jinja2Templates
 from app.auth.dependencies import get_current_user
 from app.auth.routes import router as auth_router
 from app.events.routes import router as events_router
+from app.i18n import inject_template_i18n
 from app.middleware.auth_middleware import SessionValidationMiddleware
 from app.sync.routes import router as sync_router
 from app.users.routes import router as users_router
@@ -34,24 +35,32 @@ app.include_router(sync_router)
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request, user=Depends(get_current_user)):
-    return templates.TemplateResponse(
-        "calendar.html",
+    context = inject_template_i18n(
+        request,
         {
             "request": request,
             "user": user,
             "now": datetime.utcnow(),
         },
     )
+    return templates.TemplateResponse(
+        "calendar.html",
+        context,
+    )
 
 
 @app.get("/invite", response_class=HTMLResponse)
 async def invite_page(request: Request, user=Depends(get_current_user)):
-    return templates.TemplateResponse(
-        "invite.html",
+    context = inject_template_i18n(
+        request,
         {
             "request": request,
             "user": user,
         },
+    )
+    return templates.TemplateResponse(
+        "invite.html",
+        context,
     )
 
 

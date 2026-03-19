@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Calendar - CalendarPlanner{% endblock %}
+{% block title %}{{ t('app.calendar_title') }}{% endblock %}
 
 {% block content %}
 <script src="https://unpkg.com/htmx.org@1.9.12"></script>
@@ -8,51 +8,51 @@
 <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
     <section class="space-y-4 lg:col-span-3">
         <div id="month-grid" hx-get="/calendar/month?year={{ now.year }}&month={{ now.month }}" hx-trigger="load" hx-swap="innerHTML">
-            <div class="glass rounded-2xl p-4 text-white/50">Loading calendar…</div>
+            <div class="glass rounded-2xl p-4 text-white/50">{{ t('calendar.loading_calendar') }}</div>
         </div>
         <div id="day-events" hx-get="/calendar/day?year={{ now.year }}&month={{ now.month }}&day={{ now.day }}" hx-trigger="load" hx-swap="innerHTML">
-            <div class="glass rounded-2xl p-4 text-white/50">Loading events…</div>
+            <div class="glass rounded-2xl p-4 text-white/50">{{ t('calendar.loading_events') }}</div>
         </div>
     </section>
 
     <aside class="space-y-4">
         <div class="glass rounded-2xl p-4">
             <div class="mb-3 flex items-center justify-between">
-          <h3 class="text-lg font-semibold text-white">Event Entry</h3>
+          <h3 class="text-lg font-semibold text-white">{{ t('calendar.event_entry') }}</h3>
           <button id="event-entry-open-btn"
               type="button"
               class="glass-btn-secondary rounded-xl px-3 py-1.5 text-sm font-medium">
-            + Add Event
+            {{ t('calendar.add_event') }}
           </button>
                 <button id="qa-open-btn"
                         type="button"
                     class="glass-btn-primary rounded-xl px-3 py-1.5 text-sm font-medium">
-                    &#9889; Quick Add
+                    &#9889; {{ t('calendar.quick_add') }}
                 </button>
             </div>
-        <p class="text-sm text-white/70">Use Quick Add for natural language input or open the manual event modal for structured entry.</p>
+              <p class="text-sm text-white/70">{{ t('calendar.entry_help') }}</p>
         </div>
 
       {% include "partials/event_entry_modal.html" %}
         {% include "partials/quick_add_modal.html" %}
 
         <div class="glass rounded-2xl p-4">
-            <h3 class="mb-2 text-lg font-semibold text-white">Household</h3>
-            <div id="household-info" class="text-sm text-white/60">Loading…</div>
-            <a href="/invite" class="mt-3 inline-block glass-btn-primary rounded-xl px-3 py-2 text-sm font-medium">Invite Member</a>
+            <h3 class="mb-2 text-lg font-semibold text-white">{{ t('calendar.household') }}</h3>
+            <div id="household-info" class="text-sm text-white/60">{{ t('calendar.loading') }}</div>
+            <a href="/invite" class="mt-3 inline-block glass-btn-primary rounded-xl px-3 py-2 text-sm font-medium">{{ t('calendar.invite_member') }}</a>
         </div>
 
         <div class="glass rounded-2xl p-4">
           <div class="mb-2 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-white">Google Sync</h3>
-            <button id="sync-refresh-btn" type="button" class="glass-btn-secondary rounded-xl px-3 py-1.5 text-xs font-medium">Refresh</button>
+            <h3 class="text-lg font-semibold text-white">{{ t('calendar.google_sync') }}</h3>
+            <button id="sync-refresh-btn" type="button" class="glass-btn-secondary rounded-xl px-3 py-1.5 text-xs font-medium">{{ t('calendar.refresh') }}</button>
           </div>
-          <div id="sync-status" class="text-sm text-white/70">Loading sync status…</div>
-          <p id="sync-last-success" class="mt-1 text-xs text-white/60">Last successful sync: checking…</p>
+          <div id="sync-status" class="text-sm text-white/70">{{ t('calendar.loading_sync') }}</div>
+          <p id="sync-last-success" class="mt-1 text-xs text-white/60">{{ t('calendar.last_successful_sync') }}</p>
           <div class="mt-3 flex flex-wrap gap-2">
-            <a id="sync-connect-link" href="/auth/login" class="glass-btn-secondary hidden rounded-xl px-3 py-2 text-sm font-medium">Connect Google</a>
-            <button id="sync-export-btn" type="button" class="glass-btn-primary rounded-xl px-3 py-2 text-sm font-medium">Sync This Month</button>
-            <button id="sync-import-btn" type="button" class="glass-btn-secondary rounded-xl px-3 py-2 text-sm font-medium">Pull From Google</button>
+            <a id="sync-connect-link" href="/auth/login" class="glass-btn-secondary hidden rounded-xl px-3 py-2 text-sm font-medium">{{ t('calendar.connect_google') }}</a>
+            <button id="sync-export-btn" type="button" class="glass-btn-primary rounded-xl px-3 py-2 text-sm font-medium">{{ t('calendar.sync_month') }}</button>
+            <button id="sync-import-btn" type="button" class="glass-btn-secondary rounded-xl px-3 py-2 text-sm font-medium">{{ t('calendar.pull_google') }}</button>
           </div>
           <p id="sync-result" class="mt-2 text-xs text-white/70"></p>
         </div>
@@ -60,6 +60,35 @@
 </div>
 
 <script>
+const I18N = {
+  eventSaved: {{ t('events.saved')|tojson }},
+  networkTryAgain: {{ t('errors.network_try_again')|tojson }},
+  failedSaveEvent: {{ t('errors.save_event_failed')|tojson }},
+  discardUnsaved: {{ t('calendar.discard_unsaved')|tojson }},
+  deleteConfirm: {{ t('calendar.delete_confirm')|tojson }},
+  deleteFailed: {{ t('calendar.delete_failed')|tojson }},
+  householdFailed: {{ t('calendar.household_failed')|tojson }},
+  syncNever: {{ t('sync.never')|tojson }},
+  syncUnknown: {{ t('sync.unknown')|tojson }},
+  syncUnableLoad: {{ t('sync.unable_status')|tojson }},
+  syncFailedStatus: {{ t('sync.failed_status')|tojson }},
+  syncingNow: {{ t('sync.export_in_progress')|tojson }},
+  pullNow: {{ t('sync.import_in_progress')|tojson }},
+  syncFailed: {{ t('sync.failed')|tojson }},
+  pullFailed: {{ t('sync.pull_failed')|tojson }}
+};
+
+function pad2(value) {
+  return String(value).padStart(2, '0');
+}
+
+function formatDatetimeLocal(dateValue) {
+  if (!(dateValue instanceof Date) || Number.isNaN(dateValue.getTime())) {
+    return '';
+  }
+  return `${dateValue.getFullYear()}-${pad2(dateValue.getMonth() + 1)}-${pad2(dateValue.getDate())}T${pad2(dateValue.getHours())}:${pad2(dateValue.getMinutes())}`;
+}
+
 let currentYear = {{ now.year }};
 let currentMonth = {{ now.month }};
 let currentDay = {{ now.day }};
@@ -282,7 +311,7 @@ function closeEventEntryModal(force = false) {
   if (eventEntrySaveInFlight) {
     return;
   }
-  if (!force && eventEntryDirty && !confirm('Discard unsaved event changes?')) {
+  if (!force && eventEntryDirty && !confirm(I18N.discardUnsaved)) {
     return;
   }
   eventEntryModal.classList.add('hidden');
@@ -361,7 +390,7 @@ async function submitEventEntry(keepOpen) {
 
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
-      eventEntrySaveError.textContent = data.detail || 'Failed to save event.';
+      eventEntrySaveError.textContent = data.detail || I18N.failedSaveEvent;
       eventEntrySaveError.classList.remove('hidden');
       return;
     }
@@ -372,7 +401,7 @@ async function submitEventEntry(keepOpen) {
     currentMonth = savedDate.getUTCMonth() + 1;
     currentDay = savedDate.getUTCDate();
     await refreshPanels();
-    showToast('Event saved');
+    showToast(I18N.eventSaved);
 
     if (keepOpen) {
       resetEventEntryForm();
@@ -381,7 +410,7 @@ async function submitEventEntry(keepOpen) {
       closeEventEntryModal(true);
     }
   } catch (_) {
-    eventEntrySaveError.textContent = 'Network error. Try again.';
+    eventEntrySaveError.textContent = I18N.networkTryAgain;
     eventEntrySaveError.classList.remove('hidden');
   } finally {
     eventEntrySaveInFlight = false;
@@ -427,13 +456,13 @@ async function submitEventForm(event) {
 }
 
 async function deleteEvent(eventId) {
-  if (!confirm('Delete this event? This cannot be undone.')) {
+  if (!confirm(I18N.deleteConfirm)) {
     return;
   }
 
   const response = await fetch(`/api/events/${eventId}`, { method: 'DELETE' });
   if (!response.ok) {
-    alert('Failed to delete event');
+    alert(I18N.deleteFailed);
     return;
   }
   await refreshPanels();
@@ -447,7 +476,7 @@ fetch('/api/users/household')
     div.innerHTML = `<p><strong>Members:</strong> ${data.member_count}</p><ul class="mt-2 list-disc pl-5">${members}</ul>`;
   })
   .catch(() => {
-    document.getElementById('household-info').textContent = 'Failed to load household data.';
+    document.getElementById('household-info').textContent = I18N.householdFailed;
   });
 
 const syncStatusEl = document.getElementById('sync-status');
@@ -460,11 +489,11 @@ const syncConnectLink = document.getElementById('sync-connect-link');
 
 function formatSyncTimestamp(isoDateTime) {
   if (!isoDateTime) {
-    return 'Never';
+    return I18N.syncNever;
   }
   const parsed = new Date(isoDateTime);
   if (Number.isNaN(parsed.getTime())) {
-    return 'Unknown';
+    return I18N.syncUnknown;
   }
   return parsed.toLocaleString();
 }
@@ -477,7 +506,7 @@ function setSyncBusy(isBusy) {
 
 function renderSyncStatus(data) {
   if (!data) {
-    syncStatusEl.textContent = 'Unable to load sync status.';
+    syncStatusEl.textContent = I18N.syncUnableLoad;
     syncLastSuccessEl.textContent = 'Last successful sync: unknown';
     return;
   }
@@ -519,7 +548,7 @@ async function loadSyncStatus() {
     const data = await response.json();
     renderSyncStatus(data);
   } catch (_) {
-    syncStatusEl.textContent = 'Failed to load sync status.';
+    syncStatusEl.textContent = I18N.syncFailedStatus;
   } finally {
     setSyncBusy(false);
   }
@@ -527,7 +556,7 @@ async function loadSyncStatus() {
 
 async function exportCurrentMonthToGoogle() {
   setSyncBusy(true);
-  syncResultEl.textContent = 'Syncing current month to Google Calendar…';
+  syncResultEl.textContent = I18N.syncingNow;
   try {
     const response = await fetch(`/api/sync/export-month?year=${currentYear}&month=${currentMonth}`, {
       method: 'POST'
@@ -535,7 +564,7 @@ async function exportCurrentMonthToGoogle() {
 
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
-      throw new Error(data.detail || 'Sync failed');
+      throw new Error(data.detail || I18N.syncFailed);
     }
 
     const result = await response.json();
@@ -544,7 +573,7 @@ async function exportCurrentMonthToGoogle() {
       (errorCount ? ` ${errorCount} warning(s): ${(result.errors || []).slice(0, 2).join(' | ')}` : '');
     await loadSyncStatus();
   } catch (error) {
-    syncResultEl.textContent = `Sync failed: ${error.message || 'unknown error'}`;
+    syncResultEl.textContent = `Sync failed: ${error.message || I18N.syncUnknown}`;
   } finally {
     setSyncBusy(false);
   }
@@ -552,7 +581,7 @@ async function exportCurrentMonthToGoogle() {
 
 async function importCurrentMonthFromGoogle() {
   setSyncBusy(true);
-  syncResultEl.textContent = 'Pulling current month from Google Calendar…';
+  syncResultEl.textContent = I18N.pullNow;
   try {
     const response = await fetch(`/api/sync/import-month?year=${currentYear}&month=${currentMonth}`, {
       method: 'POST'
@@ -560,7 +589,7 @@ async function importCurrentMonthFromGoogle() {
 
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
-      throw new Error(data.detail || 'Pull failed');
+      throw new Error(data.detail || I18N.pullFailed);
     }
 
     const result = await response.json();
@@ -582,7 +611,7 @@ async function importCurrentMonthFromGoogle() {
     await refreshPanels();
     await loadSyncStatus();
   } catch (error) {
-    syncResultEl.textContent = `Pull failed: ${error.message || 'unknown error'}`;
+    syncResultEl.textContent = `Pull failed: ${error.message || I18N.syncUnknown}`;
   } finally {
     setSyncBusy(false);
   }
@@ -760,12 +789,7 @@ loadSyncStatus();
 
   function toDatetimeLocal(isoString) {
     if (!isoString) return '';
-    const d = new Date(isoString);
-    // Use sv-SE locale to get YYYY-MM-DDTHH:MM format
-    return d.toLocaleString('sv-SE', {
-      year: 'numeric', month: '2-digit', day: '2-digit',
-      hour: '2-digit', minute: '2-digit'
-    }).replace(' ', 'T');
+    return formatDatetimeLocal(new Date(isoString));
   }
 
   function populateReview(originalText, parsed) {
@@ -908,7 +932,7 @@ loadSyncStatus();
         qaParseFailures++;
         const data = await res.json().catch(() => ({}));
         showPhase('text-entry');
-        showQAError('parse_failed', data.detail || 'Could not parse that text.');
+        showQAError('parse_failed', data.detail || {{ t('qa.parse_text_failed')|tojson }});
         
         // After 2+ failures, offer fallback form
         if (qaParseFailures >= 2) {
@@ -985,7 +1009,7 @@ loadSyncStatus();
     fallbackBtn.id = 'qa-fallback-try-btn';
     fallbackBtn.type = 'button';
     fallbackBtn.className = 'glass-btn-secondary w-full rounded-xl px-4 py-2 text-sm font-medium mt-2';
-    fallbackBtn.textContent = 'Try manual entry instead';
+    fallbackBtn.textContent = {{ t('qa.try_manual')|tojson }};
     fallbackBtn.addEventListener('click', showQAFallback);
     
     qaErrorInline.appendChild(fallbackBtn);
@@ -1006,23 +1030,14 @@ loadSyncStatus();
     const now = new Date();
     const end = new Date(now.getTime() + 3600000); // +1 hour
     
-    document.getElementById('qa-fallback-start').value = 
-      now.toLocaleString('sv-SE', {
-        year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit'
-      }).replace(' ', 'T');
-    
-    document.getElementById('qa-fallback-end').value = 
-      end.toLocaleString('sv-SE', {
-        year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit'
-      }).replace(' ', 'T');
+    document.getElementById('qa-fallback-start').value = formatDatetimeLocal(now);
+    document.getElementById('qa-fallback-end').value = formatDatetimeLocal(end);
     
     // Focus on title field
     document.getElementById('qa-fallback-title').focus();
     
     // Announce via live region
-    qaLiveRegion.textContent = 'Using manual entry form. Fill in the event details.';
+    qaLiveRegion.textContent = {{ t('qa.manual_announce')|tojson }};
   }
 
   async function parseFromImage(file) {
@@ -1049,7 +1064,7 @@ loadSyncStatus();
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         showPhase('text-entry');
-        showQAError('parse_failed', err.detail || 'Failed to parse uploaded image.');
+        showQAError('parse_failed', err.detail || {{ t('qa.parse_image_failed')|tojson }});
         return;
       }
 
@@ -1057,7 +1072,7 @@ loadSyncStatus();
       if (parsed.errors && parsed.errors.length > 0) {
         showPhase('fallback');
         document.getElementById('qa-fallback-original-text').textContent =
-          parsed.raw_text || 'No readable text extracted.';
+          parsed.raw_text || {{ t('qa.no_text_extracted')|tojson }};
         document.getElementById('qa-fallback-title').value = parsed.title || '';
         showQAError('parse_failed', parsed.errors[0]);
         qaLiveRegion.textContent = 'OCR parsing needs review. Manual form is shown with extracted text.';
@@ -1096,15 +1111,15 @@ loadSyncStatus();
     
     // Validation
     if (!title) {
-      alert('Event name is required.');
+      alert({{ t('qa.event_name_required')|tojson }});
       return;
     }
     if (!startStr) {
-      alert('Start date/time is required.');
+      alert({{ t('qa.start_required')|tojson }});
       return;
     }
     if (!endStr) {
-      alert('End date/time is required.');
+      alert({{ t('qa.end_required')|tojson }});
       return;
     }
     
@@ -1139,11 +1154,11 @@ loadSyncStatus();
       
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        alert(err.detail || 'Failed to save event.');
+        alert(err.detail || I18N.failedSaveEvent);
         return;
       }
       
-      showToast('Event saved');
+      showToast(I18N.eventSaved);
       closeModal();
       await refreshPanels();
     } catch (error) {
@@ -1163,7 +1178,7 @@ loadSyncStatus();
   // ── Save ─────────────────────────────────────────────────────────────────
   async function saveEvent(keepOpen) {
     if (_ambiguityPending) {
-      showSaveError('Please choose the intended year before saving.');
+      showSaveError({{ t('qa.choose_year')|tojson }});
       showPhase('ambiguity');
       return;
     }
@@ -1171,12 +1186,12 @@ loadSyncStatus();
     const payload = buildPayload();
 
     if (!payload.title) {
-      showSaveError('Title is required.');
+      showSaveError({{ t('qa.title_required')|tojson }});
       document.getElementById('qa-parsed-title').focus();
       return;
     }
     if (!payload.start_at) {
-      showSaveError('Start date/time is required.');
+      showSaveError({{ t('qa.start_required')|tojson }});
       document.getElementById('qa-parsed-start').focus();
       return;
     }
@@ -1194,11 +1209,11 @@ loadSyncStatus();
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        showSaveError(err.detail || 'Failed to save event. Check the fields and try again.');
+        showSaveError(err.detail || {{ t('qa.save_failed_check')|tojson }});
         return;
       }
 
-      showToast('Event saved');
+      showToast(I18N.eventSaved);
 
       if (keepOpen) {
         resetModal();
@@ -1209,7 +1224,7 @@ loadSyncStatus();
       }
 
     } catch (_) {
-      showSaveError('Network error — event not saved. Try again.');
+      showSaveError({{ t('qa.network_not_saved')|tojson }});
     } finally {
       _saveInFlight = false;
       qaSaveBtn.disabled = false;

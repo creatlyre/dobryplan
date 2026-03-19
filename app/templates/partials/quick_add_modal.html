@@ -12,15 +12,15 @@
     <!-- ── Header ───────────────────────────────────────────── -->
     <div class="flex items-center justify-between border-b border-white/20 px-6 py-4">
       <div>
-        <h2 id="qa-modal-title" class="text-lg font-semibold text-white">Quick Add Event</h2>
+        <h2 id="qa-modal-title" class="text-lg font-semibold text-white">{{ t('calendar.quick_add') }}</h2>
         <p class="mt-0.5 text-xs text-white/50">
-          Describe an event in natural language, e.g. "dentist Thursday 14:00"
+          {{ t('qa.describe_hint') }}
         </p>
       </div>
       <button id="qa-header-close-btn"
               type="button"
               class="rounded-lg p-1 text-white/50 hover:bg-white/10 hover:text-white"
-              aria-label="Close modal">
+              aria-label="{{ t('qa.close_modal') }}">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd"
                 d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -32,12 +32,12 @@
     <!-- ── Text Entry Phase ──────────────────────────────────── -->
     <div id="qa-text-entry" class="px-6 py-4">
       <label for="qa-text-input" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-        What's the event?
+        {{ t('qa.whats_event') }}
       </label>
       <input
         id="qa-text-input"
         type="text"
-        placeholder="dentist Thursday 14:00, meeting next Friday 10am, ..."
+        placeholder="{{ t('qa.placeholder') }}"
         class="glass-input"
         autocomplete="off"
         aria-describedby="qa-error-summary"
@@ -48,7 +48,7 @@
         <p id="qa-error-summary" class="text-sm text-red-300 font-medium"></p>
         <p id="qa-error-why" class="text-xs text-red-400 mt-1"></p>
         <button id="qa-error-retry-link" type="button" class="text-xs text-red-400/80 hover:text-red-300 hover:underline mt-2 hidden">
-          Try again
+          {{ t('qa.try_again') }}
         </button>
       </div>
 
@@ -72,28 +72,28 @@
           type="button"
           class="flex-1 glass-btn-primary rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-50"
         >
-          Parse
+          {{ t('qa.parse') }}
         </button>
         <button
           id="qa-manual-btn"
           type="button"
           class="glass-btn-secondary rounded-xl px-4 py-2 text-sm"
         >
-          Manual Entry
+          {{ t('qa.manual_entry') }}
         </button>
         <button
           id="qa-ocr-btn"
           type="button"
           class="glass-btn-secondary rounded-xl px-4 py-2 text-sm"
         >
-          Scan Image
+          {{ t('qa.scan_image') }}
         </button>
         <button
           id="qa-close-btn-text"
           type="button"
           class="glass-btn-secondary rounded-xl px-4 py-2 text-sm"
         >
-          Cancel
+          {{ t('qa.cancel') }}
         </button>
       </div>
       <input id="qa-ocr-input" type="file" accept="image/*" class="hidden" />
@@ -102,15 +102,15 @@
     <!-- ── Loading Phase ─────────────────────────────────────── -->
     <div id="qa-loading" class="hidden px-6 py-10 text-center" aria-hidden="true">
       <div class="inline-block h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-indigo-400"></div>
-      <p class="mt-2 text-sm text-white/50">Parsing…</p>
+      <p class="mt-2 text-sm text-white/50">{{ t('qa.parsing') }}</p>
     </div>
     <!-- ── Ambiguity Phase (year disambiguation) ────────────────── -->
     <div id="qa-ambiguity-phase" class="hidden px-6 py-4">
       <div class="mb-4 rounded-xl border border-amber-400/40 bg-amber-500/10 px-4 py-3">
-        <p class="text-sm font-medium text-amber-300">Which year did you mean?</p>
+        <p class="text-sm font-medium text-amber-300">{{ t('qa.which_year') }}</p>
         <p class="mt-0.5 text-xs text-amber-400/80">
           "<span id="qa-ambiguity-event-summary"></span>" — the year wasn't specified.
-          Please choose the intended year before saving.
+          {{ t('qa.choose_year_before_save') }}
         </p>
       </div>
 
@@ -124,7 +124,7 @@
           type="button"
           class="glass-btn-secondary rounded-xl px-4 py-2 text-sm"
         >
-          Back
+          {{ t('qa.back') }}
         </button>
       </div>
     </div>
@@ -133,13 +133,13 @@
 
       <!-- Original text reference -->
       <div class="mb-4 flex items-start justify-between rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-xs text-white/60">
-        <span><strong>From:</strong> <span id="qa-review-original-text" class="italic"></span></span>
+        <span><strong>{{ t('qa.from') }}:</strong> <span id="qa-review-original-text" class="italic"></span></span>
         <button
           id="qa-edit-text-btn"
           type="button"
           class="ml-3 shrink-0 text-indigo-400 hover:text-indigo-300 hover:underline"
         >
-          Edit text
+          {{ t('qa.edit_text') }}
         </button>
       </div>
 
@@ -151,7 +151,7 @@
         <div>
           <label for="qa-parsed-title"
                  class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-            Title <span class="text-red-400">*</span>
+            {{ t('qa.title') }} <span class="text-red-400">*</span>
           </label>
           <input
             id="qa-parsed-title"
@@ -166,7 +166,7 @@
           <div>
             <label for="qa-parsed-start"
                    class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-              Start <span class="text-red-400">*</span>
+              {{ t('qa.start') }} <span class="text-red-400">*</span>
             </label>
             <input
               id="qa-parsed-start"
@@ -178,7 +178,7 @@
           <div>
             <label for="qa-parsed-end"
                    class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-              End
+              {{ t('qa.end') }}
             </label>
             <input
               id="qa-parsed-end"
@@ -193,23 +193,23 @@
           <div>
             <label for="qa-parsed-repeat"
                    class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-              Repeat
+              {{ t('qa.repeat') }}
             </label>
             <select
               id="qa-parsed-repeat"
               class="glass-input"
             >
-              <option value="">No repeat</option>
-              <option value="DAILY">Daily</option>
-              <option value="WEEKLY">Weekly</option>
-              <option value="MONTHLY">Monthly</option>
-              <option value="YEARLY">Yearly</option>
+              <option value="">{{ t('qa.no_repeat') }}</option>
+              <option value="DAILY">{{ t('qa.repeat_daily') }}</option>
+              <option value="WEEKLY">{{ t('qa.repeat_weekly') }}</option>
+              <option value="MONTHLY">{{ t('qa.repeat_monthly') }}</option>
+              <option value="YEARLY">{{ t('qa.repeat_yearly') }}</option>
             </select>
           </div>
           <div>
             <label for="qa-parsed-count"
                    class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-              Count
+              {{ t('qa.count') }}
             </label>
             <input
               id="qa-parsed-count"
@@ -225,7 +225,7 @@
         <div>
           <label for="qa-parsed-until"
                  class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-            Repeat until (optional)
+            {{ t('qa.repeat_until') }}
           </label>
           <input
             id="qa-parsed-until"
@@ -238,16 +238,16 @@
         <div>
           <label for="qa-parsed-visibility"
                  class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">
-            Visibility
+            {{ t('qa.visibility') }}
           </label>
           <select
             id="qa-parsed-visibility"
             class="glass-input"
           >
-            <option value="shared">Shared (household)</option>
-            <option value="private">Private (only me)</option>
+            <option value="shared">{{ t('qa.visibility_shared') }}</option>
+            <option value="private">{{ t('qa.visibility_private') }}</option>
           </select>
-          <p class="mt-1 text-xs text-white/40">Shared events appear for all household members. Private events are only visible to you.</p>
+          <p class="mt-1 text-xs text-white/40">{{ t('qa.visibility_help') }}</p>
         </div>
 
         <!-- Save inline error -->
@@ -260,21 +260,21 @@
             type="button"
             class="flex-1 glass-btn-primary rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-50"
           >
-            Save Event
+            {{ t('qa.save_event') }}
           </button>
           <button
             id="qa-save-another-btn"
             type="button"
             class="flex-1 glass-btn-secondary rounded-xl px-4 py-2 text-sm disabled:opacity-50"
           >
-            Save &amp; Add Another
+            {{ t('qa.save_add_another') }}
           </button>
           <button
             id="qa-back-btn"
             type="button"
             class="glass-btn-secondary rounded-xl px-4 py-2 text-sm"
           >
-            Back
+            {{ t('qa.back') }}
           </button>
         </div>
       </div>

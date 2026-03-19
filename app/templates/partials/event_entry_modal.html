@@ -8,14 +8,14 @@
        class="glass relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl p-5 sm:p-6">
     <div class="mb-4 flex items-start justify-between">
       <div>
-        <h2 id="event-entry-title" class="text-lg font-semibold text-white">Add Event</h2>
-        <p class="mt-1 text-xs text-white/60">Manual event entry with date and time pickers.</p>
+        <h2 id="event-entry-title" class="text-lg font-semibold text-white">{{ t('calendar.add_event') }}</h2>
+        <p class="mt-1 text-xs text-white/60">{{ t('event_entry.manual_help') }}</p>
       </div>
       <button id="event-entry-close-btn"
               type="button"
               class="glass-btn-secondary min-h-[44px] min-w-[44px] rounded-xl px-3 py-2 text-sm"
-              aria-label="Close event entry modal">
-        Close
+                aria-label="{{ t('qa.close_modal') }}">
+              {{ t('qa.close') }}
       </button>
     </div>
 
@@ -23,61 +23,61 @@
       <input id="event-entry-id" type="hidden" />
 
       <div>
-        <label for="event-entry-title-input" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">Title</label>
+        <label for="event-entry-title-input" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">{{ t('qa.title') }}</label>
         <input id="event-entry-title-input" class="glass-input" maxlength="200" required />
-        <p id="event-entry-title-error" class="mt-1 hidden text-xs text-red-300">Enter a valid title.</p>
+        <p id="event-entry-title-error" class="mt-1 hidden text-xs text-red-300">{{ t('event_entry.valid_title') }}</p>
       </div>
 
       <div>
-        <label for="event-entry-description" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">Description</label>
+        <label for="event-entry-description" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">{{ t('event_entry.description') }}</label>
         <textarea id="event-entry-description" class="glass-input" rows="2" style="resize:vertical"></textarea>
       </div>
 
       <div>
-        <label for="event-entry-visibility" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">Visibility</label>
+        <label for="event-entry-visibility" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">{{ t('qa.visibility') }}</label>
         <select id="event-entry-visibility" class="glass-input">
-          <option value="shared">Shared (household)</option>
-          <option value="private">Private (only me)</option>
+          <option value="shared">{{ t('qa.visibility_shared') }}</option>
+          <option value="private">{{ t('qa.visibility_private') }}</option>
         </select>
-        <p class="mt-1 text-xs text-white/40">Shared events appear for all household members. Private events are only visible to you.</p>
+        <p class="mt-1 text-xs text-white/40">{{ t('qa.visibility_help') }}</p>
       </div>
 
       <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <div>
-          <label for="event-entry-start-date" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">Start Date</label>
+          <label for="event-entry-start-date" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">{{ t('event_entry.start_date') }}</label>
           <input id="event-entry-start-date" type="date" class="glass-input" required />
-          <p id="event-entry-date-lock-note" class="mt-1 hidden text-xs text-cyan-200">Date locked to selected calendar day.</p>
-          <p id="event-entry-start-date-error" class="mt-1 hidden text-xs text-red-300">Choose a start date.</p>
+          <p id="event-entry-date-lock-note" class="mt-1 hidden text-xs text-cyan-200">{{ t('event_entry.date_locked') }}</p>
+          <p id="event-entry-start-date-error" class="mt-1 hidden text-xs text-red-300">{{ t('event_entry.choose_start_date') }}</p>
         </div>
         <div>
-          <label for="event-entry-start-time" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">Start Time</label>
+          <label for="event-entry-start-time" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">{{ t('event_entry.start_time') }}</label>
           <input id="event-entry-start-time" type="time" step="1800" class="glass-input" required />
-          <p id="event-entry-start-time-error" class="mt-1 hidden text-xs text-red-300">Choose a start time.</p>
+          <p id="event-entry-start-time-error" class="mt-1 hidden text-xs text-red-300">{{ t('event_entry.choose_start_time') }}</p>
         </div>
         <div>
-          <label for="event-entry-end-time" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">End Time (optional)</label>
+          <label for="event-entry-end-time" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">{{ t('event_entry.end_time') }}</label>
           <input id="event-entry-end-time" type="time" step="1800" class="glass-input" />
-          <p id="event-entry-end-time-error" class="mt-1 hidden text-xs text-red-300">End time adjusted automatically.</p>
+          <p id="event-entry-end-time-error" class="mt-1 hidden text-xs text-red-300">{{ t('event_entry.end_adjusted') }}</p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <div>
-          <label for="event-entry-repeat" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">Repeat</label>
+          <label for="event-entry-repeat" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">{{ t('qa.repeat') }}</label>
           <select id="event-entry-repeat" class="glass-input">
-            <option value="">No repeat</option>
-            <option value="DAILY">Daily</option>
-            <option value="WEEKLY">Weekly</option>
-            <option value="MONTHLY">Monthly</option>
-            <option value="YEARLY">Yearly</option>
+            <option value="">{{ t('qa.no_repeat') }}</option>
+            <option value="DAILY">{{ t('qa.repeat_daily') }}</option>
+            <option value="WEEKLY">{{ t('qa.repeat_weekly') }}</option>
+            <option value="MONTHLY">{{ t('qa.repeat_monthly') }}</option>
+            <option value="YEARLY">{{ t('qa.repeat_yearly') }}</option>
           </select>
         </div>
         <div>
-          <label for="event-entry-repeat-count" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">Repeat count</label>
+          <label for="event-entry-repeat-count" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">{{ t('event_entry.repeat_count') }}</label>
           <input id="event-entry-repeat-count" type="number" min="1" class="glass-input" />
         </div>
         <div>
-          <label for="event-entry-repeat-until" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">Repeat until</label>
+          <label for="event-entry-repeat-until" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">{{ t('qa.repeat_until') }}</label>
           <input id="event-entry-repeat-until" type="date" class="glass-input" />
         </div>
       </div>
@@ -85,9 +85,9 @@
       <p id="event-entry-save-error" class="hidden rounded-xl border border-red-400/30 bg-red-900/20 px-3 py-2 text-xs text-red-300" role="alert"></p>
 
       <div class="flex flex-wrap gap-2">
-        <button id="event-entry-save-btn" type="submit" class="glass-btn-primary min-h-[44px] rounded-xl px-4 py-2 text-sm font-medium" disabled>Save Event</button>
-        <button id="event-entry-save-another-btn" type="button" class="glass-btn-secondary min-h-[44px] rounded-xl px-4 py-2 text-sm" disabled>Save &amp; Add Another</button>
-        <button id="event-entry-cancel-btn" type="button" class="glass-btn-secondary min-h-[44px] rounded-xl px-4 py-2 text-sm">Cancel</button>
+        <button id="event-entry-save-btn" type="submit" class="glass-btn-primary min-h-[44px] rounded-xl px-4 py-2 text-sm font-medium" disabled>{{ t('qa.save_event') }}</button>
+        <button id="event-entry-save-another-btn" type="button" class="glass-btn-secondary min-h-[44px] rounded-xl px-4 py-2 text-sm" disabled>{{ t('qa.save_add_another') }}</button>
+        <button id="event-entry-cancel-btn" type="button" class="glass-btn-secondary min-h-[44px] rounded-xl px-4 py-2 text-sm">{{ t('qa.cancel') }}</button>
       </div>
     </form>
   </div>

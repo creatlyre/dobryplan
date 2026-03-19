@@ -1,12 +1,12 @@
 <div class="glass rounded-2xl p-4">
     <div class="mb-4 flex items-center justify-between">
-        <button class="glass-btn-secondary rounded-xl px-3 py-1.5 text-sm" hx-get="/calendar/month?year={{ prev_year }}&month={{ prev_month }}" hx-target="#month-grid" hx-swap="innerHTML" onclick="setMonthState({{ prev_year }}, {{ prev_month }})">← Prev</button>
+        <button class="glass-btn-secondary rounded-xl px-3 py-1.5 text-sm" hx-get="/calendar/month?year={{ prev_year }}&month={{ prev_month }}" hx-target="#month-grid" hx-swap="innerHTML" onclick="setMonthState({{ prev_year }}, {{ prev_month }})">&larr; {{ t('month.prev') }}</button>
         <h3 class="text-lg font-semibold text-white">{{ display_month_name }} {{ display_year }}</h3>
-        <button class="glass-btn-secondary rounded-xl px-3 py-1.5 text-sm" hx-get="/calendar/month?year={{ next_year }}&month={{ next_month }}" hx-target="#month-grid" hx-swap="innerHTML" onclick="setMonthState({{ next_year }}, {{ next_month }})">Next →</button>
+        <button class="glass-btn-secondary rounded-xl px-3 py-1.5 text-sm" hx-get="/calendar/month?year={{ next_year }}&month={{ next_month }}" hx-target="#month-grid" hx-swap="innerHTML" onclick="setMonthState({{ next_year }}, {{ next_month }})">{{ t('month.next') }} &rarr;</button>
     </div>
     <div class="grid grid-cols-7 gap-1 sm:gap-2 text-xs font-semibold uppercase text-white/50 mb-1">
-        <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
-        <div class="text-indigo-300/70">Sat</div><div class="text-indigo-300/70">Sun</div>
+        <div>{{ t('weekday.mon') }}</div><div>{{ t('weekday.tue') }}</div><div>{{ t('weekday.wed') }}</div><div>{{ t('weekday.thu') }}</div><div>{{ t('weekday.fri') }}</div>
+        <div class="text-indigo-300/70">{{ t('weekday.sat') }}</div><div class="text-indigo-300/70">{{ t('weekday.sun') }}</div>
     </div>
     <div class="mt-1 grid grid-cols-7 gap-1 sm:gap-2 text-xs">
         {% for week in weeks %}
@@ -19,7 +19,7 @@
                 <div class="truncate mt-0.5 text-[10px] sm:text-[11px] bg-indigo-500/25 text-indigo-200 rounded px-1 py-0.5">{{ event.start_at.strftime('%H:%M') }} {{ event.title }}</div>
                 {% endfor %}
                 {% if items|length > 2 %}
-                <div class="text-[10px] text-white/40 mt-0.5">+{{ items|length - 2 }} more</div>
+                <div class="text-[10px] text-white/40 mt-0.5">+{{ items|length - 2 }} {{ t('month.more') }}</div>
                 {% endif %}
             </button>
             {% endfor %}
