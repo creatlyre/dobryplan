@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from app.auth.supabase_auth import build_google_authorize_url
+
 from app.users.repository import UserRepository
 
 
@@ -58,3 +60,11 @@ def test_parse_invalid_session_returns_401_not_500(test_client, monkeypatch):
 
     assert response.status_code == 401
     assert response.json()["detail"] == "Invalid session"
+
+
+def test_build_google_authorize_url_includes_calendar_scopes():
+    url = build_google_authorize_url("http://localhost:8000/auth/callback")
+    assert "provider=google" in url
+    assert "scopes=" in url
+    assert "https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar" in url
+    assert "prompt=consent" in url

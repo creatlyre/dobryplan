@@ -17,7 +17,17 @@ def is_supabase_auth_enabled(settings: Settings | None = None) -> bool:
 def build_google_authorize_url(redirect_to: str) -> str:
     settings = Settings()
     base = settings.SUPABASE_URL.rstrip("/")
-    query = urlencode({"provider": "google", "redirect_to": redirect_to})
+    scope_value = " ".join(settings.GOOGLE_SCOPES)
+    query = urlencode(
+        {
+            "provider": "google",
+            "redirect_to": redirect_to,
+            "scopes": scope_value,
+            "prompt": "consent",
+            "access_type": "offline",
+            "include_granted_scopes": "true",
+        }
+    )
     return f"{base}/auth/v1/authorize?{query}"
 
 

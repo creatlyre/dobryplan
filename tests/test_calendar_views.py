@@ -292,3 +292,97 @@ def test_quick_add_ocr_fallback_on_errors(authenticated_client):
     html = _calendar_html(authenticated_client)
     assert "parsed.raw_text || 'No readable text extracted.'" in html
     assert "showPhase('fallback')" in html
+
+
+# ── Google sync panel (07-xx revisit) ─────────────────────────────────────
+
+def test_google_sync_panel_present(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert "Google Sync" in html
+    assert 'id="sync-status"' in html
+    assert 'id="sync-last-success"' in html
+    assert 'id="sync-refresh-btn"' in html
+    assert 'id="sync-export-btn"' in html
+    assert 'id="sync-import-btn"' in html
+    assert 'id="sync-connect-link"' in html
+
+
+def test_google_sync_panel_wiring(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert "fetch('/api/sync/status')" in html
+    assert "fetch(`/api/sync/export-month?year=${currentYear}&month=${currentMonth}`" in html
+    assert "fetch(`/api/sync/import-month?year=${currentYear}&month=${currentMonth}`" in html
+    assert "formatSyncTimestamp" in html
+    assert "Last successful sync:" in html
+    assert "loadSyncStatus();" in html
+    assert "syncRefreshBtn.addEventListener('click', loadSyncStatus)" in html
+    assert "syncExportBtn.addEventListener('click', exportCurrentMonthToGoogle)" in html
+    assert "syncImportBtn.addEventListener('click', importCurrentMonthFromGoogle)" in html
+    assert "No events found for this month" in html
+    assert "calendars_scanned" in html
+
+
+# ── Phase 7 UI/UX modal flow ──────────────────────────────────────────────
+
+def test_event_entry_modal_markup_present(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert 'id="event-entry-open-btn"' in html
+    assert 'id="event-entry-modal"' in html
+    assert 'id="event-entry-form"' in html
+    assert 'id="event-entry-title-input"' in html
+    assert 'id="event-entry-start-date"' in html
+    assert 'id="event-entry-start-time"' in html
+    assert 'id="event-entry-end-time"' in html
+
+
+def test_event_entry_modal_validation_and_submit_markers(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert "updateEventEntryValidation" in html
+    assert "eventEntrySaveBtn.disabled" in html
+    assert "eventEntrySaveAnotherBtn.disabled" in html
+    assert "autoCorrectEndDateTime" in html
+    assert "submitEventEntry" in html
+    assert "eventEntrySaveError" in html
+
+
+def test_event_entry_keyboard_routing_markers(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert "closeEventEntryModal" in html
+    assert "openEventEntryModal" in html
+    assert "Escape closes topmost visible modal" in html
+    assert "E opens manual event-entry modal only outside typing contexts." in html
+
+
+def test_quick_add_manual_entry_bridge_present(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert 'id="qa-manual-btn"' in html
+    assert "openManualFromQuickAdd" in html
+    assert "qaManualBtn.addEventListener('click'" in html
+
+
+def test_event_entry_mobile_fullscreen_markers(authenticated_client):
+    html = _calendar_html(authenticated_client)
+    assert "#event-entry-modal" in html
+    assert "#event-entry-panel" in html
+    assert "min-height: 100vh" in html
+    assert "max-width: 100%" in html
+
+
+def test_day_click_opens_event_entry_for_selected_day(authenticated_client):
+    month = authenticated_client.get("/calendar/month?year=2026&month=3")
+    assert month.status_code == 200
+    assert "openEventEntryForDay(" in month.text
+
+    html = _calendar_html(authenticated_client)
+    assert "function openEventEntryForDay(year, month, day)" in html
+    assert "Date locked to selected calendar day." in html
+    assert "setEventEntryDateLocked(true)" in html
+
+
+def test_invite_back_link_present(authenticated_client):
+    response = authenticated_client.get("/invite")
+    assert response.status_code == 200
+    html = response.text
+    assert 'href="/calendar"' in html
+    assert "Back to Calendar" in html
+    assert "focus-visible:ring-cyan-300" in html

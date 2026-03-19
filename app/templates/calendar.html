@@ -18,22 +18,43 @@
     <aside class="space-y-4">
         <div class="glass rounded-2xl p-4">
             <div class="mb-3 flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-white">Event Editor</h3>
+          <h3 class="text-lg font-semibold text-white">Event Entry</h3>
+          <button id="event-entry-open-btn"
+              type="button"
+              class="glass-btn-secondary rounded-xl px-3 py-1.5 text-sm font-medium">
+            + Add Event
+          </button>
                 <button id="qa-open-btn"
                         type="button"
                     class="glass-btn-primary rounded-xl px-3 py-1.5 text-sm font-medium">
                     &#9889; Quick Add
                 </button>
             </div>
-            {% include "partials/event_form.html" %}
+        <p class="text-sm text-white/70">Use Quick Add for natural language input or open the manual event modal for structured entry.</p>
         </div>
 
+      {% include "partials/event_entry_modal.html" %}
         {% include "partials/quick_add_modal.html" %}
 
         <div class="glass rounded-2xl p-4">
             <h3 class="mb-2 text-lg font-semibold text-white">Household</h3>
             <div id="household-info" class="text-sm text-white/60">Loading…</div>
             <a href="/invite" class="mt-3 inline-block glass-btn-primary rounded-xl px-3 py-2 text-sm font-medium">Invite Member</a>
+        </div>
+
+        <div class="glass rounded-2xl p-4">
+          <div class="mb-2 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-white">Google Sync</h3>
+            <button id="sync-refresh-btn" type="button" class="glass-btn-secondary rounded-xl px-3 py-1.5 text-xs font-medium">Refresh</button>
+          </div>
+          <div id="sync-status" class="text-sm text-white/70">Loading sync status…</div>
+          <p id="sync-last-success" class="mt-1 text-xs text-white/60">Last successful sync: checking…</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <a id="sync-connect-link" href="/auth/login" class="glass-btn-secondary hidden rounded-xl px-3 py-2 text-sm font-medium">Connect Google</a>
+            <button id="sync-export-btn" type="button" class="glass-btn-primary rounded-xl px-3 py-2 text-sm font-medium">Sync This Month</button>
+            <button id="sync-import-btn" type="button" class="glass-btn-secondary rounded-xl px-3 py-2 text-sm font-medium">Pull From Google</button>
+          </div>
+          <p id="sync-result" class="mt-2 text-xs text-white/70"></p>
         </div>
     </aside>
 </div>
@@ -53,6 +74,11 @@ function loadDay(year, month, day) {
   currentMonth = month;
   currentDay = day;
   htmx.ajax('GET', `/calendar/day?year=${year}&month=${month}&day=${day}`, '#day-events');
+}
+
+function selectedDayIsoDate() {
+  const date = new Date(Date.UTC(currentYear, currentMonth - 1, currentDay));
+  return date.toISOString().split('T')[0];
 }
 
 function resetEventForm() {
@@ -99,41 +125,301 @@ async function refreshPanels() {
   await htmx.ajax('GET', `/calendar/day?year=${currentYear}&month=${currentMonth}&day=${currentDay}`, '#day-events');
 }
 
-async function submitEventForm(event) {
-  event.preventDefault();
-  const eventId = document.getElementById('event-id').value;
+const eventEntryModal = document.getElementById('event-entry-modal');
+const eventEntryPanel = document.getElementById('event-entry-panel');
+const eventEntryForm = document.getElementById('event-entry-form');
+const eventEntryOpenBtn = document.getElementById('event-entry-open-btn');
+const eventEntryCloseBtn = document.getElementById('event-entry-close-btn');
+const eventEntryCancelBtn = document.getElementById('event-entry-cancel-btn');
+const eventEntrySaveBtn = document.getElementById('event-entry-save-btn');
+const eventEntrySaveAnotherBtn = document.getElementById('event-entry-save-another-btn');
+const eventEntrySaveError = document.getElementById('event-entry-save-error');
+const eventEntryIdInput = document.getElementById('event-entry-id');
+const eventEntryTitleInput = document.getElementById('event-entry-title-input');
+const eventEntryDescriptionInput = document.getElementById('event-entry-description');
+const eventEntryStartDateInput = document.getElementById('event-entry-start-date');
+const eventEntryStartTimeInput = document.getElementById('event-entry-start-time');
+const eventEntryEndTimeInput = document.getElementById('event-entry-end-time');
+const eventEntryRepeatInput = document.getElementById('event-entry-repeat');
+const eventEntryRepeatCountInput = document.getElementById('event-entry-repeat-count');
+const eventEntryRepeatUntilInput = document.getElementById('event-entry-repeat-until');
+const eventEntryTitleError = document.getElementById('event-entry-title-error');
+const eventEntryStartDateError = document.getElementById('event-entry-start-date-error');
+const eventEntryStartTimeError = document.getElementById('event-entry-start-time-error');
+const eventEntryEndTimeError = document.getElementById('event-entry-end-time-error');
+const eventEntryDateLockNote = document.getElementById('event-entry-date-lock-note');
+
+let eventEntryDirty = false;
+let eventEntrySaveInFlight = false;
+let eventEntryLastTrigger = null;
+let eventEntryDateLocked = false;
+
+function parseDateTimeParts(dateValue, timeValue) {
+  if (!dateValue || !timeValue) {
+    return null;
+  }
+  return new Date(`${dateValue}T${timeValue}`);
+}
+
+function dateToYmd(dateObj) {
+  return dateObj.toISOString().split('T')[0];
+}
+
+function dateToHm(dateObj) {
+  return dateObj.toTimeString().slice(0, 5);
+}
+
+function clearEventEntryErrorState() {
+  eventEntryTitleError.classList.add('hidden');
+  eventEntryStartDateError.classList.add('hidden');
+  eventEntryStartTimeError.classList.add('hidden');
+  eventEntryEndTimeError.classList.add('hidden');
+  eventEntrySaveError.classList.add('hidden');
+  eventEntrySaveError.textContent = '';
+}
+
+function setEventEntryDateLocked(locked) {
+  eventEntryDateLocked = locked;
+  eventEntryStartDateInput.disabled = locked;
+  eventEntryDateLockNote.classList.toggle('hidden', !locked);
+}
+
+function resetEventEntryForm() {
+  eventEntryForm.reset();
+  eventEntryIdInput.value = '';
+  eventEntryStartDateInput.value = selectedDayIsoDate();
+  setEventEntryDateLocked(false);
+  eventEntryDirty = false;
+  clearEventEntryErrorState();
+  updateEventEntryValidation();
+}
+
+function buildEventEntryRRule() {
+  const freq = eventEntryRepeatInput.value;
+  if (!freq) {
+    return null;
+  }
+  const parts = [`FREQ=${freq}`];
+  if (eventEntryRepeatCountInput.value) {
+    parts.push(`COUNT=${parseInt(eventEntryRepeatCountInput.value, 10)}`);
+  }
+  if (eventEntryRepeatUntilInput.value) {
+    parts.push(`UNTIL=${eventEntryRepeatUntilInput.value.replaceAll('-', '')}T235959Z`);
+  }
+  return parts.join(';');
+}
+
+function updateEventEntryValidation() {
+  const titleValue = eventEntryTitleInput.value.trim();
+  const startDate = eventEntryStartDateInput.value;
+  const startTime = eventEntryStartTimeInput.value;
+  const endTime = eventEntryEndTimeInput.value;
+
+  const validTitle = titleValue.length >= 3 && titleValue.length <= 200;
+  const validStartDate = Boolean(startDate);
+  const validStartTime = Boolean(startTime);
+
+  eventEntryTitleError.classList.toggle('hidden', validTitle);
+  eventEntryStartDateError.classList.toggle('hidden', validStartDate);
+  eventEntryStartTimeError.classList.toggle('hidden', validStartTime);
+
+  if (!endTime || !validStartDate || !validStartTime) {
+    eventEntryEndTimeError.classList.add('hidden');
+  }
+
+  const validForm = validTitle && validStartDate && validStartTime;
+  eventEntrySaveBtn.disabled = !validForm || eventEntrySaveInFlight;
+  eventEntrySaveAnotherBtn.disabled = !validForm || eventEntrySaveInFlight;
+  return validForm;
+}
+
+function populateEventEntryFromDateTimeLocal(startAt, endAt) {
+  const startDate = startAt ? new Date(startAt) : null;
+  const endDate = endAt ? new Date(endAt) : null;
+
+  if (startDate && !Number.isNaN(startDate.getTime())) {
+    eventEntryStartDateInput.value = dateToYmd(startDate);
+    eventEntryStartTimeInput.value = dateToHm(startDate);
+  }
+
+  if (endDate && !Number.isNaN(endDate.getTime())) {
+    eventEntryEndTimeInput.value = dateToHm(endDate);
+  }
+}
+
+function prefillEvent(eventId, title, description, startAt, endAt) {
+  resetEventEntryForm();
+  eventEntryIdInput.value = eventId || '';
+  eventEntryTitleInput.value = title || '';
+  eventEntryDescriptionInput.value = description || '';
+  populateEventEntryFromDateTimeLocal(startAt, endAt);
+  setEventEntryDateLocked(false);
+  updateEventEntryValidation();
+  openEventEntryModal(document.activeElement);
+}
+
+function openEventEntryForDay(year, month, day) {
+  loadDay(year, month, day);
+  resetEventEntryForm();
+  eventEntryStartDateInput.value = new Date(Date.UTC(year, month - 1, day)).toISOString().split('T')[0];
+  setEventEntryDateLocked(true);
+  updateEventEntryValidation();
+  openEventEntryModal(document.activeElement || eventEntryOpenBtn);
+}
+
+function openEventEntryModal(trigger = null) {
+  if (trigger) {
+    eventEntryLastTrigger = trigger;
+  }
+  eventEntryModal.classList.remove('hidden');
+  eventEntryModal.classList.add('flex');
+  eventEntryTitleInput.focus();
+}
+
+function closeEventEntryModal(force = false) {
+  if (eventEntrySaveInFlight) {
+    return;
+  }
+  if (!force && eventEntryDirty && !confirm('Discard unsaved event changes?')) {
+    return;
+  }
+  eventEntryModal.classList.add('hidden');
+  eventEntryModal.classList.remove('flex');
+  resetEventEntryForm();
+  if (eventEntryLastTrigger && typeof eventEntryLastTrigger.focus === 'function') {
+    eventEntryLastTrigger.focus();
+  }
+}
+
+function openManualFromQuickAdd(prefill = null) {
+  const quickAddModal = document.getElementById('quick-add-modal');
+  quickAddModal.classList.add('hidden');
+  quickAddModal.classList.remove('flex');
+  resetEventEntryForm();
+  if (prefill) {
+    eventEntryTitleInput.value = prefill.title || '';
+    if (prefill.start_at) {
+      populateEventEntryFromDateTimeLocal(prefill.start_at, prefill.end_at || null);
+    }
+  }
+  setEventEntryDateLocked(false);
+  updateEventEntryValidation();
+  openEventEntryModal(document.getElementById('qa-open-btn'));
+}
+
+function autoCorrectEndDateTime(startDate, endDate) {
+  if (!endDate || endDate > startDate) {
+    return endDate;
+  }
+  eventEntryEndTimeError.classList.remove('hidden');
+  const corrected = new Date(startDate.getTime() + (60 * 60 * 1000));
+  eventEntryEndTimeInput.value = dateToHm(corrected);
+  return corrected;
+}
+
+async function submitEventEntry(keepOpen) {
+  if (!updateEventEntryValidation()) {
+    return;
+  }
+
+  const startDate = parseDateTimeParts(eventEntryStartDateInput.value, eventEntryStartTimeInput.value);
+  if (!startDate) {
+    return;
+  }
+
+  const rawEndDate = eventEntryEndTimeInput.value
+    ? parseDateTimeParts(eventEntryStartDateInput.value, eventEntryEndTimeInput.value)
+    : new Date(startDate.getTime() + (60 * 60 * 1000));
+  const endDate = autoCorrectEndDateTime(startDate, rawEndDate);
+
   const payload = {
-    title: document.getElementById('event-title').value,
-    description: document.getElementById('event-description').value || null,
-    start_at: new Date(document.getElementById('event-start').value).toISOString(),
-    end_at: new Date(document.getElementById('event-end').value).toISOString(),
+    title: eventEntryTitleInput.value.trim(),
+    description: eventEntryDescriptionInput.value.trim() || null,
+    start_at: startDate.toISOString(),
+    end_at: endDate.toISOString(),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-    rrule: buildRRule()
+    rrule: buildEventEntryRRule()
   };
 
+  const eventId = eventEntryIdInput.value;
   const method = eventId ? 'PUT' : 'POST';
   const endpoint = eventId ? `/api/events/${eventId}` : '/api/events';
 
-  const response = await fetch(endpoint, {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
+  eventEntrySaveInFlight = true;
+  eventEntrySaveBtn.disabled = true;
+  eventEntrySaveAnotherBtn.disabled = true;
 
-  if (!response.ok) {
-    const data = await response.json().catch(() => ({}));
-    alert(data.detail || 'Failed to save event');
-    return false;
+  try {
+    const response = await fetch(endpoint, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      eventEntrySaveError.textContent = data.detail || 'Failed to save event.';
+      eventEntrySaveError.classList.remove('hidden');
+      return;
+    }
+
+    const saved = await response.json();
+    const savedDate = new Date(saved.start_at);
+    currentYear = savedDate.getUTCFullYear();
+    currentMonth = savedDate.getUTCMonth() + 1;
+    currentDay = savedDate.getUTCDate();
+    await refreshPanels();
+    showToast('Event saved');
+
+    if (keepOpen) {
+      resetEventEntryForm();
+      eventEntryTitleInput.focus();
+    } else {
+      closeEventEntryModal(true);
+    }
+  } catch (_) {
+    eventEntrySaveError.textContent = 'Network error. Try again.';
+    eventEntrySaveError.classList.remove('hidden');
+  } finally {
+    eventEntrySaveInFlight = false;
+    updateEventEntryValidation();
   }
+}
 
-  const saved = await response.json();
-  const savedDate = new Date(saved.start_at);
-  currentYear = savedDate.getUTCFullYear();
-  currentMonth = savedDate.getUTCMonth() + 1;
-  currentDay = savedDate.getUTCDate();
+eventEntryOpenBtn.addEventListener('click', () => {
+  resetEventEntryForm();
+  setEventEntryDateLocked(false);
+  openEventEntryModal(eventEntryOpenBtn);
+});
+eventEntryCloseBtn.addEventListener('click', () => closeEventEntryModal());
+eventEntryCancelBtn.addEventListener('click', () => closeEventEntryModal());
 
-  resetEventForm();
-  await refreshPanels();
+eventEntryForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  await submitEventEntry(false);
+});
+eventEntrySaveAnotherBtn.addEventListener('click', async () => {
+  await submitEventEntry(true);
+});
+
+[eventEntryTitleInput, eventEntryDescriptionInput, eventEntryStartDateInput,
+ eventEntryStartTimeInput, eventEntryEndTimeInput, eventEntryRepeatInput,
+ eventEntryRepeatCountInput, eventEntryRepeatUntilInput].forEach((element) => {
+  element.addEventListener('input', () => {
+    eventEntryDirty = true;
+    updateEventEntryValidation();
+  });
+});
+
+eventEntryModal.addEventListener('click', (event) => {
+  if (event.target === eventEntryModal) {
+    closeEventEntryModal();
+  }
+});
+
+async function submitEventForm(event) {
+  event.preventDefault();
+  await submitEventEntry(false);
   return false;
 }
 
@@ -161,6 +447,149 @@ fetch('/api/users/household')
     document.getElementById('household-info').textContent = 'Failed to load household data.';
   });
 
+const syncStatusEl = document.getElementById('sync-status');
+const syncLastSuccessEl = document.getElementById('sync-last-success');
+const syncResultEl = document.getElementById('sync-result');
+const syncExportBtn = document.getElementById('sync-export-btn');
+const syncImportBtn = document.getElementById('sync-import-btn');
+const syncRefreshBtn = document.getElementById('sync-refresh-btn');
+const syncConnectLink = document.getElementById('sync-connect-link');
+
+function formatSyncTimestamp(isoDateTime) {
+  if (!isoDateTime) {
+    return 'Never';
+  }
+  const parsed = new Date(isoDateTime);
+  if (Number.isNaN(parsed.getTime())) {
+    return 'Unknown';
+  }
+  return parsed.toLocaleString();
+}
+
+function setSyncBusy(isBusy) {
+  syncExportBtn.disabled = isBusy;
+  syncImportBtn.disabled = isBusy;
+  syncRefreshBtn.disabled = isBusy;
+}
+
+function renderSyncStatus(data) {
+  if (!data) {
+    syncStatusEl.textContent = 'Unable to load sync status.';
+    syncLastSuccessEl.textContent = 'Last successful sync: unknown';
+    return;
+  }
+
+  syncLastSuccessEl.textContent = `Last successful sync: ${formatSyncTimestamp(data.last_successful_sync_at)}`;
+
+  if (!data.oauth_configured) {
+    syncStatusEl.textContent = 'Google OAuth is not configured on this server.';
+    syncConnectLink.classList.add('hidden');
+    syncExportBtn.disabled = true;
+    syncImportBtn.disabled = true;
+    return;
+  }
+
+  const householdText = data.household_users === 1 ? '1 member' : `${data.household_users} members`;
+  if (!data.google_connected) {
+    syncStatusEl.textContent = `Google account not connected. Household: ${householdText}.`;
+    syncConnectLink.href = data.connect_url || '/auth/login';
+    syncConnectLink.classList.remove('hidden');
+    syncExportBtn.disabled = true;
+    syncImportBtn.disabled = true;
+    return;
+  }
+
+  syncStatusEl.textContent = `Ready to sync. Household: ${householdText}.`;
+  syncConnectLink.classList.add('hidden');
+  syncExportBtn.disabled = false;
+  syncImportBtn.disabled = false;
+}
+
+async function loadSyncStatus() {
+  setSyncBusy(true);
+  syncResultEl.textContent = '';
+  try {
+    const response = await fetch('/api/sync/status');
+    if (!response.ok) {
+      throw new Error('status_error');
+    }
+    const data = await response.json();
+    renderSyncStatus(data);
+  } catch (_) {
+    syncStatusEl.textContent = 'Failed to load sync status.';
+  } finally {
+    setSyncBusy(false);
+  }
+}
+
+async function exportCurrentMonthToGoogle() {
+  setSyncBusy(true);
+  syncResultEl.textContent = 'Syncing current month to Google Calendar…';
+  try {
+    const response = await fetch(`/api/sync/export-month?year=${currentYear}&month=${currentMonth}`, {
+      method: 'POST'
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.detail || 'Sync failed');
+    }
+
+    const result = await response.json();
+    const errorCount = (result.errors || []).length;
+    syncResultEl.textContent = `Synced ${result.events_synced} event(s) across ${result.users_synced} user(s).` +
+      (errorCount ? ` ${errorCount} warning(s): ${(result.errors || []).slice(0, 2).join(' | ')}` : '');
+    await loadSyncStatus();
+  } catch (error) {
+    syncResultEl.textContent = `Sync failed: ${error.message || 'unknown error'}`;
+  } finally {
+    setSyncBusy(false);
+  }
+}
+
+async function importCurrentMonthFromGoogle() {
+  setSyncBusy(true);
+  syncResultEl.textContent = 'Pulling current month from Google Calendar…';
+  try {
+    const response = await fetch(`/api/sync/import-month?year=${currentYear}&month=${currentMonth}`, {
+      method: 'POST'
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.detail || 'Pull failed');
+    }
+
+    const result = await response.json();
+    const errorCount = (result.errors || []).length;
+    const scanned = result.calendars_scanned || 0;
+    if (result.requires_reauth) {
+      syncConnectLink.href = '/auth/login';
+      syncConnectLink.classList.remove('hidden');
+    }
+    if (!errorCount && result.events_imported === 0 && result.events_updated === 0) {
+      syncResultEl.textContent = `Pull complete. No events found for this month in ${scanned} Google calendar(s).`;
+    } else {
+      syncResultEl.textContent = `Pulled ${result.events_imported} new event(s), updated ${result.events_updated} event(s) from ${scanned} calendar(s).` +
+        (errorCount ? ` ${errorCount} warning(s): ${(result.errors || []).slice(0, 2).join(' | ')}` : '');
+    }
+    if (result.requires_reauth) {
+      syncResultEl.textContent += ' Reconnect Google to grant calendar permissions.';
+    }
+    await refreshPanels();
+    await loadSyncStatus();
+  } catch (error) {
+    syncResultEl.textContent = `Pull failed: ${error.message || 'unknown error'}`;
+  } finally {
+    setSyncBusy(false);
+  }
+}
+
+syncRefreshBtn.addEventListener('click', loadSyncStatus);
+syncExportBtn.addEventListener('click', exportCurrentMonthToGoogle);
+syncImportBtn.addEventListener('click', importCurrentMonthFromGoogle);
+loadSyncStatus();
+
 // ── Quick Add Modal ────────────────────────────────────────────────────────
 (function () {
   const qaModal       = document.getElementById('quick-add-modal');
@@ -170,6 +599,7 @@ fetch('/api/users/household')
   const qaLoading     = document.getElementById('qa-loading');
   const qaTextInput   = document.getElementById('qa-text-input');
   const qaParseBtn    = document.getElementById('qa-parse-btn');
+  const qaManualBtn   = document.getElementById('qa-manual-btn');
   const qaOcrBtn      = document.getElementById('qa-ocr-btn');
   const qaOcrInput    = document.getElementById('qa-ocr-input');
   const qaSaveBtn     = document.getElementById('qa-save-btn');
@@ -795,6 +1225,7 @@ fetch('/api/users/household')
   document.getElementById('qa-open-btn').addEventListener('click', openModal);
   document.getElementById('qa-header-close-btn').addEventListener('click', closeModal);
   document.getElementById('qa-close-btn-text').addEventListener('click', closeModal);
+  qaManualBtn.addEventListener('click', () => openManualFromQuickAdd());
 
   document.getElementById('qa-back-btn').addEventListener('click', () => {
     showPhase('text-entry');
@@ -814,11 +1245,34 @@ fetch('/api/users/household')
     qaTextInput.focus();
   });
 
-  // Escape closes modal (not during save)
+  // Escape closes topmost visible modal (not during save)
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !qaModal.classList.contains('hidden') && !_saveInFlight) {
-      closeModal();
+    if (e.key === 'Escape') {
+      const eventEntryVisible = !eventEntryModal.classList.contains('hidden');
+      const quickAddVisible = !qaModal.classList.contains('hidden');
+      if (eventEntryVisible) {
+        closeEventEntryModal();
+        return;
+      }
+      if (quickAddVisible && !_saveInFlight) {
+        closeModal();
+      }
     }
+  });
+
+  // E opens manual event-entry modal only outside typing contexts.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'e' && e.key !== 'E') return;
+    const active = document.activeElement;
+    const typing = active && (
+      active.tagName === 'INPUT' ||
+      active.tagName === 'TEXTAREA' ||
+      active.isContentEditable
+    );
+    if (typing) return;
+    if (!eventEntryModal.classList.contains('hidden')) return;
+    resetEventEntryForm();
+    openEventEntryModal(eventEntryOpenBtn);
   });
 
   // ── Focus Trap & Keyboard Navigation (WCAG 2.1 AA) ──────────────────────

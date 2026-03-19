@@ -31,6 +31,7 @@ class Settings(BaseSettings):
             "https://www.googleapis.com/auth/calendar",
         ]
     )
+    GOOGLE_EVENT_REMINDER_MINUTES: int = 30
 
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRY_HOURS: int = 8

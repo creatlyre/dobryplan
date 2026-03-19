@@ -214,7 +214,7 @@
 - Form validation: client-side instant feedback prevents invalid submissions
 - Date/time UX: replace datetime-local with separate date + time inputs using native pickers
 
-**Plans:** 0/4 planned (ready for execution)
+**Plans:** 4/4 planned (ready for execution)
 
 - [ ] 07-01-PLAN.md - Back button + modal structure
 - [ ] 07-02-PLAN.md - Date/time picker inputs + validation logic
