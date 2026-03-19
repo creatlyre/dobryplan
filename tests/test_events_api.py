@@ -131,7 +131,7 @@ def test_parse_event_uses_calendar_timezone(authenticated_client, test_db, test_
 def test_ocr_parse_event_success(authenticated_client, monkeypatch):
     now = datetime(2026, 3, 20, 14, 0, 0)
 
-    def fake_parse_image(self, image_bytes, timezone, context_date):
+    def fake_parse_image(self, image_bytes, timezone, context_date, locale="en"):
         assert image_bytes == b"fake-image-bytes"
         return OCRParseResult(
             title="School concert",

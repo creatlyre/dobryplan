@@ -26,7 +26,7 @@ class OCRService:
     def __init__(self, reader: Any | None = None) -> None:
         self._reader = reader
 
-    def _get_reader(self) -> Any:
+    def _get_reader(self, locale: str = "en") -> Any:
         if self._reader is not None:
             return self._reader
 
@@ -35,7 +35,8 @@ class OCRService:
         except Exception as exc:  # pragma: no cover - exercised in environments without easyocr
             raise RuntimeError("EasyOCR is not installed") from exc
 
-        self._reader = easyocr.Reader(["en"], gpu=False)
+        langs = ["pl", "en"] if locale == "pl" else ["en"]
+        self._reader = easyocr.Reader(langs, gpu=False)
         return self._reader
 
     @staticmethod
@@ -57,12 +58,12 @@ class OCRService:
 
         return texts, confidences
 
-    def parse_image(self, image_bytes: bytes, timezone: str, context_date: datetime | None = None) -> OCRParseResult:
+    def parse_image(self, image_bytes: bytes, timezone: str, context_date: datetime | None = None, locale: str = "en") -> OCRParseResult:
         if not image_bytes:
             return OCRParseResult(timezone=timezone, errors=["No image data provided"])
 
         try:
-            reader = self._get_reader()
+            reader = self._get_reader(locale)
             read_result = reader.readtext(image_bytes)
         except Exception as exc:
             return OCRParseResult(timezone=timezone, errors=[f"OCR unavailable: {exc}"])
@@ -74,7 +75,7 @@ class OCRService:
 
         avg_conf = sum(confidences) / len(confidences) if confidences else 0.0
         nlp = NLPService()
-        parsed = nlp.parse(raw_text, timezone, context_date)
+        parsed = nlp.parse(raw_text, timezone, context_date, locale=locale)
 
         end_at = parsed.end_at
         if parsed.start_at and end_at is None:

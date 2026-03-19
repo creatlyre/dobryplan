@@ -97,7 +97,7 @@ async def parse_event(payload: ParseEventRequest, request: Request, user=Depends
     
     # Parse the text
     nlp = NLPService()
-    result = nlp.parse(payload.text, timezone, context_date)
+    result = nlp.parse(payload.text, timezone, context_date, locale=user_locale)
 
     # Return as response model
     return ParseEventResponse(
@@ -137,7 +137,7 @@ async def parse_event_from_image(
             raise HTTPException(status_code=400, detail=_msg(user_locale, "events.invalid_context_date")) from None
 
     timezone = _resolve_timezone(user, db)
-    result = OCRService().parse_image(image_bytes, timezone, parsed_context)
+    result = OCRService().parse_image(image_bytes, timezone, parsed_context, locale=user_locale)
 
     return OCRParseResponse(
         title=result.title,
