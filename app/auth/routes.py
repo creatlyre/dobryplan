@@ -151,7 +151,7 @@ async def oauth_callback(
 
     if not code:
         # Supabase OAuth implicit flow delivers tokens in URL fragment; JS forwards them to /auth/session.
-        locale = get_request_locale(request)
+        locale = resolve_locale(request)
         unknown_error = json.dumps(_msg(request, "sync.unknown"))
         return HTMLResponse(
             f"""
