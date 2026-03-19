@@ -376,3 +376,182 @@ class TestConfidenceScores:
             context_date,
         )
         assert result.confidence_date < 1.0
+
+
+class TestPolishParsing:
+    """Test Polish locale parsing for keywords, months, and diacritics."""
+
+    def test_parse_polish_jutro(self, nlp_service, context_date):
+        """Test Polish 'jutro' (tomorrow) keyword."""
+        result = nlp_service.parse(
+            "dentysta jutro o 14",
+            "Europe/Warsaw",
+            context_date,
+            locale="pl",
+        )
+        expected = context_date + timedelta(days=1)
+        assert result.start_at is not None
+        assert result.start_at.date() == expected.date()
+        assert result.start_at.hour == 14
+        assert result.errors == []
+
+    def test_parse_polish_dzisiaj(self, nlp_service, context_date):
+        """Test Polish 'dzisiaj' (today) keyword."""
+        result = nlp_service.parse(
+            "spotkanie dzisiaj o 16",
+            "Europe/Warsaw",
+            context_date,
+            locale="pl",
+        )
+        assert result.start_at is not None
+        assert result.start_at.date() == context_date.date()
+        assert result.start_at.hour == 16
+        assert result.errors == []
+
+    def test_parse_polish_weekday_poniedzialek(self, nlp_service, context_date):
+        """Test Polish weekday 'poniedziałek' (Monday) with modifier."""
+        result = nlp_service.parse(
+            "trening następny poniedziałek",
+            "Europe/Warsaw",
+            context_date,
+            locale="pl",
+        )
+        assert result.start_at is not None
+        assert result.start_at.weekday() == 0  # Monday
+        assert result.errors == []
+
+    def test_parse_polish_weekday_ascii(self, nlp_service, context_date):
+        """Test Polish weekday without diacritics: 'poniedzialek'."""
+        result = nlp_service.parse(
+            "trening nastepny poniedzialek",
+            "Europe/Warsaw",
+            context_date,
+            locale="pl",
+        )
+        assert result.start_at is not None
+        assert result.start_at.weekday() == 0  # Monday
+        assert result.errors == []
+
+    def test_parse_polish_month_marzec(self, nlp_service, context_date):
+        """Test Polish month 'marca' (March, genitive) with DD month pattern."""
+        result = nlp_service.parse(
+            "koncert 25 marca",
+            "Europe/Warsaw",
+            context_date,
+            locale="pl",
+        )
+        assert result.start_at is not None
+        assert result.start_at.month == 3
+        assert result.start_at.day == 25
+        assert result.errors == []
+
+    def test_parse_polish_month_kwiecien(self, nlp_service, context_date):
+        """Test Polish month 'kwietnia' (April, genitive)."""
+        result = nlp_service.parse(
+            "spotkanie 10 kwietnia",
+            "Europe/Warsaw",
+            context_date,
+            locale="pl",
+        )
+        assert result.start_at is not None
+        assert result.start_at.month == 4
+        assert result.start_at.day == 10
+        assert result.errors == []
+
+    def test_parse_polish_recurrence_codziennie(self, nlp_service, context_date):
+        """Test Polish recurrence 'codziennie' (daily)."""
+        result = nlp_service.parse(
+            "ćwiczenia jutro codziennie",
+            "Europe/Warsaw",
+            context_date,
+            locale="pl",
+        )
+        assert result.recurrence is not None
+        assert result.recurrence["freq"] == "DAILY"
+        assert result.errors == []
+
+    def test_parse_polish_recurrence_co_tydzien(self, nlp_service, context_date):
+        """Test Polish recurrence 'co tydzień' (weekly)."""
+        result = nlp_service.parse(
+            "trening co tydzień",
+            "Europe/Warsaw",
+            context_date,
+            locale="pl",
+        )
+        assert result.recurrence is not None
+        assert result.recurrence["freq"] == "WEEKLY"
+
+    def test_parse_polish_time_rano(self, nlp_service, context_date):
+        """Test Polish time keyword 'rano' (morning)."""
+        result = nlp_service.parse(
+            "spacer jutro rano",
+            "Europe/Warsaw",
+            context_date,
+            locale="pl",
+        )
+        assert result.start_at is not None
+        assert result.start_at.hour == 9  # rano = morning = 09:00
+        assert result.errors == []
+
+    def test_parse_polish_title_preserves_diacritics(self, nlp_service, context_date):
+        """Test that Polish diacritics (ą, ć, ę, ł, ń, ó, ś, ź, ż) are preserved in title."""
+        result = nlp_service.parse(
+            "zażółć jutro o 10",
+            "Europe/Warsaw",
+            context_date,
+            locale="pl",
+        )
+        assert result.title is not None
+        assert "zażółć" in result.title.lower()
+        assert result.errors == []
+
+    def test_parse_polish_title_diacritics_complex(self, nlp_service, context_date):
+        """Test that multi-word Polish titles keep diacritics: 'gęślą jaźń'."""
+        result = nlp_service.parse(
+            "gęślą jaźń jutro",
+            "Europe/Warsaw",
+            context_date,
+            locale="pl",
+        )
+        assert result.title is not None
+        # Title should preserve Polish letters, not strip them
+        assert any(c in result.title for c in "ęśąź")
+
+    def test_parse_polish_za_n_dni(self, nlp_service, context_date):
+        """Test Polish 'za N dni' (in N days) relative date pattern."""
+        result = nlp_service.parse(
+            "wizyta za 3 dni",
+            "Europe/Warsaw",
+            context_date,
+            locale="pl",
+        )
+        expected = context_date + timedelta(days=3)
+        assert result.start_at is not None
+        assert result.start_at.date() == expected.date()
+        assert result.errors == []
+
+    def test_english_still_works_with_pl_locale(self, nlp_service, context_date):
+        """Parity test: English phrases still parse correctly under Polish locale."""
+        result = nlp_service.parse(
+            "dentist tomorrow 2pm",
+            "America/New_York",
+            context_date,
+            locale="pl",
+        )
+        expected = context_date + timedelta(days=1)
+        assert result.start_at is not None
+        assert result.start_at.date() == expected.date()
+        assert result.start_at.hour == 14
+        assert result.errors == []
+
+    def test_english_default_locale_unchanged(self, nlp_service, context_date):
+        """Parity test: default locale=en behavior is intact."""
+        result = nlp_service.parse(
+            "meeting next Friday 2pm",
+            "America/New_York",
+            context_date,
+        )
+        assert result.start_at is not None
+        assert result.start_at.weekday() == 4  # Friday
+        assert result.start_at.hour == 14
+        assert result.errors == []
