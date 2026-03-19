@@ -4,12 +4,12 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 07
 status: completed
-last_updated: "2026-03-19T16:09:55.672Z"
+last_updated: "2026-03-19T18:29:02.869Z"
 progress:
-  total_phases: 6
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_phases: 8
+  completed_phases: 7
+  total_plans: 22
+  completed_plans: 22
 ---
 
 # Session State
@@ -21,8 +21,8 @@ See: .planning/PROJECT.md
 ## Position
 
 **Milestone:** v1.0 milestone
-**Current phase:** 07
-**Status:** Milestone complete
+**Current phase:** 08 (planned)
+**Status:** v1.0 milestone complete
 
 ## Session Log
 
@@ -35,3 +35,7 @@ See: .planning/PROJECT.md
 | Title | Area | File |
 |-------|------|------|
 | Manual calendar add with title-time and Google reminders | ui | `.planning/todos/pending/2026-03-19-manual-calendar-add-with-title-time-and-google-reminders.md` |
+
+### Roadmap Evolution
+
+- Phase 8 added: Event visibility controls for solo/private vs shared family events with Google sync behavior

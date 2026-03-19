@@ -8,21 +8,37 @@ A shared household calendar web application that lets two people (e.g., partners
 
 A shared calendar both partners can edit that stays in sync with Google Calendar, so the family schedule is always current everywhere — on the web and on their phones.
 
+## Current State
+
+- v1.0 shipped on 2026-03-19.
+- Core household workflow is complete: OAuth sign-in, two-user sharing, event CRUD, recurring events, Google sync export/push, NLP quick-add, OCR quick-add, and UI/UX polish.
+- Planning artifacts for v1.0 are archived under `.planning/milestones/`.
+
+## Next Milestone Goals
+
+- Define v1.1 scope with clear requirements and roadmap.
+- Implement event visibility controls (solo/private vs shared family events) starting with Phase 8.
+- Improve release hygiene by running a final milestone audit after the last completed phase before archival.
+
 ## Requirements
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Two users can share a single calendar and each add/edit events — v1.0
+- ✓ Events can be recurring (daily/weekly/monthly/yearly) — v1.0
+- ✓ View upcoming events for the current day and month — v1.0
+- ✓ Export/sync events to Google Calendar for both linked users — v1.0
+- ✓ Natural-language request processing with review-before-save flow — v1.0
+- ✓ Image input extraction with confidence/review and fallback — v1.0
+- ✓ Modal-first event entry UX with keyboard and mobile support — v1.0
 
 ### Active
 
-- [ ] Two users can share a single calendar and each add/edit events
-- [ ] Events can be recurring (e.g., weekly, monthly) or one-time
-- [ ] View upcoming events for the current day and current month
-- [ ] Export/sync an entire month to Google Calendar
-- [ ] Two-way or push connectivity with Google Workspace Calendar
-- [ ] Natural-language request processing to auto-add events to the calendar
-- [ ] Image input: extract event date/name from images (e.g., flyers, screenshots) and add to calendar
+- [ ] Event visibility controls: solo/private events vs shared household events
+- [ ] Conflict detection when both users edit the same event simultaneously
+- [ ] Real-time collaboration updates between linked users
+- [ ] Browser reminders with configurable reminder lead time
+- [ ] Additional calendar views (weekly and multi-week agenda)
 
 ### Out of Scope
 
@@ -49,10 +65,10 @@ A shared calendar both partners can edit that stays in sync with Google Calendar
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Python backend | User's stated tech preference | — Pending |
-| Two-user model (not multi-user) | Simplest model that covers household use case | — Pending |
-| Push sync to Google Calendar (not full two-way v1) | Reduces complexity; users read on phone via Google | — Pending |
-| Image OCR for event extraction | Nice-to-have but differentiating feature | — Pending |
+| Python backend | User's stated tech preference | ✓ Implemented |
+| Two-user model (not multi-user) | Simplest model that covers household use case | ✓ Implemented |
+| Push sync to Google Calendar (not full two-way v1) | Reduces complexity; users read on phone via Google | ✓ Implemented |
+| Image OCR for event extraction | Differentiating quick-add path with review safety | ✓ Implemented |
 
 ---
-*Last updated: 2026-03-18 after initialization*
+*Last updated: 2026-03-19 after v1.0 milestone completion*
