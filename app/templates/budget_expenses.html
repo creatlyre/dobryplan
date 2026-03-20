@@ -91,7 +91,7 @@
       <!-- One-time expenses section -->
       <div class="glass rounded-xl p-4">
         <div class="flex justify-between items-center mb-3">
-          <h3 class="text-sm font-semibold">{{ t('budget.expenses_onetime_title') }}</h3>
+          <h3 class="text-sm font-semibold">{{ t('budget.expenses_onetime_title') }} <span id="ot-count" class="text-xs opacity-50 font-normal"></span></h3>
           <button id="ot-bulk-btn" class="glass-btn-info rounded-lg px-2 py-0.5 text-xs">&#128203; {{ t('budget.expenses_bulk_paste') }}</button>
         </div>
         <!-- Filter & Sort bar -->
@@ -276,7 +276,13 @@
     const tbody = document.getElementById('onetime-body');
     const emptyEl = document.getElementById('onetime-empty');
     const totalEl = document.getElementById('onetime-total');
+    const countEl = document.getElementById('ot-count');
     const items = getFilteredSorted();
+    const totalCount = onetimeData.length;
+    const filtered = filterMonth > 0;
+    countEl.textContent = filtered
+      ? '(' + items.length + '/' + totalCount + ')'
+      : '(' + totalCount + ')';
 
     if (items.length === 0) {
       tbody.innerHTML = '';

@@ -109,6 +109,10 @@
 
   const currency = '{{ t("budget.currency") }}';
   let currentYear = new Date().getFullYear();
+  const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  const editHint = isTouchDevice
+    ? '{{ t("budget.overview_tap_to_edit") }}'
+    : '{{ t("budget.overview_dblclick_to_edit") }}';
 
   function fmt(n) {
     const s = Math.abs(n).toFixed(2);
@@ -153,7 +157,7 @@
         <td class="py-1.5 px-2 text-right">${fmt(m.net)}</td>
         <td class="py-1.5 px-2 text-right">${fmt(m.additional_earnings)}</td>
         <td class="py-1.5 px-2 text-right">${fmt(m.recurring_expenses)}</td>
-        <td class="py-1.5 px-2 text-right">${fmt(m.onetime_expenses)}</td>
+        <td class="py-1.5 px-2 text-right ot-editable cursor-pointer hover:bg-white/5 transition-colors" data-month="${m.month}" title="${editHint}">${fmt(m.onetime_expenses)}</td>
         <td class="py-1.5 px-2 text-right font-medium" style="${colorClass(m.monthly_balance)}">${fmt(m.monthly_balance)}</td>
         <td class="py-1.5 px-2 text-right font-medium" style="${colorClass(m.account_balance)}">${fmt(m.account_balance)}</td>
       </tr>`;
@@ -197,7 +201,59 @@
     }
   }
 
+  // Inline edit for one-time expenses on overview
+  const editLabel = {{ t('budget.overview_edit_name')|tojson }};
+  const editSaved = {{ t('budget.overview_edit_saved')|tojson }};
+
+  function attachOnetimeEdit() {
+    const tbody = document.getElementById('overview-body');
+    const eventName = isTouchDevice ? 'click' : 'dblclick';
+    tbody.addEventListener(eventName, (e) => {
+      const cell = e.target.closest('.ot-editable');
+      if (!cell || cell.querySelector('input')) return;
+      const month = parseInt(cell.dataset.month);
+      const oldText = cell.textContent.trim();
+
+      cell.innerHTML = `<div class="flex flex-col gap-1">
+        <input type="text" class="glass-input rounded px-1 py-0.5 text-xs w-full" placeholder="${editLabel}" id="ot-edit-name">
+        <input type="number" step="0.01" class="glass-input rounded px-1 py-0.5 text-xs w-full" placeholder="±" id="ot-edit-amount">
+        <div class="flex gap-1"><button class="glass-btn-primary rounded px-2 py-0.5 text-xs" id="ot-edit-save">OK</button><button class="glass-btn-secondary rounded px-2 py-0.5 text-xs" id="ot-edit-cancel">✕</button></div>
+      </div>`;
+
+      const nameInput = cell.querySelector('#ot-edit-name');
+      const amountInput = cell.querySelector('#ot-edit-amount');
+      nameInput.focus();
+
+      async function save() {
+        const name = nameInput.value.trim();
+        const amount = parseFloat(amountInput.value);
+        if (!name || isNaN(amount) || amount === 0) { cancel(); return; }
+        const res = await fetch('/api/budget/expenses', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ year: currentYear, month, name, amount, recurring: false })
+        });
+        if (res.ok) { reload(); }
+        else { cancel(); }
+      }
+
+      function cancel() { cell.textContent = oldText; }
+
+      cell.querySelector('#ot-edit-save').addEventListener('click', save);
+      cell.querySelector('#ot-edit-cancel').addEventListener('click', cancel);
+      amountInput.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') { ev.preventDefault(); save(); }
+        if (ev.key === 'Escape') cancel();
+      });
+      nameInput.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') { ev.preventDefault(); amountInput.focus(); }
+        if (ev.key === 'Escape') cancel();
+      });
+    });
+  }
+
   init();
+  attachOnetimeEdit();
 })();
 </script>
 {% endblock %}
