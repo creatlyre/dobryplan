@@ -85,6 +85,26 @@ Plans:
 | 14. Expense Management | 3/3 | Complete    | 2026-03-20 |
 | 15. Year Overview Dashboard | 1/1 | Complete    | 2026-03-20 |
 
+### Phase 16: Overview month detail - clickable months showing one-time expense breakdown
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 15
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 16 to break down)
+
+### Phase 17: Performance optimization - faster page loads and API responses
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 16
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 17 to break down)
+
 ---
 
 *Roadmap updated: 2026-03-20 after creating v2.0 Budget Tracker roadmap*

@@ -43,3 +43,5 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 ### Roadmap Evolution
 
 - v2.0 roadmap created: 4 phases (12-15) derived from 5 requirement categories
+- Phase 16 added: Overview month detail - clickable months showing one-time expense breakdown
+- Phase 17 added: Performance optimization - faster page loads and API responses
