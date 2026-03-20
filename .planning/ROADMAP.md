@@ -4,7 +4,7 @@
 
 - [x] v1.0 milestone - Phases 1-7 shipped 2026-03-19 (22/22 plans complete). Archive: .planning/milestones/v1.0-ROADMAP.md
 - [x] v1.1 milestone - Phases 8-11 shipped 2026-03-20 (10/10 plans complete). Archive: .planning/milestones/v1.1-ROADMAP.md
-- [ ] **v2.0 milestone — Budget Tracker** - Phases 12-15
+- [x] v2.0 milestone — Budget Tracker - Phases 12-15 shipped 2026-03-20 (214 tests passing)
 
 ## Phases
 
@@ -14,7 +14,8 @@
  (completed 2026-03-20)
 - [x] **Phase 14: Expense Management** — Recurring and one-time expense CRUD with auto-application
  (completed 2026-03-20)
-- [ ] **Phase 15: Year Overview Dashboard** — 12-month financial table with running balance and live recalculation
+- [x] **Phase 15: Year Overview Dashboard** — 12-month financial table with running balance and live recalculation
+ (completed 2026-03-20)
 
 ## Phase Details
 
@@ -82,7 +83,7 @@ Plans:
 | 12. Budget Data Foundation & Settings UI | 3/3 | Complete    | 2026-03-20 |
 | 13. Income Calculation Engine | 0/? | Complete    | 2026-03-20 |
 | 14. Expense Management | 3/3 | Complete    | 2026-03-20 |
-| 15. Year Overview Dashboard | 0/? | Not started | - |
+| 15. Year Overview Dashboard | 1/1 | Complete    | 2026-03-20 |
 
 ---
 
