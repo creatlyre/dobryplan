@@ -1,5 +1,12 @@
 {
+  "scripts": {
+    "build:css": "npx @tailwindcss/cli -i ./public/css/input.css -o ./public/css/style.css --minify"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.2",
+    "tailwindcss": "^4.2.2"
   }
 }

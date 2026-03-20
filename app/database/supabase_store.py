@@ -60,11 +60,22 @@ class SupabaseStoreError(RuntimeError):
         return {}
 
 
+_shared_client: httpx.Client | None = None
+
+
+def _get_shared_client() -> httpx.Client:
+    global _shared_client
+    if _shared_client is None or _shared_client.is_closed:
+        _shared_client = httpx.Client(timeout=20.0)
+    return _shared_client
+
+
 class SupabaseStore:
     def __init__(self):
         self.settings = Settings()
         self.base_url = self.settings.SUPABASE_URL.rstrip("/")
         self.api_key = self.settings.SUPABASE_SERVICE_ROLE_KEY or self.settings.SUPABASE_ANON_KEY
+        self._client = _get_shared_client()
 
     def _auth_context(self, auth_token: str | None) -> dict[str, Any]:
         if not auth_token:
@@ -124,8 +135,7 @@ class SupabaseStore:
     def select(self, table: str, params: Dict[str, str], auth_token: str | None = None) -> List[Dict[str, Any]]:
         url = f"{self.base_url}/rest/v1/{table}"
         query = {"select": "*", **params}
-        with httpx.Client(timeout=20.0) as client:
-            response = client.get(url, params=query, headers=self._headers(auth_token=auth_token, content_type_json=False))
+        response = self._client.get(url, params=query, headers=self._headers(auth_token=auth_token, content_type_json=False))
         if response.status_code >= 400:
             raise SupabaseStoreError(
                 "select",
@@ -145,12 +155,11 @@ class SupabaseStore:
         auth_token: str | None = None,
     ) -> Dict[str, Any]:
         url = f"{self.base_url}/rest/v1/{table}"
-        with httpx.Client(timeout=20.0) as client:
-            response = client.post(
-                url,
-                json=payload,
-                headers=self._headers(auth_token=auth_token, prefer="return=representation"),
-            )
+        response = self._client.post(
+            url,
+            json=payload,
+            headers=self._headers(auth_token=auth_token, prefer="return=representation"),
+        )
         if response.status_code >= 400:
             raise SupabaseStoreError(
                 "insert",
@@ -173,13 +182,12 @@ class SupabaseStore:
         auth_token: str | None = None,
     ) -> Dict[str, Any] | None:
         url = f"{self.base_url}/rest/v1/{table}"
-        with httpx.Client(timeout=20.0) as client:
-            response = client.patch(
-                url,
-                params=filters,
-                json=payload,
-                headers=self._headers(auth_token=auth_token, prefer="return=representation"),
-            )
+        response = self._client.patch(
+            url,
+            params=filters,
+            json=payload,
+            headers=self._headers(auth_token=auth_token, prefer="return=representation"),
+        )
         if response.status_code >= 400:
             raise SupabaseStoreError(
                 "update",
@@ -199,8 +207,7 @@ class SupabaseStore:
         url = f"{self.base_url}/rest/v1/{table}"
         headers = self._headers(auth_token=auth_token, content_type_json=False, prefer="count=exact")
         query = {"select": "id", **filters}
-        with httpx.Client(timeout=20.0) as client:
-            response = client.get(url, params=query, headers=headers)
+        response = self._client.get(url, params=query, headers=headers)
         if response.status_code >= 400:
             raise SupabaseStoreError(
                 "count",
@@ -221,12 +228,11 @@ class SupabaseStore:
 
     def delete(self, table: str, filters: Dict[str, str], auth_token: str | None = None) -> int:
         url = f"{self.base_url}/rest/v1/{table}"
-        with httpx.Client(timeout=20.0) as client:
-            response = client.delete(
-                url,
-                params=filters,
-                headers=self._headers(auth_token=auth_token, content_type_json=False, prefer="return=representation"),
-            )
+        response = self._client.delete(
+            url,
+            params=filters,
+            headers=self._headers(auth_token=auth_token, content_type_json=False, prefer="return=representation"),
+        )
         if response.status_code >= 400:
             raise SupabaseStoreError(
                 "delete",

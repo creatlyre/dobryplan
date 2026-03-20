@@ -5,6 +5,7 @@ from fastapi import Depends, FastAPI, Request
 from fastapi.exception_handlers import http_exception_handler
 from fastapi.exceptions import HTTPException
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.auth.dependencies import get_current_user
@@ -33,6 +34,7 @@ app = FastAPI(
 
 templates = Jinja2Templates(directory="app/templates")
 
+app.mount("/static", StaticFiles(directory="public"), name="static")
 app.add_middleware(SessionValidationMiddleware)
 app.include_router(auth_router)
 app.include_router(users_router)
