@@ -51,10 +51,24 @@ Plans:
 - [x] 10-01-PLAN.md - Add locale-aware NLP/OCR parsing contracts for Polish text and diacritics — Complete
 - [x] 10-02-PLAN.md - Add Polish parser/OCR verification tests and regression gate — Complete
 
+### Phase 11: Fast day-click manual event entry with title+start time (end defaults to +1h), and Google Calendar reminder payload defaults/overrides with UI and sync test coverage
+
+**Goal:** Enable rapid day-click event creation (title + time only, end auto-set to start + 1h) and ensure synced events include reminder configurations that trigger Google Calendar notifications on user devices.
+**Requirements**: TBD
+**Depends on:** Phase 10
+**Plans:** 3 plans
+**Status:** 📋 Planned
+
+Plans:
+- [ ] 11-01-PLAN.md — Fast day-click manual entry UI with form prefill, date locking, and auto-calculated end-time (Wave 1)
+- [ ] 11-02-PLAN.md — Event model reminder support (backward-compatible), schema updates, and Google sync payload generation (Wave 2)
+- [ ] 11-03-PLAN.md — End-to-end integration tests (day-click → sync → Google) and regression verification (Wave 3)
+
 ---
 
-*Roadmap updated for v1.1 on 2026-03-19*
+*Roadmap updated for v1.1 on 2026-03-20*
 *Phase 8: ✅ Complete and committed (2a4dd7c)*
 *Phase 9: ✅ Complete and committed (553369f) — 117/117 tests passing*
 *Phase 10: ✅ Planned (ready for execution)*
-*Next step: /gsd-execute-phase 10*
+*Phase 11: 📋 Planned (3 plans created, ready for execution) — `/gsd-execute-phase 11`*
+*Next step: Execute Phase 10 or Phase 11*
