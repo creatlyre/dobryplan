@@ -1,6 +1,7 @@
 from datetime import datetime
 from types import SimpleNamespace
 
+from app.database.models import Event
 from app.sync.service import GoogleSyncService
 
 
@@ -98,43 +99,86 @@ def test_sync_status_returns_calendar_last_sync(authenticated_client, test_db, t
     assert response.json()["last_successful_sync_at"] == stamp
 
 
-def test_event_body_includes_default_popup_reminder(test_db):
+def test_event_body_defaults_to_google_default_reminders(test_db):
+    """Event with no reminder config → useDefault=True (Google handles default)."""
     service = GoogleSyncService(test_db)
-    event = SimpleNamespace(
+    event = Event(
         id="evt-1",
         title="Reminder event",
         description="",
         start_at=datetime(2026, 3, 20, 9, 0, 0),
         end_at=datetime(2026, 3, 20, 10, 0, 0),
         timezone="UTC",
-        rrule=None,
         created_by_user_id="user-1",
     )
 
     body = service._event_body(event)
 
     assert "reminders" in body
-    assert body["reminders"]["useDefault"] is False
-    assert body["reminders"]["overrides"][0]["method"] == "popup"
-    assert body["reminders"]["overrides"][0]["minutes"] > 0
+    assert body["reminders"]["useDefault"] is True
 
 
-def test_event_body_uses_per_event_reminder_minutes(test_db):
+def test_event_body_single_reminder_backward_compat(test_db):
+    """Event with only reminder_minutes → single popup override (backward compat)."""
     service = GoogleSyncService(test_db)
-    event = SimpleNamespace(
+    event = Event(
         id="evt-2",
         title="Custom reminder",
         description="",
         start_at=datetime(2026, 3, 20, 11, 0, 0),
         end_at=datetime(2026, 3, 20, 12, 0, 0),
         timezone="UTC",
-        rrule=None,
         reminder_minutes=5,
         created_by_user_id="user-2",
     )
 
     body = service._event_body(event)
-    assert body["reminders"]["overrides"][0]["minutes"] == 5
+    assert body["reminders"]["useDefault"] is False
+    assert len(body["reminders"]["overrides"]) == 1
+    assert body["reminders"]["overrides"][0] == {"method": "popup", "minutes": 5}
+
+
+def test_event_body_multiple_reminders(test_db):
+    """Event with reminder_minutes_list → multiple popup overrides."""
+    service = GoogleSyncService(test_db)
+    event = Event(
+        id="evt-3",
+        title="Multi reminder",
+        description="",
+        start_at=datetime(2026, 3, 20, 10, 0, 0),
+        end_at=datetime(2026, 3, 20, 11, 0, 0),
+        timezone="UTC",
+        reminder_minutes_list=[30, 1440],
+        created_by_user_id="user-3",
+    )
+
+    body = service._event_body(event)
+    assert body["reminders"]["useDefault"] is False
+    assert len(body["reminders"]["overrides"]) == 2
+    assert body["reminders"]["overrides"][0] == {"method": "popup", "minutes": 30}
+    assert body["reminders"]["overrides"][1] == {"method": "popup", "minutes": 1440}
+
+
+def test_event_body_list_takes_precedence_over_single(test_db):
+    """When both fields set, reminder_minutes_list wins."""
+    service = GoogleSyncService(test_db)
+    event = Event(
+        id="evt-4",
+        title="Precedence test",
+        description="",
+        start_at=datetime(2026, 3, 20, 14, 0, 0),
+        end_at=datetime(2026, 3, 20, 15, 0, 0),
+        timezone="UTC",
+        reminder_minutes=10,
+        reminder_minutes_list=[30, 60],
+        created_by_user_id="user-4",
+    )
+
+    body = service._event_body(event)
+    assert body["reminders"]["useDefault"] is False
+    assert len(body["reminders"]["overrides"]) == 2
+    assert body["reminders"]["overrides"][0]["minutes"] == 30
+    assert body["reminders"]["overrides"][1]["minutes"] == 60
 
 
 # ── Phase 8 visibility-aware sync ─────────────────────────────────────────
@@ -142,14 +186,13 @@ def test_event_body_uses_per_event_reminder_minutes(test_db):
 
 def test_event_body_includes_visibility_metadata(test_db):
     service = GoogleSyncService(test_db)
-    event = SimpleNamespace(
+    event = Event(
         id="evt-vis-1",
         title="Private meeting",
         description="",
         start_at=datetime(2026, 3, 20, 9, 0, 0),
         end_at=datetime(2026, 3, 20, 10, 0, 0),
         timezone="UTC",
-        rrule=None,
         visibility="private",
         created_by_user_id="owner-123",
     )
@@ -162,14 +205,13 @@ def test_event_body_includes_visibility_metadata(test_db):
 
 def test_event_body_defaults_visibility_to_shared(test_db):
     service = GoogleSyncService(test_db)
-    event = SimpleNamespace(
+    event = Event(
         id="evt-vis-2",
         title="No visibility field",
         description="",
         start_at=datetime(2026, 3, 20, 9, 0, 0),
         end_at=datetime(2026, 3, 20, 10, 0, 0),
         timezone="UTC",
-        rrule=None,
         created_by_user_id="owner-456",
     )
     body = service._event_body(event)
