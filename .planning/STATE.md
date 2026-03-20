@@ -3,13 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 11
-status: executing
-last_updated: "2026-03-20T08:52:46.219Z"
+current_plan: 3 of 3
+status: completed
+last_updated: "2026-03-20T09:05:26.058Z"
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 10
-  completed_plans: 5
+  completed_plans: 7
 ---
 
 # Session State
@@ -23,12 +24,13 @@ See: .planning/PROJECT.md
 **Milestone:** v1.1 localization milestone
 **Current phase:** 11
 **Current plan:** 3 of 3
-**Status:** Executing Phase 11 — Plan 02 complete
+**Status:** Phase 11 complete — all 3 plans executed
 
 ## Decisions
 
 - Phase 11-01: Kept openEventEntryForDay alongside addEventForDay for backward compat; start time defaults to current hour (9-17) or noon
 - Phase 11-02: Backward-compat dual-field (reminder_minutes + reminder_minutes_list) with effective_reminders property; no config fallback in payload (useDefault=True for Google defaults)
+- Phase 11-03: E2E integration tests verify day-click→sync→reminder pipeline; 145 tests pass with zero regressions
 
 ## Session Log
 
@@ -36,6 +38,7 @@ See: .planning/PROJECT.md
 - 2026-03-19: Started v1.1 milestone focused on Polish default + English switch
 - 2026-03-20: Completed 11-01-PLAN.md (day-click quick-entry UI) in 4min
 - 2026-03-20: Completed 11-02-PLAN.md (reminder infrastructure) in 5min
+- 2026-03-20: Completed 11-03-PLAN.md (integration tests + regression verification) in 3min — Phase 11 complete
 
 ## Accumulated Context
 
