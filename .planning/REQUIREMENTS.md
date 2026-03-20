@@ -156,12 +156,32 @@
 | I18N-03 | Phase 9 | Language switcher, persistence, and translation coverage | Shipped v1.1 |
 | I18N-06 | Phase 9 | Language switcher, persistence, and translation coverage | Shipped v1.1 |
 | I18N-07 | Phase 10 | Verify parser works with Polish language after localization | Shipped v1.1 |
+| BSET-01 | Phase 12 | Budget Data Foundation & Settings UI | Pending |
+| BSET-02 | Phase 12 | Budget Data Foundation & Settings UI | Pending |
+| BSET-03 | Phase 12 | Budget Data Foundation & Settings UI | Pending |
+| BSET-04 | Phase 12 | Budget Data Foundation & Settings UI | Pending |
+| BSET-05 | Phase 12 | Budget Data Foundation & Settings UI | Pending |
+| BL-01 | Phase 12 | Budget Data Foundation & Settings UI | Pending |
+| INC-01 | Phase 13 | Income Calculation Engine | Pending |
+| INC-02 | Phase 13 | Income Calculation Engine | Pending |
+| INC-03 | Phase 13 | Income Calculation Engine | Pending |
+| INC-04 | Phase 13 | Income Calculation Engine | Pending |
+| INC-05 | Phase 13 | Income Calculation Engine | Pending |
+| EXP-01 | Phase 14 | Expense Management | Pending |
+| EXP-02 | Phase 14 | Expense Management | Pending |
+| EXP-03 | Phase 14 | Expense Management | Pending |
+| EXP-04 | Phase 14 | Expense Management | Pending |
+| YOV-01 | Phase 15 | Year Overview Dashboard | Pending |
+| YOV-02 | Phase 15 | Year Overview Dashboard | Pending |
+| YOV-03 | Phase 15 | Year Overview Dashboard | Pending |
+| YOV-04 | Phase 15 | Year Overview Dashboard | Pending |
+| YOV-05 | Phase 15 | Year Overview Dashboard | Pending |
 
 **Coverage:**
-- v2.0 requirements: 16 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 16
+- v2.0 requirements: 20 total
+- Mapped to phases: 20
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-18*
-*Last updated: 2026-03-20 after defining v2.0 Budget Tracker requirements*
+*Last updated: 2026-03-20 after creating v2.0 Budget Tracker roadmap*
