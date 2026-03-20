@@ -25,7 +25,7 @@
 
 - [x] **Phase 18: Event Privacy** - Validate & harden visibility toggle, filtering, sync retraction, and lock icon
  (completed 2026-03-20)
-- [ ] **Phase 19: Reminder UI** - Wire reminder controls to existing backend in event forms
+- [x] **Phase 19: Reminder UI** - Wire reminder controls to existing backend in event forms (completed 2026-03-20)
 - [ ] **Phase 20: Multi-Year Budget** - Fix data integrity (carry-forward, year-scoping) and enable year navigation
 - [ ] **Phase 21: Year-over-Year Comparison** - Side-by-side annual totals with delta indicators
 
@@ -55,7 +55,7 @@ Plans:
   2. User can add and remove custom reminders (up to 5) in the event form
   3. Event form shows helper text explaining reminders sync to Google Calendar
   4. Configured reminders sync to Google Calendar and trigger notifications on the user's phone
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 19-01-PLAN.md — i18n keys, HTML reminder sections, JavaScript chip UI and submit wiring
@@ -91,7 +91,7 @@ Plans:
 | 16. Overview Month Detail | v2.0 | 2/2 | Complete | 2026-03-20 |
 | 17. Performance Optimization | v2.0 | 2/2 | Complete | 2026-03-20 |
 | 18. Event Privacy | 2/2 | Complete   | 2026-03-20 | - |
-| 19. Reminder UI | v2.1 | 0/? | Not started | - |
+| 19. Reminder UI | 1/1 | Complete   | 2026-03-20 | - |
 | 20. Multi-Year Budget | v2.1 | 0/? | Not started | - |
 | 21. Year-over-Year Comparison | v2.1 | 0/? | Not started | - |
 

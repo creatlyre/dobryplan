@@ -40,9 +40,9 @@
 | PRIV-02 | Phase 18 | Complete |
 | PRIV-03 | Phase 18 | Complete |
 | PRIV-04 | Phase 18 | Complete |
-| REM-01 | Phase 19 | Pending |
-| REM-02 | Phase 19 | Pending |
-| REM-03 | Phase 19 | Pending |
+| REM-01 | Phase 19 | Complete |
+| REM-02 | Phase 19 | Complete |
+| REM-03 | Phase 19 | Complete |
 | BUD-01 | Phase 20 | Pending |
 | BUD-02 | Phase 20 | Pending |
 | BUD-03 | Phase 20 | Pending |
