@@ -498,6 +498,12 @@ eventEntryOpenBtn.addEventListener('click', () => {
 eventEntryCloseBtn.addEventListener('click', () => closeEventEntryModal());
 eventEntryCancelBtn.addEventListener('click', () => closeEventEntryModal());
 
+eventEntryStartTimeInput.addEventListener('change', () => {
+  if (eventEntryForm.classList.contains('quick-entry-mode') && eventEntryStartTimeInput.value) {
+    eventEntryEndTimeInput.value = calculateEndTime(eventEntryStartTimeInput.value);
+  }
+});
+
 eventEntryForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   await submitEventEntry(false);
