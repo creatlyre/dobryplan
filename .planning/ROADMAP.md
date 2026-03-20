@@ -24,7 +24,12 @@
   2. User can set 3 hourly rates in PLN, flat monthly ZUS+accounting costs, and initial bank account balance — all values persisted across sessions
   3. User can return to settings at any time and update any value with changes saved immediately
   4. Budget settings UI renders in Polish by default (English available if i18n wiring is low effort)
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 12-01-PLAN.md — Budget data layer + API + i18n keys
+- [ ] 12-02-PLAN.md — Settings UI + navigation integration
+- [ ] 12-03-PLAN.md — Integration tests + human verification
 
 ### Phase 13: Income Calculation Engine
 **Goal**: Users can enter monthly work hours and additional household earnings, and the system computes gross and net income per month
@@ -61,7 +66,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 12. Budget Data Foundation & Settings UI | 0/? | Not started | - |
+| 12. Budget Data Foundation & Settings UI | 0/3 | Planned | - |
 | 13. Income Calculation Engine | 0/? | Not started | - |
 | 14. Expense Management | 0/? | Not started | - |
 | 15. Year Overview Dashboard | 0/? | Not started | - |
