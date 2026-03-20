@@ -574,3 +574,108 @@ def test_query_param_overrides_cookie(authenticated_client):
     html = authenticated_client.get("/?lang=en").text
     assert_locale_rendered(html, "en")
     assert authenticated_client.cookies.get("locale") == "en"
+
+
+# ── Phase 11 Wave 3: Backward compatibility regression ────────────────────────
+
+
+def test_manual_event_entry_full_form_still_works(authenticated_client):
+    """Regression: traditional full-form event creation unchanged by day-click additions."""
+    now = datetime.utcnow().replace(microsecond=0)
+
+    response = authenticated_client.post(
+        "/api/events",
+        json={
+            "title": "Full form event",
+            "description": "Created via traditional full manual form",
+            "start_at": (now + timedelta(hours=5)).isoformat(),
+            "end_at": (now + timedelta(hours=6)).isoformat(),
+            "timezone": "UTC",
+            "visibility": "private",
+            "rrule": "FREQ=DAILY;COUNT=3",
+        },
+    )
+    assert response.status_code == 201
+    event = response.json()
+    assert event["title"] == "Full form event"
+    assert event["description"] == "Created via traditional full manual form"
+    assert event["visibility"] == "private"
+    assert event["rrule"] == "FREQ=DAILY;COUNT=3"
+
+    response = authenticated_client.get(
+        f"/calendar/month?year={now.year}&month={now.month}"
+    )
+    assert response.status_code == 200
+    assert "Full form event" in response.text
+
+
+def test_recurring_event_creation_unchanged(authenticated_client):
+    """Regression: recurring event creation still works with full params."""
+    now = datetime.utcnow().replace(microsecond=0)
+
+    response = authenticated_client.post(
+        "/api/events",
+        json={
+            "title": "Weekly meeting",
+            "start_at": (now + timedelta(hours=1)).isoformat(),
+            "end_at": (now + timedelta(hours=2)).isoformat(),
+            "timezone": "UTC",
+            "rrule": "FREQ=WEEKLY;UNTIL=20260630",
+        },
+    )
+    assert response.status_code == 201
+    event = response.json()
+    assert event["rrule"] == "FREQ=WEEKLY;UNTIL=20260630"
+    assert "Weekly meeting" in event["title"]
+
+
+def test_event_deletion_unchanged(authenticated_client, test_db, test_user_a):
+    """Regression: event deletion still works."""
+    now = datetime.utcnow().replace(microsecond=0)
+
+    response = authenticated_client.post(
+        "/api/events",
+        json={
+            "title": "To delete",
+            "start_at": (now + timedelta(hours=2)).isoformat(),
+            "end_at": (now + timedelta(hours=3)).isoformat(),
+            "timezone": "UTC",
+        },
+    )
+    assert response.status_code == 201
+    event_id = response.json()["id"]
+
+    response = authenticated_client.delete(f"/api/events/{event_id}")
+    assert response.status_code in (200, 204)
+
+
+def test_sync_export_includes_reminders_backward_compat(
+    authenticated_client, test_db, test_user_a,
+):
+    """Regression: old single-reminder field still handled correctly in sync payload."""
+    from app.sync.service import GoogleSyncService
+    from app.events.repository import EventRepository
+
+    now = datetime.utcnow().replace(microsecond=0)
+
+    response = authenticated_client.post(
+        "/api/events",
+        json={
+            "title": "Single reminder event",
+            "start_at": (now + timedelta(hours=1)).isoformat(),
+            "end_at": (now + timedelta(hours=2)).isoformat(),
+            "timezone": "UTC",
+            "reminder_minutes": 15,
+        },
+    )
+    assert response.status_code == 201
+
+    service = GoogleSyncService(test_db)
+    event = EventRepository(test_db).get_by_id(
+        response.json()["id"], test_user_a.calendar_id,
+    )
+    body = service._event_body(event)
+
+    assert body["reminders"]["useDefault"] is False
+    assert len(body["reminders"]["overrides"]) == 1
+    assert body["reminders"]["overrides"][0]["minutes"] == 15
