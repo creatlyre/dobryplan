@@ -105,14 +105,20 @@ Plans:
 
 ### Phase 17: Performance optimization - faster page loads and API responses
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Eliminate Tailwind CDN runtime dependency with prebuilt CSS, add HTTP connection pooling in the database layer, and serve static assets with caching headers
+**Requirements**: PERF-01, PERF-02, PERF-03
 **Depends on:** Phase 16
-**Plans:** 0 plans
+**Success Criteria** (what must be TRUE):
+  1. No pages load the Tailwind CDN play script — all styling comes from a prebuilt static CSS file
+  2. SupabaseStore reuses httpx connections across requests (connection pooling)
+  3. Static CSS file served with Cache-Control headers
+  4. All existing tests continue to pass (no regressions)
+**Plans:** 2 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 17 to break down)
+- [ ] 17-01-PLAN.md — Tailwind CSS build + static file serving + connection pooling
+- [ ] 17-02-PLAN.md — Integration tests + human verification
 
 ---
 
-*Roadmap updated: 2026-03-20 after creating v2.0 Budget Tracker roadmap*
+*Roadmap updated: 2026-03-20*
