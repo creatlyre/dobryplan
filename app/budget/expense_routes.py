@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.auth.dependencies import get_current_user
 from app.budget.expense_repository import ExpenseRepository
-from app.budget.expense_schemas import ExpenseCreate, ExpenseResponse, ExpenseUpdate
+from app.budget.expense_schemas import BulkExpenseCreate, ExpenseCreate, ExpenseResponse, ExpenseUpdate
 from app.budget.expense_service import ExpenseService
 from app.database.database import get_db
 
@@ -33,6 +33,19 @@ async def create_expense(
     service = _service(db)
     expense = service.create_expense(user.calendar_id, payload)
     return {"data": ExpenseResponse.model_validate(expense, from_attributes=True).model_dump()}
+
+
+@router.post("/bulk")
+async def bulk_create_expenses(
+    payload: BulkExpenseCreate,
+    user=Depends(get_current_user),
+    db=Depends(get_db),
+):
+    if not user.calendar_id:
+        raise HTTPException(status_code=400, detail="No calendar linked")
+    service = _service(db)
+    expenses = service.bulk_create(user.calendar_id, payload.expenses)
+    return {"data": [ExpenseResponse.model_validate(e, from_attributes=True).model_dump() for e in expenses]}
 
 
 @router.put("/{expense_id}")

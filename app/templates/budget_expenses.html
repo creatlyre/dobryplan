@@ -59,6 +59,7 @@
       <div class="glass rounded-xl p-4 mb-6">
         <div class="flex justify-between items-center mb-3">
           <h3 class="text-sm font-semibold">{{ t('budget.expenses_recurring_title') }}</h3>
+          <button id="rec-bulk-btn" class="glass-btn-info rounded-lg px-2 py-0.5 text-xs">&#128203; {{ t('budget.expenses_bulk_paste') }}</button>
         </div>
         <!-- Recurring table -->
         <table class="w-full text-sm">
@@ -91,6 +92,7 @@
       <div class="glass rounded-xl p-4">
         <div class="flex justify-between items-center mb-3">
           <h3 class="text-sm font-semibold">{{ t('budget.expenses_onetime_title') }}</h3>
+          <button id="ot-bulk-btn" class="glass-btn-info rounded-lg px-2 py-0.5 text-xs">&#128203; {{ t('budget.expenses_bulk_paste') }}</button>
         </div>
         <!-- Filter & Sort bar -->
         <div class="flex flex-wrap gap-3 mb-3 items-center text-xs">
@@ -142,6 +144,35 @@
   </div>
 </div>
 
+<!-- Bulk paste modal -->
+<div id="bulk-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.6);">
+  <div class="glass rounded-2xl p-6 w-full max-w-2xl mx-4">
+    <h3 id="bulk-modal-title" class="text-sm font-semibold mb-3"></h3>
+    <textarea id="bulk-textarea" rows="10" class="glass-input w-full rounded-lg px-3 py-2 text-xs font-mono mb-3" placeholder=""></textarea>
+    <div id="bulk-preview" class="hidden mb-3">
+      <div class="text-xs mb-2">
+        <span class="font-medium" id="bulk-parsed-count"></span>
+        <span id="bulk-skipped-info" class="opacity-50 ml-2"></span>
+      </div>
+      <div class="max-h-48 overflow-y-auto">
+        <table class="w-full text-xs">
+          <thead><tr class="border-b border-white/10">
+            <th class="text-left py-1 px-1" id="bulk-col-month">{{ t('budget.expenses_month') }}</th>
+            <th class="text-left py-1 px-1">{{ t('budget.expenses_name') }}</th>
+            <th class="text-right py-1 px-1">{{ t('budget.expenses_amount') }}</th>
+          </tr></thead>
+          <tbody id="bulk-preview-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="flex gap-2 justify-end">
+      <button id="bulk-cancel-btn" class="glass-btn-secondary rounded-lg px-3 py-1.5 text-xs">{{ t('budget.expenses_bulk_cancel') }}</button>
+      <button id="bulk-parse-btn" class="glass-btn-info rounded-lg px-3 py-1.5 text-xs">{{ t('budget.expenses_bulk_parse') }}</button>
+      <button id="bulk-confirm-btn" class="glass-btn-primary rounded-lg px-3 py-1.5 text-xs hidden">{{ t('budget.expenses_bulk_confirm') }}</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function() {
   const monthNames = [
@@ -160,7 +191,15 @@
     deleted: '{{ t("budget.expenses_deleted") }}',
     emptyRecurring: '{{ t("budget.expenses_empty_recurring") }}',
     emptyOnetime: '{{ t("budget.expenses_empty_onetime") }}',
-    filterAll: '{{ t("budget.expenses_filter_all") }}'
+    filterAll: '{{ t("budget.expenses_filter_all") }}',
+    month: '{{ t("budget.expenses_month") }}',
+    bulkTitleRecurring: '{{ t("budget.expenses_bulk_title_recurring") }}',
+    bulkTitleOnetime: '{{ t("budget.expenses_bulk_title_onetime") }}',
+    bulkPlaceholderRecurring: '{{ t("budget.expenses_bulk_placeholder_recurring") }}',
+    bulkPlaceholderOnetime: '{{ t("budget.expenses_bulk_placeholder_onetime") }}',
+    bulkParsed: '{{ t("budget.expenses_bulk_parsed") }}',
+    bulkSkipped: '{{ t("budget.expenses_bulk_skipped") }}',
+    bulkAdded: '{{ t("budget.expenses_bulk_added") }}'
   };
 
   let currentYear = new Date().getFullYear();
@@ -394,9 +433,177 @@
     }
   }
 
+  // --- Bulk paste parsing ---
+  let bulkMode = '';
+  let bulkParsed = [];
+
+  function parseRecurringText(text) {
+    const results = [];
+    const skipped = [];
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    for (const line of lines) {
+      const parts = line.split('\t').map(p => p.trim());
+      for (let i = 0; i + 1 < parts.length; i += 2) {
+        const name = (parts[i] || '').trim();
+        const amount = parseFloat(parts[i + 1] || '');
+        if (name && !isNaN(amount) && amount > 0) {
+          results.push({ name, amount });
+        } else if (name) {
+          skipped.push(name);
+        }
+      }
+      if (parts.length % 2 === 1 && parts.length > 0) {
+        const last = parts[parts.length - 1].trim();
+        if (last) skipped.push(last);
+      }
+    }
+    return { results, skipped };
+  }
+
+  function parseOnetimeText(text) {
+    const results = [];
+    const skipped = [];
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    for (const line of lines) {
+      const parts = line.split('\t').map(p => p.trim());
+      let i = 0;
+      let carry = '';
+      while (i < parts.length) {
+        let name, amountStr, monthPart;
+        if (carry) {
+          name = carry;
+          amountStr = parts[i] || '';
+          monthPart = i + 1 < parts.length ? parts[i + 1] : '';
+          i += 2;
+        } else {
+          name = parts[i] || '';
+          amountStr = i + 1 < parts.length ? parts[i + 1] : '';
+          monthPart = i + 2 < parts.length ? parts[i + 2] : '';
+          i += 3;
+        }
+        carry = '';
+        let month;
+        const spaceIdx = monthPart.indexOf(' ');
+        if (spaceIdx > 0) {
+          month = parseInt(monthPart.substring(0, spaceIdx));
+          carry = monthPart.substring(spaceIdx + 1).trim();
+        } else {
+          month = parseInt(monthPart);
+        }
+        const amount = parseFloat(amountStr);
+        name = name.trim();
+        if (name && !isNaN(amount) && amount > 0 && month >= 1 && month <= 12) {
+          results.push({ name, amount, month });
+        } else if (name) {
+          skipped.push(name);
+        }
+      }
+    }
+    return { results, skipped };
+  }
+
+  function openBulkModal(mode) {
+    bulkMode = mode;
+    bulkParsed = [];
+    const modal = document.getElementById('bulk-modal');
+    const title = document.getElementById('bulk-modal-title');
+    const textarea = document.getElementById('bulk-textarea');
+    const preview = document.getElementById('bulk-preview');
+    const confirmBtn = document.getElementById('bulk-confirm-btn');
+    const parseBtn = document.getElementById('bulk-parse-btn');
+    const monthCol = document.getElementById('bulk-col-month');
+    title.textContent = mode === 'recurring' ? labels.bulkTitleRecurring : labels.bulkTitleOnetime;
+    textarea.placeholder = mode === 'recurring' ? labels.bulkPlaceholderRecurring : labels.bulkPlaceholderOnetime;
+    textarea.value = '';
+    preview.classList.add('hidden');
+    confirmBtn.classList.add('hidden');
+    parseBtn.classList.remove('hidden');
+    monthCol.style.display = mode === 'onetime' ? '' : 'none';
+    modal.classList.remove('hidden');
+    textarea.focus();
+  }
+
+  function closeBulkModal() {
+    document.getElementById('bulk-modal').classList.add('hidden');
+    bulkParsed = [];
+  }
+
+  function parseBulkInput() {
+    const text = document.getElementById('bulk-textarea').value;
+    if (!text.trim()) return;
+    let parsed;
+    if (bulkMode === 'recurring') {
+      parsed = parseRecurringText(text);
+    } else {
+      parsed = parseOnetimeText(text);
+    }
+    bulkParsed = parsed.results;
+    const preview = document.getElementById('bulk-preview');
+    const countEl = document.getElementById('bulk-parsed-count');
+    const skippedEl = document.getElementById('bulk-skipped-info');
+    const tbody = document.getElementById('bulk-preview-body');
+    countEl.textContent = labels.bulkParsed + ': ' + bulkParsed.length;
+    if (parsed.skipped.length > 0) {
+      skippedEl.textContent = '(' + labels.bulkSkipped + ': ' + parsed.skipped.length + ' \u2014 ' + parsed.skipped.join(', ') + ')';
+    } else {
+      skippedEl.textContent = '';
+    }
+    tbody.innerHTML = bulkParsed.map(e => {
+      const monthCell = bulkMode === 'onetime'
+        ? '<td class="py-0.5 px-1">' + e.month + ' - ' + monthNames[e.month - 1] + '</td>'
+        : '';
+      return '<tr class="border-b border-white/5">' + monthCell +
+        '<td class="py-0.5 px-1">' + e.name + '</td>' +
+        '<td class="py-0.5 px-1 text-right">' + e.amount.toFixed(2) + '</td></tr>';
+    }).join('');
+    preview.classList.remove('hidden');
+    document.getElementById('bulk-parse-btn').classList.add('hidden');
+    if (bulkParsed.length > 0) {
+      document.getElementById('bulk-confirm-btn').classList.remove('hidden');
+    }
+  }
+
+  async function confirmBulk() {
+    if (bulkParsed.length === 0) return;
+    const expenses = bulkParsed.map(e => ({
+      year: currentYear,
+      month: bulkMode === 'recurring' ? 0 : e.month,
+      name: e.name,
+      amount: e.amount,
+      recurring: bulkMode === 'recurring'
+    }));
+    const res = await fetch('/api/budget/expenses/bulk', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ expenses })
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (bulkMode === 'recurring') {
+        recurringData.push(...json.data);
+        renderRecurring();
+      } else {
+        onetimeData.push(...json.data);
+        renderOnetime();
+      }
+      showToast(labels.bulkAdded + ' (' + json.data.length + ')');
+      closeBulkModal();
+    }
+  }
+
   // Event listeners
   document.getElementById('rec-add-btn').addEventListener('click', () => addExpense(true));
   document.getElementById('ot-add-btn').addEventListener('click', () => addExpense(false));
+  document.getElementById('rec-bulk-btn').addEventListener('click', () => openBulkModal('recurring'));
+  document.getElementById('ot-bulk-btn').addEventListener('click', () => openBulkModal('onetime'));
+  document.getElementById('bulk-parse-btn').addEventListener('click', parseBulkInput);
+  document.getElementById('bulk-confirm-btn').addEventListener('click', confirmBulk);
+  document.getElementById('bulk-cancel-btn').addEventListener('click', closeBulkModal);
+  document.getElementById('bulk-textarea').addEventListener('input', function() {
+    document.getElementById('bulk-preview').classList.add('hidden');
+    document.getElementById('bulk-confirm-btn').classList.add('hidden');
+    document.getElementById('bulk-parse-btn').classList.remove('hidden');
+  });
 
   document.getElementById('filter-month').addEventListener('change', function() {
     filterMonth = parseInt(this.value);

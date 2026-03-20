@@ -89,3 +89,7 @@ class ExpenseResponse(BaseModel):
     recurring: bool
 
     model_config = {"from_attributes": True}
+
+
+class BulkExpenseCreate(BaseModel):
+    expenses: list[ExpenseCreate]

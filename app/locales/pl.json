@@ -244,5 +244,17 @@
   "budget.expenses_sort_month": "Miesiąc",
   "budget.expenses_sort_name": "Nazwa",
   "budget.expenses_sort_amount": "Kwota",
-  "budget.expenses_total": "Suma"
+  "budget.expenses_total": "Suma",
+  "budget.expenses_bulk_paste": "Wklej wiele",
+  "budget.expenses_bulk_title_recurring": "Wklej wydatki stałe",
+  "budget.expenses_bulk_title_onetime": "Wklej wydatki jednorazowe",
+  "budget.expenses_bulk_placeholder_recurring": "Wklej tekst... (nazwa[TAB]kwota na wiersz)",
+  "budget.expenses_bulk_placeholder_onetime": "Wklej tekst... (nazwa[TAB]kwota[TAB]miesiąc na wiersz)",
+  "budget.expenses_bulk_parse": "Parsuj",
+  "budget.expenses_bulk_confirm": "Dodaj wszystkie",
+  "budget.expenses_bulk_cancel": "Anuluj",
+  "budget.expenses_bulk_parsed": "Sparsowano",
+  "budget.expenses_bulk_skipped": "Pominięto",
+  "budget.expenses_bulk_added": "Dodano wydatki",
+  "budget.expenses_bulk_edit": "Edytuj"
 }

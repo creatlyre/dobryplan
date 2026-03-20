@@ -244,5 +244,17 @@
   "budget.expenses_sort_month": "Month",
   "budget.expenses_sort_name": "Name",
   "budget.expenses_sort_amount": "Amount",
-  "budget.expenses_total": "Total"
+  "budget.expenses_total": "Total",
+  "budget.expenses_bulk_paste": "Paste many",
+  "budget.expenses_bulk_title_recurring": "Paste recurring expenses",
+  "budget.expenses_bulk_title_onetime": "Paste one-time expenses",
+  "budget.expenses_bulk_placeholder_recurring": "Paste text... (name[TAB]amount per line)",
+  "budget.expenses_bulk_placeholder_onetime": "Paste text... (name[TAB]amount[TAB]month per line)",
+  "budget.expenses_bulk_parse": "Parse",
+  "budget.expenses_bulk_confirm": "Add all",
+  "budget.expenses_bulk_cancel": "Cancel",
+  "budget.expenses_bulk_parsed": "Parsed",
+  "budget.expenses_bulk_skipped": "Skipped",
+  "budget.expenses_bulk_added": "Expenses added",
+  "budget.expenses_bulk_edit": "Edit"
 }

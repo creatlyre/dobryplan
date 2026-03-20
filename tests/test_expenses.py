@@ -169,6 +169,55 @@ class TestExpenseValidation:
         assert res.status_code == 404
 
 
+class TestExpenseBulk:
+    """Bulk create endpoint."""
+
+    def test_bulk_create_recurring(self, authenticated_client):
+        res = authenticated_client.post(
+            "/api/budget/expenses/bulk",
+            json={"expenses": [
+                {"year": 2026, "month": 0, "name": "Czynsz", "amount": 6300, "recurring": True},
+                {"year": 2026, "month": 0, "name": "Internet", "amount": 80, "recurring": True},
+                {"year": 2026, "month": 0, "name": "Netflix", "amount": 30, "recurring": True},
+            ]},
+        )
+        assert res.status_code == 200
+        data = res.json()["data"]
+        assert len(data) == 3
+        assert {e["name"] for e in data} == {"Czynsz", "Internet", "Netflix"}
+
+    def test_bulk_create_onetime(self, authenticated_client):
+        res = authenticated_client.post(
+            "/api/budget/expenses/bulk",
+            json={"expenses": [
+                {"year": 2026, "month": 1, "name": "Wiertla", "amount": 65},
+                {"year": 2026, "month": 3, "name": "Robot szyby", "amount": 3000},
+            ]},
+        )
+        assert res.status_code == 200
+        data = res.json()["data"]
+        assert len(data) == 2
+        assert data[0]["month"] == 1
+        assert data[1]["month"] == 3
+
+    def test_bulk_create_empty_list(self, authenticated_client):
+        res = authenticated_client.post(
+            "/api/budget/expenses/bulk",
+            json={"expenses": []},
+        )
+        assert res.status_code == 200
+        assert res.json()["data"] == []
+
+    def test_bulk_validation_rejects_invalid(self, authenticated_client):
+        res = authenticated_client.post(
+            "/api/budget/expenses/bulk",
+            json={"expenses": [
+                {"year": 2026, "month": 1, "name": "", "amount": 100},
+            ]},
+        )
+        assert res.status_code == 422
+
+
 class TestExpensePage:
     """Page rendering tests."""
 

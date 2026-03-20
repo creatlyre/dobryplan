@@ -41,3 +41,6 @@ class ExpenseService:
 
     def delete_expense(self, expense_id: str) -> bool:
         return self.repo.delete(expense_id)
+
+    def bulk_create(self, calendar_id: str, items: list[ExpenseCreate]) -> list[Expense]:
+        return [self.repo.create(calendar_id, item) for item in items]
