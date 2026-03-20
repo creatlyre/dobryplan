@@ -35,8 +35,8 @@ class ExpenseCreate(BaseModel):
     @field_validator("amount")
     @classmethod
     def valid_amount(cls, v: float) -> float:
-        if v <= 0:
-            raise ValueError("Amount must be positive")
+        if v == 0:
+            raise ValueError("Amount must not be zero")
         return round(v, 2)
 
     @model_validator(mode="after")
@@ -45,6 +45,8 @@ class ExpenseCreate(BaseModel):
             self.recurring = True
         if self.recurring and self.month != 0:
             self.month = 0
+        if self.recurring and self.amount < 0:
+            raise ValueError("Recurring expenses must have positive amount")
         return self
 
 
@@ -73,8 +75,8 @@ class ExpenseUpdate(BaseModel):
     @classmethod
     def valid_amount(cls, v: float | None) -> float | None:
         if v is not None:
-            if v <= 0:
-                raise ValueError("Amount must be positive")
+            if v == 0:
+                raise ValueError("Amount must not be zero")
             return round(v, 2)
         return v
 

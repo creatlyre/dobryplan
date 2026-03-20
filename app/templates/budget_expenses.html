@@ -136,7 +136,7 @@
         <div class="flex gap-2 mt-2 items-center">
           <input type="number" min="1" max="12" id="ot-month" placeholder="{{ t('budget.expenses_month') }}" class="glass-input w-16 rounded-lg px-2 py-1 text-xs">
           <input type="text" id="ot-name" placeholder="{{ t('budget.expenses_name') }}" class="glass-input flex-1 rounded-lg px-2 py-1 text-xs">
-          <input type="number" step="0.01" min="0.01" id="ot-amount" placeholder="{{ t('budget.expenses_amount') }}" class="glass-input w-28 rounded-lg px-2 py-1 text-xs">
+          <input type="number" step="0.01" id="ot-amount" placeholder="{{ t('budget.expenses_amount') }}" class="glass-input w-28 rounded-lg px-2 py-1 text-xs">
           <button id="ot-add-btn" class="glass-btn-primary rounded-lg px-3 py-1 text-xs">{{ t('budget.expenses_add') }}</button>
         </div>
       </div>
@@ -335,7 +335,7 @@
 
     function save() {
       const newValue = field === 'amount' ? parseFloat(input.value) : input.value.trim();
-      if (!newValue || (field === 'amount' && (isNaN(newValue) || newValue <= 0))) {
+      if (!newValue || (field === 'amount' && (isNaN(newValue) || newValue === 0))) {
         cell.textContent = oldValue;
         return;
       }
@@ -382,7 +382,8 @@
       amount = parseFloat(document.getElementById('ot-amount').value);
     }
 
-    if (!name || !amount || amount <= 0) return;
+    if (!name || !amount) return;
+    if (recurring && amount <= 0) return;
     if (!recurring && (!month || month < 1 || month > 12)) return;
 
     const res = await fetch('/api/budget/expenses', {
@@ -446,7 +447,7 @@
       for (let i = 0; i + 1 < parts.length; i += 2) {
         const name = (parts[i] || '').trim();
         const amount = parseFloat(parts[i + 1] || '');
-        if (name && !isNaN(amount) && amount > 0) {
+        if (name && !isNaN(amount) && amount !== 0) {
           results.push({ name, amount });
         } else if (name) {
           skipped.push(name);
@@ -492,7 +493,7 @@
         }
         const amount = parseFloat(amountStr);
         name = name.trim();
-        if (name && !isNaN(amount) && amount > 0 && month >= 1 && month <= 12) {
+        if (name && !isNaN(amount) && amount !== 0 && month >= 1 && month <= 12) {
           results.push({ name, amount, month });
         } else if (name) {
           skipped.push(name);

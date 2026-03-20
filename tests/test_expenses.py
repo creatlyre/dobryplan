@@ -143,10 +143,29 @@ class TestExpenseValidation:
         )
         assert res.status_code == 422
 
-    def test_expense_amount_positive(self, authenticated_client):
+    def test_expense_amount_zero_rejected(self, authenticated_client):
         res = authenticated_client.post(
             "/api/budget/expenses",
             json={"year": 2026, "month": 1, "name": "Test", "amount": 0},
+        )
+        assert res.status_code == 422
+
+    def test_onetime_expense_negative_amount_ok(self, authenticated_client):
+        """Negative one-time expense acts as a correction/patch."""
+        res = authenticated_client.post(
+            "/api/budget/expenses",
+            json={"year": 2026, "month": 1, "name": "Poprawka styczen", "amount": -5400},
+        )
+        assert res.status_code == 200
+        data = res.json()["data"]
+        assert data["amount"] == -5400.0
+        assert data["recurring"] is False
+
+    def test_recurring_expense_negative_rejected(self, authenticated_client):
+        """Recurring expenses must stay positive."""
+        res = authenticated_client.post(
+            "/api/budget/expenses",
+            json={"year": 2026, "month": 0, "name": "Bad recurring", "amount": -100, "recurring": True},
         )
         assert res.status_code == 422
 
