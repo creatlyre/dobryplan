@@ -61,3 +61,14 @@ class Event:
     last_edited_by_user_id: str | None = None
     is_deleted: bool = False
     visibility: str = "shared"
+    reminder_minutes: int | None = None
+    reminder_minutes_list: list[int] = field(default_factory=list)
+
+    @property
+    def effective_reminders(self) -> list[int]:
+        """Return reminders: use list if set, else single reminder, else empty."""
+        if self.reminder_minutes_list:
+            return self.reminder_minutes_list
+        if self.reminder_minutes is not None:
+            return [self.reminder_minutes]
+        return []

@@ -44,6 +44,8 @@ def _to_event(row: dict[str, Any]) -> Event:
         last_edited_by_user_id=row.get("last_edited_by_user_id"),
         is_deleted=bool(row.get("is_deleted", False)),
         visibility=row.get("visibility") or "shared",
+        reminder_minutes=row.get("reminder_minutes"),
+        reminder_minutes_list=row.get("reminder_minutes_list") or [],
     )
 
 
@@ -66,6 +68,8 @@ class EventRepository:
                 "rrule": payload.rrule,
                 "is_deleted": False,
                 "visibility": payload.visibility,
+                "reminder_minutes": getattr(payload, "reminder_minutes", None),
+                "reminder_minutes_list": getattr(payload, "reminder_minutes_list", None) or [],
             },
         )
         return _to_event(row)
