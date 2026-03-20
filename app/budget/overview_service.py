@@ -47,11 +47,15 @@ class OverviewService:
         # Split expenses
         recurring_expense_total = 0.0
         onetime_by_month: dict[int, float] = {}
+        onetime_items_by_month: dict[int, list] = {}
         for e in expenses_list:
             if e.month == 0 or e.recurring:
                 recurring_expense_total += e.amount
             else:
                 onetime_by_month[e.month] = onetime_by_month.get(e.month, 0) + e.amount
+                onetime_items_by_month.setdefault(e.month, []).append(
+                    {"id": e.id, "name": e.name, "amount": e.amount}
+                )
 
         running_balance = initial_balance
         months = []
@@ -75,6 +79,7 @@ class OverviewService:
                 "additional_earnings": round(additional, 2),
                 "recurring_expenses": round(recurring_expense_total, 2),
                 "onetime_expenses": round(onetime_expenses, 2),
+                "onetime_items": onetime_items_by_month.get(m, []),
                 "monthly_balance": round(monthly_balance, 2),
                 "account_balance": round(running_balance, 2),
             })

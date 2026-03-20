@@ -286,5 +286,11 @@
   "calendar.expense_bulk_confirm": "Add all",
   "calendar.expense_bulk_cancel": "Cancel",
   "calendar.expense_bulk_parsed": "Parsed",
-  "calendar.expense_bulk_added": "Expenses added"
+  "calendar.expense_bulk_added": "Expenses added",
+  "budget.overview_detail_name": "Name",
+  "budget.overview_detail_amount": "Amount",
+  "budget.overview_detail_total": "Total",
+  "budget.overview_detail_empty": "No one-time expenses",
+  "budget.overview_detail_add": "Add expense",
+  "budget.overview_detail_delete_confirm": "Deleted"
 }
