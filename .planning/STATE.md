@@ -1,14 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: "Budget Tracker"
-status: completed
-last_updated: "2026-03-20"
+milestone: v2.1
+milestone_name: Privacy, Reminders & Multi-Year Budget
+status: executing
+stopped_at: Completed 18-01-PLAN.md
+last_updated: "2026-03-20T20:36:42.143Z"
+last_activity: 2026-03-20
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 14
-  completed_plans: 14
+  total_phases: 4
+  completed_phases: 0
+  total_plans: 2
+  completed_plans: 1
 ---
 
 # Session State
@@ -18,28 +20,63 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-20)
 
 **Core value:** A shared calendar both partners can edit that stays in sync with Google Calendar.
-**Current focus:** v2.0 milestone complete — planning next milestone
+**Current focus:** Phase 18 — Event Privacy
 
 ## Position
 
-**Milestone:** v2.0 Budget Tracker — SHIPPED
-**Tests:** 230 passing
+**Milestone:** v2.1 Privacy, Reminders & Multi-Year Budget
+Phase: 18 of 21 (Event Privacy)
+Plan: 1 of 2 in current phase
+Status: Executing
+Last activity: 2026-03-20
 
-[████████████████████] 6/6 phases
+[░░░░░░░░░░░░░░░░░░░░] 0/4 phases
 
-## Decisions
+## Performance Metrics
 
-- BL-01 (localization) assigned to Phase 12 — existing i18n system means each phase adds keys as it builds UI, foundation phase sets the pattern
+**Velocity:**
+
+- Total plans completed: 0 (v2.1)
+- Average duration: -
+- Total execution time: -
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| - | - | - | - |
+
+## Accumulated Context
+
+| Phase 18 P01 | 3min | 2 tasks | 3 files |
+
+### Decisions
+
+- Research confirms zero new packages, zero database migrations needed for v2.1
+- Event privacy backend ~90% done — phase is validation + UI + sync cleanup
+- Reminder backend 100% done — phase is form UI only
+- Multi-year budget API already year-parameterized — main work is data integrity + YoY endpoint
+- [Phase 18]: Lock emoji chosen as sole privacy indicator, no background color change
+
+### Pending Todos
+
+None yet.
+
+### Blockers/Concerns
+
+- Carry-forward balance computation strategy needs validation during Phase 20 planning
+- Sync retraction (shared→private deleting from partner's GCal) not currently implemented — must ship WITH visibility toggle
+
+## Session Continuity
+
+Last session: 2026-03-20T20:36:42.140Z
+Stopped at: Completed 18-01-PLAN.md
+Resume file: None
 
 ## Session Log
 
-- 2026-03-20: Started v2.0 milestone — Budget Tracker feature
-- 2026-03-20: Gathered milestone goals — income calculation, expenses, year overview
-- 2026-03-20: Created roadmap — 4 phases (12-15), 20 requirements, 100% coverage
-- 2026-03-20: Phase 12 context gathered — settings page structure, rate identity, save behavior, data ownership decisions captured
-
-### Roadmap Evolution
-
-- v2.0 roadmap created: 4 phases (12-15) derived from 5 requirement categories
-- Phase 16 added: Overview month detail - clickable months showing one-time expense breakdown
-- Phase 17 added: Performance optimization - faster page loads and API responses
+- 2026-03-20: Started v2.1 milestone — Privacy, Reminders & Multi-Year Budget
+- 2026-03-20: Gathered milestone goals — event visibility, reminder UI, multi-year budget browsing, year comparison
+- 2026-03-20: Research completed — HIGH confidence, zero new dependencies
+- 2026-03-20: Requirements defined — 11 requirements (PRIV×4, REM×3, BUD×4)
+- 2026-03-20: Roadmap created — 4 phases (18-21), 100% coverage

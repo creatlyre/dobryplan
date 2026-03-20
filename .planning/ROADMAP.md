@@ -39,7 +39,7 @@
   2. Private events are completely invisible to partner on day view, month grid, and API responses
   3. Private events show a lock icon to the owner on the calendar grid
   4. Changing an event from shared to private deletes it from partner's Google Calendar
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 18-01-PLAN.md — UI: Lock icons & event form visibility dropdown
@@ -86,7 +86,7 @@ Plans:
 | 15. Year Overview Dashboard | v2.0 | 1/1 | Complete | 2026-03-20 |
 | 16. Overview Month Detail | v2.0 | 2/2 | Complete | 2026-03-20 |
 | 17. Performance Optimization | v2.0 | 2/2 | Complete | 2026-03-20 |
-| 18. Event Privacy | v2.1 | 0/? | Not started | - |
+| 18. Event Privacy | 1/2 | In Progress|  | - |
 | 19. Reminder UI | v2.1 | 0/? | Not started | - |
 | 20. Multi-Year Budget | v2.1 | 0/? | Not started | - |
 | 21. Year-over-Year Comparison | v2.1 | 0/? | Not started | - |
