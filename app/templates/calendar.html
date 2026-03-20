@@ -152,7 +152,11 @@ const I18N = {
   errUnknownWhy: {{ t('qa.err_unknown_why')|tojson }},
   errUnknownFix: {{ t('qa.err_unknown_fix')|tojson }},
   errWhyLabel: {{ t('qa.err_why_label')|tojson }},
-  errFixLabel: {{ t('qa.err_fix_label')|tojson }}
+  errFixLabel: {{ t('qa.err_fix_label')|tojson }},
+  reminderToggleOn: {{ t('reminder.toggle_on')|tojson }},
+  reminderToggleOff: {{ t('reminder.toggle_off')|tojson }},
+  reminderMaxReached: {{ t('reminder.max_reached')|tojson }},
+  reminderRemoveLabel: {{ t('reminder.remove_label')|tojson }}
 };
 
 function pad2(value) {
@@ -255,6 +259,79 @@ const eventEntryStartDateError = document.getElementById('event-entry-start-date
 const eventEntryStartTimeError = document.getElementById('event-entry-start-time-error');
 const eventEntryEndTimeError = document.getElementById('event-entry-end-time-error');
 const eventEntryDateLockNote = document.getElementById('event-entry-date-lock-note');
+const eventEntryRemindersToggle = document.getElementById('event-entry-reminders-toggle');
+const eventEntryRemindersToggleLabel = document.getElementById('event-entry-reminders-toggle-label');
+const eventEntryRemindersContainer = document.getElementById('event-entry-reminders-container');
+const eventEntryReminderChips = document.getElementById('event-entry-reminder-chips');
+const eventEntryReminderAddRow = document.getElementById('event-entry-reminder-add-row');
+const eventEntryReminderMinutesInput = document.getElementById('event-entry-reminder-minutes-input');
+const eventEntryReminderMethodSelect = document.getElementById('event-entry-reminder-method-select');
+const eventEntryReminderConfirmBtn = document.getElementById('event-entry-reminder-confirm-btn');
+const eventEntryReminderAddBtn = document.getElementById('event-entry-reminder-add-btn');
+const eventEntryReminderCounter = document.getElementById('event-entry-reminder-counter');
+
+let currentReminders = [30, 2880];
+const MAX_REMINDERS = 5;
+
+function formatReminderMinutes(minutes) {
+  if (minutes >= 1440 && minutes % 1440 === 0) return (minutes / 1440) + 'd';
+  if (minutes >= 60 && minutes % 60 === 0) return (minutes / 60) + 'h';
+  return minutes + ' min';
+}
+
+function renderReminderChips() {
+  eventEntryReminderChips.innerHTML = '';
+  currentReminders.forEach((minutes, index) => {
+    const chip = document.createElement('span');
+    chip.className = 'inline-flex items-center gap-1 rounded-full bg-indigo-500/25 border border-indigo-400/30 px-2.5 py-1 text-xs text-white/90';
+    chip.innerHTML = `${formatReminderMinutes(minutes)} <button type="button" data-idx="${index}" class="ml-0.5 text-white/50 hover:text-white" aria-label="${I18N.reminderRemoveLabel}">&times;</button>`;
+    chip.querySelector('button').addEventListener('click', () => {
+      currentReminders.splice(index, 1);
+      renderReminderChips();
+      updateReminderAddState();
+    });
+    eventEntryReminderChips.appendChild(chip);
+  });
+}
+
+function updateReminderAddState() {
+  const atMax = currentReminders.length >= MAX_REMINDERS;
+  eventEntryReminderAddBtn.disabled = atMax;
+  eventEntryReminderAddBtn.classList.toggle('opacity-40', atMax);
+  eventEntryReminderAddBtn.classList.toggle('cursor-not-allowed', atMax);
+  eventEntryReminderCounter.classList.toggle('hidden', !atMax);
+}
+
+function setRemindersEnabled(enabled) {
+  eventEntryRemindersContainer.classList.toggle('hidden', !enabled);
+  eventEntryRemindersToggleLabel.textContent = enabled ? I18N.reminderToggleOn : I18N.reminderToggleOff;
+}
+
+eventEntryRemindersToggle.addEventListener('change', () => {
+  setRemindersEnabled(eventEntryRemindersToggle.checked);
+});
+
+eventEntryReminderAddBtn.addEventListener('click', () => {
+  if (currentReminders.length >= MAX_REMINDERS) return;
+  eventEntryReminderAddRow.classList.remove('hidden');
+  eventEntryReminderAddRow.classList.add('flex');
+  eventEntryReminderMinutesInput.value = '';
+  eventEntryReminderMethodSelect.value = 'popup';
+  eventEntryReminderMinutesInput.focus();
+});
+
+eventEntryReminderConfirmBtn.addEventListener('click', () => {
+  const val = parseInt(eventEntryReminderMinutesInput.value, 10);
+  if (isNaN(val) || val < 0 || val > 40320) return;
+  currentReminders.push(val);
+  eventEntryReminderAddRow.classList.add('hidden');
+  eventEntryReminderAddRow.classList.remove('flex');
+  renderReminderChips();
+  updateReminderAddState();
+});
+
+renderReminderChips();
+updateReminderAddState();
 
 let eventEntryDirty = false;
 let eventEntrySaveInFlight = false;
@@ -298,6 +375,11 @@ function resetEventEntryForm() {
   setEventEntryDateLocked(false);
   eventEntryDirty = false;
   clearEventEntryErrorState();
+  currentReminders = [30, 2880];
+  eventEntryRemindersToggle.checked = true;
+  setRemindersEnabled(true);
+  renderReminderChips();
+  updateReminderAddState();
   updateEventEntryValidation();
 }
 
@@ -354,12 +436,23 @@ function populateEventEntryFromDateTimeLocal(startAt, endAt) {
   }
 }
 
-function prefillEvent(eventId, title, description, startAt, endAt, visibility) {
+function prefillEvent(eventId, title, description, startAt, endAt, visibility, reminderMinutesList) {
   resetEventEntryForm();
   eventEntryIdInput.value = eventId || '';
   eventEntryTitleInput.value = title || '';
   eventEntryDescriptionInput.value = description || '';
   eventEntryVisibilityInput.value = visibility || 'shared';
+  if (reminderMinutesList && reminderMinutesList.length > 0) {
+    currentReminders = [...reminderMinutesList];
+    eventEntryRemindersToggle.checked = true;
+    setRemindersEnabled(true);
+  } else {
+    currentReminders = [];
+    eventEntryRemindersToggle.checked = false;
+    setRemindersEnabled(false);
+  }
+  renderReminderChips();
+  updateReminderAddState();
   populateEventEntryFromDateTimeLocal(startAt, endAt);
   setEventEntryDateLocked(false);
   updateEventEntryValidation();
@@ -481,7 +574,8 @@ async function submitEventEntry(keepOpen) {
     end_at: endDate.toISOString(),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
     rrule: buildEventEntryRRule(),
-    visibility: eventEntryVisibilityInput.value
+    visibility: eventEntryVisibilityInput.value,
+    reminder_minutes_list: eventEntryRemindersToggle.checked ? currentReminders : []
   };
 
   const eventId = eventEntryIdInput.value;
@@ -1015,12 +1109,15 @@ loadSyncStatus();
 
   // ── Toast ────────────────────────────────────────────────────────────────
   function showToast(message) {
-    const toast = document.createElement('div');
-    toast.className =
-      'fixed bottom-4 right-4 z-[100] rounded bg-green-600 px-4 py-2 text-sm text-white shadow-lg';
+    const toast = document.getElementById('global-toast');
+    if (!toast) return;
     toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    toast.classList.remove('hidden');
+    toast.classList.add('toast-success', 'rounded-xl', 'px-4', 'py-3', 'text-sm', 'font-medium');
+    setTimeout(() => {
+      toast.classList.add('hidden');
+      toast.textContent = '';
+    }, 3000);
   }
 
   // ── Parse ────────────────────────────────────────────────────────────────
