@@ -48,15 +48,15 @@ class MonthlyHoursResponse(BaseModel):
 
 class AdditionalEarningCreate(BaseModel):
     year: int
-    month: int
+    month: int  # 0 = recurring (all months), 1-12 = specific month
     name: str
     amount: float
 
     @field_validator("month")
     @classmethod
     def valid_month(cls, v: int) -> int:
-        if not 1 <= v <= 12:
-            raise ValueError("Month must be between 1 and 12")
+        if not 0 <= v <= 12:
+            raise ValueError("Month must be between 0 and 12 (0 = recurring)")
         return v
 
     @field_validator("year")

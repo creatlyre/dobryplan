@@ -210,3 +210,66 @@ def test_settings_sidebar_links_to_income(authenticated_client: TestClient):
     resp = authenticated_client.get("/budget/settings")
     assert resp.status_code == 200
     assert 'href="/budget/income"' in resp.text
+
+
+# ---------------------------------------------------------------------------
+# Recurring (stable) earnings — month=0
+# ---------------------------------------------------------------------------
+
+def test_add_recurring_earning(authenticated_client: TestClient, test_db, test_user_a):
+    """month=0 creates a recurring earning."""
+    resp = authenticated_client.post("/api/budget/income/earnings", json={
+        "year": 2026, "month": 0, "name": "Vale", "amount": 300.00
+    })
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["name"] == "Vale"
+    assert data["month"] == 0
+
+
+def test_recurring_earning_appears_in_all_months(authenticated_client: TestClient, test_db, test_user_a):
+    """Recurring earnings show in every month's recurring_earnings list."""
+    authenticated_client.post("/api/budget/income/earnings", json={
+        "year": 2026, "month": 0, "name": "Pensja partnerki", "amount": 4000.00
+    })
+    resp = authenticated_client.get("/api/budget/income?year=2026")
+    data = resp.json()["data"]
+    # Should appear in top-level recurring_earnings
+    assert len(data["recurring_earnings"]) == 1
+    assert data["recurring_earnings"][0]["name"] == "Pensja partnerki"
+    # Should appear in each month's recurring_earnings
+    for m in data["months"]:
+        assert len(m["recurring_earnings"]) == 1
+        assert m["recurring_earnings"][0]["name"] == "Pensja partnerki"
+    # Should NOT appear in per-month additional_earnings
+    for m in data["months"]:
+        assert len(m["additional_earnings"]) == 0
+
+
+def test_recurring_earning_does_not_mix_with_monthly(authenticated_client: TestClient, test_db, test_user_a):
+    """Recurring (month=0) and per-month earnings stay separate."""
+    authenticated_client.post("/api/budget/income/earnings", json={
+        "year": 2026, "month": 0, "name": "Vale", "amount": 300.00
+    })
+    authenticated_client.post("/api/budget/income/earnings", json={
+        "year": 2026, "month": 3, "name": "Bonus", "amount": 1000.00
+    })
+    resp = authenticated_client.get("/api/budget/income?year=2026")
+    data = resp.json()["data"]
+    assert len(data["recurring_earnings"]) == 1
+    m3 = data["months"][2]
+    assert len(m3["additional_earnings"]) == 1
+    assert m3["additional_earnings"][0]["name"] == "Bonus"
+    assert len(m3["recurring_earnings"]) == 1
+    assert m3["recurring_earnings"][0]["name"] == "Vale"
+
+
+def test_delete_recurring_earning(authenticated_client: TestClient, test_db, test_user_a):
+    resp = authenticated_client.post("/api/budget/income/earnings", json={
+        "year": 2026, "month": 0, "name": "Vale", "amount": 300.00
+    })
+    earning_id = resp.json()["data"]["id"]
+    resp = authenticated_client.delete(f"/api/budget/income/earnings/{earning_id}")
+    assert resp.status_code == 200
+    resp = authenticated_client.get("/api/budget/income?year=2026")
+    assert len(resp.json()["data"]["recurring_earnings"]) == 0

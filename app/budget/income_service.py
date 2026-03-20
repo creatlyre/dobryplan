@@ -26,8 +26,12 @@ class IncomeService:
 
         hours_by_month = {h.month: h for h in hours_list}
         earnings_by_month: dict[int, list[AdditionalEarning]] = {}
+        recurring_earnings: list[AdditionalEarning] = []
         for e in earnings_list:
-            earnings_by_month.setdefault(e.month, []).append(e)
+            if e.month == 0:
+                recurring_earnings.append(e)
+            else:
+                earnings_by_month.setdefault(e.month, []).append(e)
 
         r1 = settings.rate_1 if settings else 0
         r2 = settings.rate_2 if settings else 0
@@ -45,6 +49,15 @@ class IncomeService:
             gross = r1 * h1 + r2 * h2 + r3 * h3
             net = (r1 * h1) * 0.88 + (r2 * h2) * 0.88 + (r3 * h3) * 0.88 - (zus + acc)
 
+            month_earnings = [
+                {"id": e.id, "name": e.name, "amount": e.amount}
+                for e in earnings_by_month.get(m, [])
+            ]
+            recurring_entries = [
+                {"id": e.id, "name": e.name, "amount": e.amount}
+                for e in recurring_earnings
+            ]
+
             months.append({
                 "month": m,
                 "rate_1_hours": h.rate_1_hours if h else None,
@@ -52,12 +65,15 @@ class IncomeService:
                 "rate_3_hours": h.rate_3_hours if h else None,
                 "gross": round(gross, 2),
                 "net": round(net, 2),
-                "additional_earnings": [
-                    {"id": e.id, "name": e.name, "amount": e.amount}
-                    for e in earnings_by_month.get(m, [])
-                ],
+                "additional_earnings": month_earnings,
+                "recurring_earnings": recurring_entries,
             })
-        return {"year": year, "months": months}
+
+        recurring_list = [
+            {"id": e.id, "name": e.name, "amount": e.amount}
+            for e in recurring_earnings
+        ]
+        return {"year": year, "months": months, "recurring_earnings": recurring_list}
 
     def save_hours(self, calendar_id: str, payload: MonthlyHoursUpdate) -> MonthlyHours:
         return self.hours_repo.upsert(calendar_id, payload)

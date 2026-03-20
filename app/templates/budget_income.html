@@ -69,6 +69,23 @@
         <button id="year-next" class="glass-btn-secondary rounded-xl px-3 py-2 text-sm font-medium">→</button>
       </div>
 
+      <!-- Recurring / stable earnings -->
+      <div class="glass rounded-xl p-4 mb-6">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-sm font-semibold" id="recurring-label"></h3>
+          <button id="recurring-add-btn" class="glass-btn-info rounded-lg px-2 py-0.5 text-xs"></button>
+        </div>
+        <div id="recurring-list" class="space-y-1"></div>
+        <div id="recurring-empty" class="text-xs opacity-50 text-center py-2"></div>
+        <div id="recurring-form" class="hidden mt-2 space-y-1">
+          <input type="text" id="recurring-name-input" class="glass-input w-full rounded-lg px-2 py-1 text-xs">
+          <div class="flex gap-1">
+            <input type="number" step="0.01" min="0.01" id="recurring-amount-input" class="glass-input flex-1 rounded-lg px-2 py-1 text-xs">
+            <button id="recurring-save-btn" class="glass-btn-primary rounded-lg px-2 py-1 text-xs"></button>
+          </div>
+        </div>
+      </div>
+
       <!-- 12-month grid -->
       <div id="months-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
     </div>
@@ -93,6 +110,9 @@
     gross: '{{ t("budget.income_gross_label") }}',
     net: '{{ t("budget.income_net_label") }}',
     additional: '{{ t("budget.income_additional_label") }}',
+    recurringLabel: '{{ t("budget.income_recurring_label") }}',
+    recurringAdd: '{{ t("budget.income_recurring_add") }}',
+    recurringEmpty: '{{ t("budget.income_recurring_empty") }}',
     addEarning: '{{ t("budget.income_add_earning") }}',
     earningName: '{{ t("budget.income_earning_name") }}',
     earningAmount: '{{ t("budget.income_earning_amount") }}',
@@ -106,6 +126,7 @@
   let currentYear = new Date().getFullYear();
   let settings = null;
   let monthsData = [];
+  let recurringData = [];
   let saveTimers = {};
 
   function showToast(msg) {
@@ -125,6 +146,7 @@
     const res = await fetch('/api/budget/income?year=' + currentYear);
     const json = await res.json();
     monthsData = json.data.months;
+    recurringData = json.data.recurring_earnings || [];
   }
 
   function getHours(val) {
@@ -188,6 +210,7 @@
               <button class="glass-btn-info rounded-lg px-2 py-0.5 text-xs add-earning-btn" data-month="${m.month}">${labels.addEarning}</button>
             </div>
             <div id="earnings-${m.month}" class="space-y-1">
+              ${(m.recurring_earnings || []).map(e => `<div class="flex justify-between items-center text-xs opacity-50"><span>${e.name} — ${e.amount.toFixed(2)} ${labels.currency}</span><span class="text-xs">↻</span></div>`).join('')}
               ${(m.additional_earnings || []).map(e => earningRow(e, m.month)).join('')}
             </div>
             <div id="earning-form-${m.month}" class="hidden mt-2 space-y-1">
@@ -325,10 +348,18 @@
   async function deleteEarning(id, month) {
     const res = await fetch('/api/budget/income/earnings/' + id, { method: 'DELETE' });
     if (res.ok) {
-      const idx = month - 1;
-      monthsData[idx].additional_earnings = monthsData[idx].additional_earnings.filter(e => e.id !== id);
-      const row = document.querySelector(`[data-earning-id="${id}"]`);
-      if (row) row.remove();
+      if (month === 0) {
+        // Recurring earning deleted
+        recurringData = recurringData.filter(e => e.id !== id);
+        renderRecurring();
+        // Also remove from each month's recurring display
+        document.querySelectorAll(`[data-earning-id="${id}"]`).forEach(el => el.remove());
+      } else {
+        const idx = month - 1;
+        monthsData[idx].additional_earnings = monthsData[idx].additional_earnings.filter(e => e.id !== id);
+        const row = document.querySelector(`[data-earning-id="${id}"]`);
+        if (row) row.remove();
+      }
       showToast(labels.earningDeleted);
     }
   }
@@ -340,8 +371,67 @@
   async function reload() {
     document.getElementById('year-display').textContent = currentYear;
     await loadIncome();
+    renderRecurring();
     renderMonths();
   }
+
+  function renderRecurring() {
+    const list = document.getElementById('recurring-list');
+    const empty = document.getElementById('recurring-empty');
+    document.getElementById('recurring-label').textContent = labels.recurringLabel;
+    document.getElementById('recurring-add-btn').textContent = labels.recurringAdd;
+    document.getElementById('recurring-name-input').placeholder = labels.earningName;
+    document.getElementById('recurring-amount-input').placeholder = labels.earningAmount;
+    document.getElementById('recurring-save-btn').textContent = labels.save;
+
+    list.innerHTML = recurringData.map(e =>
+      `<div class="flex justify-between items-center text-xs" data-earning-id="${e.id}">
+        <span>${e.name} — ${e.amount.toFixed(2)} ${labels.currency}</span>
+        <button class="glass-btn-danger rounded px-1.5 py-0.5 text-xs delete-earning-btn" data-id="${e.id}" data-month="0">✕</button>
+      </div>`
+    ).join('');
+
+    if (recurringData.length === 0) {
+      empty.textContent = labels.recurringEmpty;
+      empty.classList.remove('hidden');
+    } else {
+      empty.classList.add('hidden');
+    }
+
+    // Attach recurring delete events
+    list.querySelectorAll('.delete-earning-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        deleteEarning(this.dataset.id, 0);
+      });
+    });
+  }
+
+  // Recurring form events
+  document.getElementById('recurring-add-btn').addEventListener('click', () => {
+    document.getElementById('recurring-form').classList.toggle('hidden');
+  });
+  document.getElementById('recurring-save-btn').addEventListener('click', async () => {
+    const nameEl = document.getElementById('recurring-name-input');
+    const amountEl = document.getElementById('recurring-amount-input');
+    const name = nameEl.value.trim();
+    const amount = parseFloat(amountEl.value);
+    if (!name || !amount || amount <= 0) return;
+
+    const res = await fetch('/api/budget/income/earnings', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ year: currentYear, month: 0, name, amount })
+    });
+    const json = await res.json();
+    if (res.ok) {
+      recurringData.push(json.data);
+      renderRecurring();
+      nameEl.value = '';
+      amountEl.value = '';
+      document.getElementById('recurring-form').classList.add('hidden');
+      showToast(labels.earningAdded);
+    }
+  });
 
   // Initial load
   async function init() {
@@ -356,6 +446,7 @@
       document.getElementById('skeleton-loader').classList.add('hidden');
       document.getElementById('income-content').classList.remove('hidden');
       document.getElementById('year-display').textContent = currentYear;
+      renderRecurring();
       renderMonths();
     } catch (err) {
       console.error('Income page init error:', err);

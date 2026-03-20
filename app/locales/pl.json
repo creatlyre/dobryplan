@@ -215,8 +215,8 @@
   "budget.income_rate_2_hours": "Godziny stawka 2",
   "budget.income_rate_3_hours": "Godziny stawka 3",
   "budget.income_hours_placeholder": "160",
-  "budget.income_gross_label": "Brutto",
-  "budget.income_net_label": "Netto",
+  "budget.income_gross_label": "Netto",
+  "budget.income_net_label": "Po opłatach",
   "budget.income_additional_label": "Dodatkowe przychody",
   "budget.income_add_earning": "+ Dodaj",
   "budget.income_earning_name": "Nazwa",
@@ -224,5 +224,8 @@
   "budget.income_no_settings": "Najpierw skonfiguruj stawki w ustawieniach budżetu.",
   "budget.income_save_success": "Godziny zapisane",
   "budget.income_earning_added": "Przychód dodany",
-  "budget.income_earning_deleted": "Przychód usunięty"
+  "budget.income_earning_deleted": "Przychód usunięty",
+  "budget.income_recurring_label": "Stałe przychody (co miesiąc)",
+  "budget.income_recurring_add": "+ Dodaj stały przychód",
+  "budget.income_recurring_empty": "Brak stałych przychodów — dodaj np. pensję partnerki, vale, 500+"
 }

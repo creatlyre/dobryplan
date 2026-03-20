@@ -215,8 +215,8 @@
   "budget.income_rate_2_hours": "Hours rate 2",
   "budget.income_rate_3_hours": "Hours rate 3",
   "budget.income_hours_placeholder": "160",
-  "budget.income_gross_label": "Gross",
-  "budget.income_net_label": "Net",
+  "budget.income_gross_label": "Netto",
+  "budget.income_net_label": "After costs",
   "budget.income_additional_label": "Additional earnings",
   "budget.income_add_earning": "+ Add",
   "budget.income_earning_name": "Name",
@@ -224,5 +224,8 @@
   "budget.income_no_settings": "Please configure rates in budget settings first.",
   "budget.income_save_success": "Hours saved",
   "budget.income_earning_added": "Earning added",
-  "budget.income_earning_deleted": "Earning deleted"
+  "budget.income_earning_deleted": "Earning deleted",
+  "budget.income_recurring_label": "Stable income (every month)",
+  "budget.income_recurring_add": "+ Add stable income",
+  "budget.income_recurring_empty": "No stable income — add e.g. partner salary, vouchers, child benefits"
 }
