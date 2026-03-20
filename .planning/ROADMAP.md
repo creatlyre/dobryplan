@@ -18,6 +18,8 @@
  (completed 2026-03-20)
 - [x] **Phase 16: Overview month detail - clickable months showing one-time expense breakdown** — Accordion UI with inline CRUD
  (completed 2026-03-20)
+- [x] **Phase 17: Performance optimization - faster page loads and API responses** — Prebuilt Tailwind CSS, connection pooling, static serving
+ (completed 2026-03-20)
 
 ## Phase Details
 
@@ -86,6 +88,8 @@ Plans:
 | 13. Income Calculation Engine | 0/? | Complete    | 2026-03-20 |
 | 14. Expense Management | 3/3 | Complete    | 2026-03-20 |
 | 15. Year Overview Dashboard | 1/1 | Complete    | 2026-03-20 |
+| 16. Overview Month Detail | 2/2 | Complete    | 2026-03-20 |
+| 17. Performance Optimization | 2/2 | Complete    | 2026-03-20 |
 
 ### Phase 16: Overview month detail - clickable months showing one-time expense breakdown
 
@@ -116,8 +120,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 17-01-PLAN.md — Tailwind CSS build + static file serving + connection pooling
-- [ ] 17-02-PLAN.md — Integration tests + human verification
+- [x] 17-01-PLAN.md — Tailwind CSS build + static file serving + connection pooling
+- [x] 17-02-PLAN.md — Integration tests + human verification
 
 ---
 
