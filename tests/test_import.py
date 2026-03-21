@@ -84,3 +84,66 @@ def test_bulk_hours_import_empty(authenticated_client: TestClient, test_db, test
     resp = authenticated_client.post("/api/budget/income/hours/bulk", json=payload)
     assert resp.status_code == 200
     assert resp.json()["data"] == []
+
+
+# ---------------------------------------------------------------------------
+# Integration: Import → YoY Comparison (IMP-04)
+# ---------------------------------------------------------------------------
+
+def test_import_feeds_yoy_comparison(authenticated_client: TestClient, test_db, test_user_a):
+    """IMP-04: Imported data appears in year-over-year comparison."""
+    # 1. Create budget settings
+    _seed_settings(test_db, test_user_a.calendar_id)
+
+    # 2. Import hours for year 2024 (previous year)
+    hours_2024 = {
+        "year": 2024,
+        "entries": [
+            {"year": 2024, "month": m, "rate_1_hours": 160, "rate_2_hours": 160, "rate_3_hours": 0}
+            for m in range(1, 13)
+        ],
+    }
+    res = authenticated_client.post("/api/budget/income/hours/bulk", json=hours_2024)
+    assert res.status_code == 200
+
+    # 3. Import hours for year 2025 (selected year) with different hours
+    hours_2025 = {
+        "year": 2025,
+        "entries": [
+            {"year": 2025, "month": m, "rate_1_hours": 160, "rate_2_hours": 168, "rate_3_hours": 0}
+            for m in range(1, 13)
+        ],
+    }
+    res = authenticated_client.post("/api/budget/income/hours/bulk", json=hours_2025)
+    assert res.status_code == 200
+
+    # 4. Verify YoY comparison for 2025 shows both years
+    res = authenticated_client.get("/api/budget/overview/comparison?year=2025")
+    assert res.status_code == 200
+    data = res.json()["data"]
+    assert data["selected_year"] == 2025
+    assert data["previous_year"] == 2024
+    assert data["selected"]["total_net"] > 0, "Selected year should have income"
+    assert data["previous"]["total_net"] > 0, "Previous year should have income"
+    assert data["delta"]["total_net"] != 0, "Delta should be non-zero (different hours)"
+
+
+def test_imported_expenses_in_yoy(authenticated_client: TestClient, test_db, test_user_a):
+    """Imported one-time expenses appear in YoY totals."""
+    _seed_settings(test_db, test_user_a.calendar_id, rate_1=100, rate_2=80, rate_3=60, zus=1500, acc=500)
+
+    # Import one-time expenses for 2024
+    res = authenticated_client.post("/api/budget/expenses/bulk", json={
+        "expenses": [
+            {"year": 2024, "month": 3, "name": "Laptop", "amount": 3500.0, "recurring": False},
+            {"year": 2024, "month": 7, "name": "Vacation", "amount": 2000.0, "recurring": False},
+        ]
+    })
+    assert res.status_code == 200
+
+    # Verify in overview
+    res = authenticated_client.get("/api/budget/overview?year=2024")
+    assert res.status_code == 200
+    months = res.json()["data"]["months"]
+    assert months[2]["onetime_expenses"] == 3500.0  # March (index 2)
+    assert months[6]["onetime_expenses"] == 2000.0  # July (index 6)
