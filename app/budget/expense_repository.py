@@ -40,25 +40,11 @@ class ExpenseRepository:
         self.db = db
 
     def get_by_calendar_year(self, calendar_id: str, year: int) -> list[Expense]:
-        # Get year-specific expenses
-        year_rows = self.db.select(
+        rows = self.db.select(
             "expenses",
             {"calendar_id": f"eq.{calendar_id}", "year": f"eq.{year}"},
         )
-        # Get recurring expenses (month=0) that may have different year
-        recurring_rows = self.db.select(
-            "expenses",
-            {"calendar_id": f"eq.{calendar_id}", "month": f"eq.{0}"},
-        )
-        # Merge, deduplicate by id
-        seen = set()
-        results = []
-        for row in year_rows + recurring_rows:
-            rid = row.get("id", "")
-            if rid not in seen:
-                seen.add(rid)
-                results.append(_to_expense(row))
-        return results
+        return [_to_expense(row) for row in rows]
 
     def create(self, calendar_id: str, payload: ExpenseCreate) -> Expense:
         row = self.db.insert(
@@ -96,3 +82,15 @@ class ExpenseRepository:
     def delete(self, expense_id: str) -> bool:
         count = self.db.delete("expenses", {"id": f"eq.{expense_id}"})
         return count > 0
+
+    def delete_by_year_recurring(self, calendar_id: str, year: int) -> int:
+        return self.db.delete(
+            "expenses",
+            {"calendar_id": f"eq.{calendar_id}", "year": f"eq.{year}", "month": "eq.0"},
+        )
+
+    def delete_by_year_onetime(self, calendar_id: str, year: int) -> int:
+        return self.db.delete(
+            "expenses",
+            {"calendar_id": f"eq.{calendar_id}", "year": f"eq.{year}", "month": "neq.0"},
+        )

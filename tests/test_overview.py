@@ -388,19 +388,21 @@ class TestMultiYearCarryForward:
 
 
 class TestRecurringExpensesMultiYear:
-    """BUD-03: Recurring expenses appear in every year (current behavior preserved)."""
+    """BUD-03: Recurring expenses are scoped to their year."""
 
-    def test_recurring_expense_shows_in_different_year(self, authenticated_client, test_db, test_user_a):
+    def test_recurring_expense_scoped_to_year(self, authenticated_client, test_db, test_user_a):
         _seed_settings(test_db, test_user_a.calendar_id, rate_1=100, rate_2=0, rate_3=0, zus=0, acc=0, balance=0)
         # Create recurring expense in 2026
         authenticated_client.post(
             "/api/budget/expenses",
             json={"year": 2026, "month": 0, "name": "Rent", "amount": 5000, "recurring": True},
         )
-        # Check it appears in 2027
+        # Shows in 2026
+        res = authenticated_client.get("/api/budget/overview?year=2026")
+        assert res.json()["data"]["months"][0]["recurring_expenses"] == 5000.0
+        # Does NOT show in 2027
         res = authenticated_client.get("/api/budget/overview?year=2027")
-        m1 = res.json()["data"]["months"][0]
-        assert m1["recurring_expenses"] == 5000.0
+        assert res.json()["data"]["months"][0]["recurring_expenses"] == 0.0
 
 
 class TestYearOverYearComparison:

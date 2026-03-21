@@ -236,6 +236,47 @@ class TestExpenseBulk:
         )
         assert res.status_code == 422
 
+    def test_bulk_delete_recurring(self, authenticated_client):
+        # Create 3 recurring expenses for 2026
+        for name in ["Rent", "Insurance", "Phone"]:
+            authenticated_client.post(
+                "/api/budget/expenses",
+                json={"year": 2026, "month": 0, "name": name, "amount": 1000, "recurring": True},
+            )
+        # Also create one onetime
+        authenticated_client.post(
+            "/api/budget/expenses",
+            json={"year": 2026, "month": 3, "name": "Gift", "amount": 200},
+        )
+        # Delete all recurring for 2026
+        res = authenticated_client.delete("/api/budget/expenses/bulk?year=2026&type=recurring")
+        assert res.status_code == 200
+        assert res.json()["deleted"] == 3
+        # Onetime still exists
+        data = authenticated_client.get("/api/budget/expenses?year=2026").json()["data"]
+        assert len(data["recurring_expenses"]) == 0
+        assert len(data["onetime_expenses"]) == 1
+
+    def test_bulk_delete_onetime(self, authenticated_client):
+        # Create recurring + onetime
+        authenticated_client.post(
+            "/api/budget/expenses",
+            json={"year": 2026, "month": 0, "name": "Rent", "amount": 1000, "recurring": True},
+        )
+        for m in [1, 5]:
+            authenticated_client.post(
+                "/api/budget/expenses",
+                json={"year": 2026, "month": m, "name": f"Item {m}", "amount": 100},
+            )
+        # Delete all onetime for 2026
+        res = authenticated_client.delete("/api/budget/expenses/bulk?year=2026&type=onetime")
+        assert res.status_code == 200
+        assert res.json()["deleted"] == 2
+        # Recurring still exists
+        data = authenticated_client.get("/api/budget/expenses?year=2026").json()["data"]
+        assert len(data["recurring_expenses"]) == 1
+        assert len(data["onetime_expenses"]) == 0
+
 
 class TestExpensePage:
     """Page rendering tests."""

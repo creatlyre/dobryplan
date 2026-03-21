@@ -68,6 +68,8 @@ class InMemoryStore:
 
         if op == "eq":
             return current == target
+        if op == "neq":
+            return current != target
         if op == "lte":
             return current is not None and current <= target
         if op == "gte":

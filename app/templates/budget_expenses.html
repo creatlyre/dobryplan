@@ -64,7 +64,10 @@
       <div class="glass rounded-xl p-4 mb-6">
         <div class="flex justify-between items-center mb-3">
           <h3 class="text-card-title">{{ t('budget.expenses_recurring_title') }}</h3>
-          <button id="rec-bulk-btn" class="glass-btn-info rounded-lg px-3 py-2 text-xs min-h-[44px]">&#128203; {{ t('budget.expenses_bulk_paste') }}</button>
+          <div class="flex gap-2">
+            <button id="rec-delete-all-btn" class="glass-btn-danger rounded-lg px-3 py-2 text-xs min-h-[44px] hidden">🗑 {{ t('budget.expenses_delete_all') }}</button>
+            <button id="rec-bulk-btn" class="glass-btn-info rounded-lg px-3 py-2 text-xs min-h-[44px]">&#128203; {{ t('budget.expenses_bulk_paste') }}</button>
+          </div>
         </div>
         <!-- Recurring table -->
         <div class="table-responsive">
@@ -99,7 +102,10 @@
       <div class="glass rounded-xl p-4">
         <div class="flex justify-between items-center mb-3">
           <h3 class="text-card-title">{{ t('budget.expenses_onetime_title') }} <span id="ot-count" class="text-caption opacity-40 font-normal"></span></h3>
-          <button id="ot-bulk-btn" class="glass-btn-info rounded-lg px-3 py-2 text-xs min-h-[44px]">&#128203; {{ t('budget.expenses_bulk_paste') }}</button>
+          <div class="flex gap-2">
+            <button id="ot-delete-all-btn" class="glass-btn-danger rounded-lg px-3 py-2 text-xs min-h-[44px] hidden">🗑 {{ t('budget.expenses_delete_all') }}</button>
+            <button id="ot-bulk-btn" class="glass-btn-info rounded-lg px-3 py-2 text-xs min-h-[44px]">&#128203; {{ t('budget.expenses_bulk_paste') }}</button>
+          </div>
         </div>
         <!-- Filter & Sort bar -->
         <div class="flex flex-wrap gap-3 mb-3 items-center text-xs">
@@ -208,7 +214,12 @@
     bulkPlaceholderOnetime: '{{ t("budget.expenses_bulk_placeholder_onetime") }}',
     bulkParsed: '{{ t("budget.expenses_bulk_parsed") }}',
     bulkSkipped: '{{ t("budget.expenses_bulk_skipped") }}',
-    bulkAdded: '{{ t("budget.expenses_bulk_added") }}'
+    bulkAdded: '{{ t("budget.expenses_bulk_added") }}',
+    deleteAll: '{{ t("budget.expenses_delete_all") }}',
+    deleteAllConfirm: '{{ t("budget.expenses_delete_all_confirm") }}',
+    deletedAll: '{{ t("budget.expenses_deleted_all") }}',
+    recurringLabel: '{{ t("budget.expenses_recurring_title") }}',
+    onetimeLabel: '{{ t("budget.expenses_onetime_title") }}'
   };
 
   let currentYear = new Date().getFullYear();
@@ -244,14 +255,17 @@
     const tbody = document.getElementById('recurring-body');
     const emptyEl = document.getElementById('recurring-empty');
     const totalEl = document.getElementById('recurring-total');
+    const delAllBtn = document.getElementById('rec-delete-all-btn');
 
     if (recurringData.length === 0) {
       tbody.innerHTML = '';
       emptyEl.classList.remove('hidden');
       totalEl.textContent = '0.00';
+      delAllBtn.classList.add('hidden');
       return;
     }
     emptyEl.classList.add('hidden');
+    delAllBtn.classList.remove('hidden');
 
     let total = 0;
     tbody.innerHTML = recurringData.map(e => {
@@ -286,12 +300,15 @@
     const emptyEl = document.getElementById('onetime-empty');
     const totalEl = document.getElementById('onetime-total');
     const countEl = document.getElementById('ot-count');
+    const delAllBtn = document.getElementById('ot-delete-all-btn');
     const items = getFilteredSorted();
     const totalCount = onetimeData.length;
     const filtered = filterMonth > 0;
     countEl.textContent = filtered
       ? '(' + items.length + '/' + totalCount + ')'
       : '(' + totalCount + ')';
+
+    delAllBtn.classList.toggle('hidden', totalCount === 0);
 
     if (items.length === 0) {
       tbody.innerHTML = '';
@@ -446,6 +463,23 @@
         renderOnetime();
       }
       showToast(labels.deleted);
+    }
+  }
+
+  async function deleteAll(type) {
+    const typeLabel = type === 'recurring' ? labels.recurringLabel : labels.onetimeLabel;
+    const msg = labels.deleteAllConfirm.replace('{type}', typeLabel).replace('{year}', currentYear);
+    if (!confirm(msg)) return;
+    const res = await fetch('/api/budget/expenses/bulk?year=' + currentYear + '&type=' + type, { method: 'DELETE' });
+    if (res.ok) {
+      if (type === 'recurring') {
+        recurringData = [];
+        renderRecurring();
+      } else {
+        onetimeData = [];
+        renderOnetime();
+      }
+      showToast(labels.deletedAll);
     }
   }
 
@@ -612,6 +646,8 @@
   document.getElementById('ot-add-btn').addEventListener('click', () => addExpense(false));
   document.getElementById('rec-bulk-btn').addEventListener('click', () => openBulkModal('recurring'));
   document.getElementById('ot-bulk-btn').addEventListener('click', () => openBulkModal('onetime'));
+  document.getElementById('rec-delete-all-btn').addEventListener('click', () => deleteAll('recurring'));
+  document.getElementById('ot-delete-all-btn').addEventListener('click', () => deleteAll('onetime'));
   document.getElementById('bulk-parse-btn').addEventListener('click', parseBulkInput);
   document.getElementById('bulk-confirm-btn').addEventListener('click', confirmBulk);
   document.getElementById('bulk-cancel-btn').addEventListener('click', closeBulkModal);

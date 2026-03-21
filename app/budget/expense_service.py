@@ -44,3 +44,9 @@ class ExpenseService:
 
     def bulk_create(self, calendar_id: str, items: list[ExpenseCreate]) -> list[Expense]:
         return [self.repo.create(calendar_id, item) for item in items]
+
+    def delete_all_recurring(self, calendar_id: str, year: int) -> int:
+        return self.repo.delete_by_year_recurring(calendar_id, year)
+
+    def delete_all_onetime(self, calendar_id: str, year: int) -> int:
+        return self.repo.delete_by_year_onetime(calendar_id, year)

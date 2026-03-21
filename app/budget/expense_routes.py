@@ -62,6 +62,23 @@ async def update_expense(
     return {"data": ExpenseResponse.model_validate(expense, from_attributes=True).model_dump()}
 
 
+@router.delete("/bulk")
+async def bulk_delete_expenses(
+    year: int,
+    type: str = "recurring",
+    user=Depends(get_current_user),
+    db=Depends(get_db),
+):
+    if not user.calendar_id:
+        raise HTTPException(status_code=400, detail="No calendar linked")
+    service = _service(db)
+    if type == "recurring":
+        count = service.delete_all_recurring(user.calendar_id, year)
+    else:
+        count = service.delete_all_onetime(user.calendar_id, year)
+    return {"ok": True, "deleted": count}
+
+
 @router.delete("/{expense_id}")
 async def delete_expense(
     expense_id: str,
