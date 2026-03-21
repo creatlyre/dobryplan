@@ -159,7 +159,7 @@
   function renderHoursPreview(entries) {
     if (!entries.length) return '<p class="text-sm opacity-50">{{ t("budget.import_no_data") }}</p>';
     let html = '<div class="table-responsive"><table class="w-full text-sm"><thead><tr class="text-xs opacity-70 border-b border-white/10">';
-    html += '<th class="text-left py-2 px-2">Month</th><th class="text-right py-2 px-2">Rate 1</th><th class="text-right py-2 px-2">Rate 2</th><th class="text-right py-2 px-2">Rate 3</th></tr></thead><tbody>';
+    html += '<th class="text-left py-2 px-2">{{ t("budget.import_col_month") }}</th><th class="text-right py-2 px-2">{{ t("budget.import_col_rate1") }}</th><th class="text-right py-2 px-2">{{ t("budget.import_col_rate2") }}</th><th class="text-right py-2 px-2">{{ t("budget.import_col_rate3") }}</th></tr></thead><tbody>';
     for (const e of entries) {
       html += `<tr class="border-b border-white/5"><td class="py-2 px-2">${e.month}</td><td class="text-right py-2 px-2">${e.rate_1_hours ?? '-'}</td><td class="text-right py-2 px-2">${e.rate_2_hours ?? '-'}</td><td class="text-right py-2 px-2">${e.rate_3_hours ?? '-'}</td></tr>`;
     }
@@ -170,8 +170,8 @@
   function renderExpensePreview(expenses) {
     if (!expenses.length) return '<p class="text-sm opacity-50">{{ t("budget.import_no_data") }}</p>';
     let html = '<div class="table-responsive"><table class="w-full text-sm"><thead><tr class="text-xs opacity-70 border-b border-white/10">';
-    html += '<th class="text-left py-2 px-2">Name</th><th class="text-right py-2 px-2">Amount</th>';
-    if (!expenses[0].recurring) html += '<th class="text-right py-2 px-2">Month</th>';
+    html += '<th class="text-left py-2 px-2">{{ t("budget.import_col_name") }}</th><th class="text-right py-2 px-2">{{ t("budget.import_col_amount") }}</th>';
+    if (!expenses[0].recurring) html += '<th class="text-right py-2 px-2">{{ t("budget.import_col_month") }}</th>';
     html += '</tr></thead><tbody>';
     for (const e of expenses) {
       html += `<tr class="border-b border-white/5"><td class="py-2 px-2">${e.name}</td><td class="text-right py-2 px-2">${e.amount.toFixed(2)}</td>`;

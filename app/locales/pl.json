@@ -333,5 +333,11 @@
   "budget.import_success": "Pomyślnie zaimportowano {count} pozycji",
   "budget.import_error": "Import nie powiódł się",
   "budget.import_no_data": "Brak danych do importu. Najpierw wklej dane w pole tekstowe.",
-  "budget.import_view_overview": "Zobacz w Przeglądzie"
+  "budget.import_view_overview": "Zobacz w Przeglądzie",
+  "budget.import_col_month": "Miesiąc",
+  "budget.import_col_rate1": "Stawka 1",
+  "budget.import_col_rate2": "Stawka 2",
+  "budget.import_col_rate3": "Stawka 3",
+  "budget.import_col_name": "Nazwa",
+  "budget.import_col_amount": "Kwota"
 }

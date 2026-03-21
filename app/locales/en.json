@@ -333,5 +333,11 @@
   "budget.import_success": "Successfully imported {count} items",
   "budget.import_error": "Import failed",
   "budget.import_no_data": "No data to import. Paste data into the textarea first.",
-  "budget.import_view_overview": "View in Overview"
+  "budget.import_view_overview": "View in Overview",
+  "budget.import_col_month": "Month",
+  "budget.import_col_rate1": "Rate 1",
+  "budget.import_col_rate2": "Rate 2",
+  "budget.import_col_rate3": "Rate 3",
+  "budget.import_col_name": "Name",
+  "budget.import_col_amount": "Amount"
 }
