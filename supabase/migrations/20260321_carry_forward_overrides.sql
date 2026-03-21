@@ -15,6 +15,6 @@ create policy "Users can manage their own carry-forward overrides"
   for all
   using (
     calendar_id in (
-      select calendar_id from public.users where id = auth.uid()
+      select calendar_id from public.users where id = auth.uid()::text
     )
   );
