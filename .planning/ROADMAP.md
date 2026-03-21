@@ -106,21 +106,21 @@ Plans:
 | 19. Reminder UI | 1/1 | Complete   | 2026-03-20 | - |
 | 20. Multi-Year Budget | v2.1 | Complete    | 2026-03-21 | - |
 | 21. Year-over-Year Comparison | 1/1 | Complete    | 2026-03-21 | - |
-| 22. Historical Year Import | v2.1 | 0/0 | Not planned | - |
+| 22. Historical Year Import | v2.1 | 0/1 | Planned | - |
 
 ### Phase 22: Historical Year Import
 **Goal**: Users can import past-year budget data (income hours/rates, one-time expenses, monthly expenses) to enable accurate year-over-year comparison with different rate structures
 **Depends on**: Phase 21 (YoY comparison must exist before historical data feeds it)
-**Requirements**: TBD
+**Requirements**: IMP-01, IMP-02, IMP-03, IMP-04
 **Success Criteria** (what must be TRUE):
   1. User can import one-time expenses for a past year via a structured format (What | How Much | Month)
   2. User can import monthly recurring expenses for a past year in the same format
   3. User can import income hours per month with multiple hourly rates (Month | Hours Rate 1 | Hours Rate 2 | Hours Rate 3) and the system calculates income from those
   4. Imported past-year data appears correctly in the year-over-year comparison
-**Plans:** 0 plans
+**Plans:** 1 plan
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 22 to break down)
+- [ ] 22-01-PLAN.md — Bulk import API, import page UI, and tests
 
 ---
 
