@@ -78,6 +78,14 @@ class IncomeService:
     def save_hours(self, calendar_id: str, payload: MonthlyHoursUpdate) -> MonthlyHours:
         return self.hours_repo.upsert(calendar_id, payload)
 
+    def bulk_save_hours(self, calendar_id: str, year: int, entries: list[MonthlyHoursUpdate]) -> list[MonthlyHours]:
+        results = []
+        for entry in entries:
+            entry.year = year
+            result = self.hours_repo.upsert(calendar_id, entry)
+            results.append(result)
+        return results
+
     def add_earning(self, calendar_id: str, payload: AdditionalEarningCreate) -> AdditionalEarning:
         return self.earnings_repo.create(calendar_id, payload)
 

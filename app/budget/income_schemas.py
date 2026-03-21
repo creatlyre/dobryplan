@@ -34,6 +34,18 @@ class MonthlyHoursUpdate(BaseModel):
         return v
 
 
+class BulkMonthlyHoursUpdate(BaseModel):
+    year: int
+    entries: list[MonthlyHoursUpdate]
+
+    @field_validator("year")
+    @classmethod
+    def valid_year(cls, v: int) -> int:
+        if not 2020 <= v <= 2100:
+            raise ValueError("Year must be between 2020 and 2100")
+        return v
+
+
 class MonthlyHoursResponse(BaseModel):
     id: str
     calendar_id: str
