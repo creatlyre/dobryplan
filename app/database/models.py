@@ -124,3 +124,13 @@ class Expense:
     recurring: bool = False
     created_at: datetime | None = None
     updated_at: datetime | None = None
+
+
+@dataclass
+class CarryForwardOverride:
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    calendar_id: str = ""
+    year: int = 0
+    amount: float = 0.0
+    created_at: datetime | None = None
+    updated_at: datetime | None = None

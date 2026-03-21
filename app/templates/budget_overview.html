@@ -141,6 +141,9 @@
   const carriedFromTpl = {{ t('budget.overview_carried_from')|tojson }};
   const noPriorDataText = {{ t('budget.overview_no_prior_data')|tojson }};
   const initialBalanceLabel = {{ t('budget.overview_initial_balance')|tojson }};
+  const carryForwardEditTitle = {{ t('budget.overview_carry_forward_edit')|tojson }};
+  const carryForwardPromptText = {{ t('budget.overview_carry_forward_prompt')|tojson }};
+  const manualOverrideLabel = {{ t('budget.overview_manual_override')|tojson }};
   const yoyLabels = {
     total_net: {{ t('budget.yoy_net_income')|tojson }},
     total_additional: {{ t('budget.yoy_additional')|tojson }},
@@ -209,16 +212,38 @@
       container.innerHTML = initialBalanceLabel + ': <span id="initial-balance" class="font-medium">' + fmt(data.initial_balance) + '</span> ' + currency;
       return;
     }
+
+    function makeEditable(displayHTML) {
+      return displayHTML + ' <button class="opacity-40 hover:opacity-100 text-xs ml-1 cursor-pointer" onclick="editCarryForward()" title="' + carryForwardEditTitle + '">✏</button>';
+    }
+
     if (cf.type === 'initial') {
-      container.innerHTML = initialBalanceLabel + ': <span id="initial-balance" class="font-medium">' + fmt(cf.amount) + '</span> ' + currency;
+      container.innerHTML = makeEditable(initialBalanceLabel + ': <span id="initial-balance" class="font-medium">' + fmt(cf.amount) + '</span> ' + currency);
     } else if (cf.type === 'carry_forward') {
       const label = carriedFromTpl.replace('{year}', cf.source_year);
       const color = cf.amount >= 0 ? '#4ade80' : '#f87171';
-      container.innerHTML = label + ': <span id="initial-balance" class="font-medium" style="color:' + color + '">' + fmtSigned(cf.amount) + '</span> ' + currency;
+      container.innerHTML = makeEditable(label + ': <span id="initial-balance" class="font-medium" style="color:' + color + '">' + fmtSigned(cf.amount) + '</span> ' + currency);
+    } else if (cf.type === 'override') {
+      const label = carriedFromTpl.replace('{year}', cf.source_year);
+      const color = cf.amount >= 0 ? '#4ade80' : '#f87171';
+      container.innerHTML = makeEditable(label + ': <span id="initial-balance" class="font-medium" style="color:' + color + '">' + fmtSigned(cf.amount) + '</span> ' + currency + ' <span class="opacity-50">' + manualOverrideLabel + '</span>');
     } else if (cf.type === 'no_prior_data') {
-      container.innerHTML = '<span class="opacity-60">' + noPriorDataText + '</span>';
+      container.innerHTML = makeEditable('<span class="opacity-60">' + noPriorDataText + '</span>');
     }
   }
+
+  window.editCarryForward = function() {
+    const current = overviewData && overviewData.carry_forward ? overviewData.carry_forward.amount : 0;
+    const input = prompt(carryForwardPromptText, current);
+    if (input === null) return;
+    const amount = parseFloat(input.replace(/\s/g, '').replace(',', '.'));
+    if (isNaN(amount)) return;
+    fetch('/api/budget/overview/carry-forward', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ year: currentYear, amount }),
+    }).then(r => { if (r.ok) reload(); });
+  };
 
   function buildDetailHTML(m) {
     const items = m.onetime_items || [];

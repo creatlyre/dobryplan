@@ -279,6 +279,8 @@
   "budget.overview_carried_from": "Przeniesione z {year}",
   "budget.overview_no_prior_data": "Brak danych za poprzedni rok \u2014 start od zera",
   "budget.overview_manual_override": "(ręcznie)",
+  "budget.overview_carry_forward_edit": "Zmień kwotę przeniesienia",
+  "budget.overview_carry_forward_prompt": "Podaj kwotę przeniesienia:",
   "budget.overview_no_settings": "Najpierw skonfiguruj ustawienia budżetu",
   "budget.overview_yearly_total": "Razem rok",
   "budget.overview_tap_to_edit": "Kliknij aby dodać wydatek",

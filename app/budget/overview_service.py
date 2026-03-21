@@ -1,12 +1,62 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.budget.income_repository import MonthlyHoursRepository, AdditionalEarningsRepository
 from app.budget.expense_repository import ExpenseRepository
 from app.budget.repository import BudgetSettingsRepository
+from app.database.models import CarryForwardOverride
+from app.database.supabase_store import SupabaseStore
 
 DEFAULT_HOURS = 160.0
+
+
+class CarryForwardRepository:
+    def __init__(self, db: SupabaseStore):
+        self.db = db
+
+    def get(self, calendar_id: str, year: int) -> CarryForwardOverride | None:
+        rows = self.db.select(
+            "carry_forward_overrides",
+            {"calendar_id": f"eq.{calendar_id}", "year": f"eq.{year}", "limit": "1"},
+        )
+        if not rows:
+            return None
+        r = rows[0]
+        return CarryForwardOverride(
+            id=r.get("id", ""),
+            calendar_id=r.get("calendar_id", ""),
+            year=int(r.get("year", 0)),
+            amount=float(r.get("amount", 0)),
+        )
+
+    def upsert(self, calendar_id: str, year: int, amount: float) -> CarryForwardOverride:
+        existing = self.get(calendar_id, year)
+        if existing:
+            row = self.db.update(
+                "carry_forward_overrides",
+                {"id": f"eq.{existing.id}"},
+                {"amount": amount, "updated_at": datetime.now(timezone.utc).isoformat()},
+            )
+            if row:
+                existing.amount = amount
+            return existing
+        row = self.db.insert(
+            "carry_forward_overrides",
+            {"calendar_id": calendar_id, "year": year, "amount": amount},
+        )
+        return CarryForwardOverride(
+            id=row.get("id", ""),
+            calendar_id=calendar_id,
+            year=year,
+            amount=amount,
+        )
+
+    def delete(self, calendar_id: str, year: int) -> bool:
+        return self.db.delete(
+            "carry_forward_overrides",
+            {"calendar_id": f"eq.{calendar_id}", "year": f"eq.{year}"},
+        ) > 0
 
 
 class OverviewService:
@@ -16,11 +66,13 @@ class OverviewService:
         hours_repo: MonthlyHoursRepository,
         earnings_repo: AdditionalEarningsRepository,
         expense_repo: ExpenseRepository,
+        carry_forward_repo: CarryForwardRepository | None = None,
     ):
         self.settings_repo = settings_repo
         self.hours_repo = hours_repo
         self.earnings_repo = earnings_repo
         self.expense_repo = expense_repo
+        self.carry_forward_repo = carry_forward_repo
 
     def get_year_bounds(self, calendar_id: str) -> dict:
         current_year = datetime.now().year
@@ -50,6 +102,12 @@ class OverviewService:
         return False
 
     def _compute_carry_forward(self, calendar_id: str, year: int, settings) -> dict:
+        # Check for manual override first
+        if self.carry_forward_repo:
+            override = self.carry_forward_repo.get(calendar_id, year)
+            if override:
+                return {"type": "override", "amount": round(override.amount, 2), "source_year": year - 1}
+
         bounds = self.get_year_bounds(calendar_id)
         global_initial = settings.initial_balance if settings else 0
 

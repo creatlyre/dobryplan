@@ -279,6 +279,8 @@
   "budget.overview_carried_from": "Carried from {year}",
   "budget.overview_no_prior_data": "No prior year data \u2014 starting from zero",
   "budget.overview_manual_override": "(manual)",
+  "budget.overview_carry_forward_edit": "Edit carry-forward amount",
+  "budget.overview_carry_forward_prompt": "Enter carry-forward amount:",
   "budget.overview_no_settings": "Configure budget settings first",
   "budget.overview_yearly_total": "Year Total",
   "budget.overview_tap_to_edit": "Tap to add expense",

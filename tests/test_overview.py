@@ -442,3 +442,54 @@ class TestYearOverYearComparison:
     def test_comparison_requires_auth(self, test_client):
         res = test_client.get("/api/budget/overview/comparison?year=2026")
         assert res.status_code in (302, 303, 401)
+
+
+class TestCarryForwardOverride:
+    """Manual carry-forward override tests."""
+
+    def test_set_override_changes_carry_forward(self, authenticated_client, test_db, test_user_a):
+        """PUT override makes overview return type=override with custom amount."""
+        _seed_settings(test_db, test_user_a.calendar_id, balance=10000)
+        authenticated_client.put(
+            "/api/budget/income/hours",
+            json={"year": 2026, "month": 1, "rate_1_hours": 160, "rate_2_hours": 160, "rate_3_hours": 160},
+        )
+        # Set manual override
+        res = authenticated_client.put(
+            "/api/budget/overview/carry-forward",
+            json={"year": 2026, "amount": 25000},
+        )
+        assert res.status_code == 200
+
+        # Verify overview uses override
+        res = authenticated_client.get("/api/budget/overview?year=2026")
+        cf = res.json()["data"]["carry_forward"]
+        assert cf["type"] == "override"
+        assert cf["amount"] == 25000.0
+        assert res.json()["data"]["initial_balance"] == 25000.0
+
+    def test_delete_override_restores_computed(self, authenticated_client, test_db, test_user_a):
+        """DELETE override restores the computed carry-forward."""
+        _seed_settings(test_db, test_user_a.calendar_id, balance=10000)
+        authenticated_client.put(
+            "/api/budget/income/hours",
+            json={"year": 2026, "month": 1, "rate_1_hours": 160, "rate_2_hours": 160, "rate_3_hours": 160},
+        )
+        # Set and then delete override
+        authenticated_client.put(
+            "/api/budget/overview/carry-forward",
+            json={"year": 2026, "amount": 99999},
+        )
+        res = authenticated_client.delete("/api/budget/overview/carry-forward?year=2026")
+        assert res.status_code == 200
+
+        # Should be back to initial type
+        res = authenticated_client.get("/api/budget/overview?year=2026")
+        cf = res.json()["data"]["carry_forward"]
+        assert cf["type"] == "initial"
+        assert cf["amount"] == 10000.0
+
+    def test_delete_nonexistent_override_returns_404(self, authenticated_client, test_db, test_user_a):
+        _seed_settings(test_db, test_user_a.calendar_id)
+        res = authenticated_client.delete("/api/budget/overview/carry-forward?year=2026")
+        assert res.status_code == 404

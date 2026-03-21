@@ -26,6 +26,7 @@ class InMemoryStore:
             "monthly_hours": [],
             "additional_earnings": [],
             "expenses": [],
+            "carry_forward_overrides": [],
         }
 
     @staticmethod
@@ -153,6 +154,8 @@ class InMemoryStore:
             table = "monthly_hours"
         elif item.__class__.__name__ == "AdditionalEarning":
             table = "additional_earnings"
+        elif item.__class__.__name__ == "CarryForwardOverride":
+            table = "carry_forward_overrides"
         else:
             raise ValueError(f"Unsupported model for add(): {item.__class__.__name__}")
 
@@ -180,6 +183,8 @@ class InMemoryStore:
             table = "monthly_hours"
         elif _item.__class__.__name__ == "AdditionalEarning":
             table = "additional_earnings"
+        elif _item.__class__.__name__ == "CarryForwardOverride":
+            table = "carry_forward_overrides"
         else:
             return None
 
