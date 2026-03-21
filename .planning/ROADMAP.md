@@ -5,7 +5,7 @@
 - [x] v1.0 milestone - Phases 1-7 shipped 2026-03-19 (22/22 plans complete). Archive: .planning/milestones/v1.0-ROADMAP.md
 - [x] v1.1 milestone - Phases 8-11 shipped 2026-03-20 (10/10 plans complete). Archive: .planning/milestones/v1.1-ROADMAP.md
 - [x] v2.0 milestone — Budget Tracker - Phases 12-17 shipped 2026-03-20 (230 tests passing). Archive: .planning/milestones/v2.0-ROADMAP.md
-- [ ] v2.1 milestone — Privacy, Reminders & Multi-Year Budget - Phases 18-21 (11 requirements, 4 phases)
+- [ ] v2.1 milestone — Privacy, Reminders & Multi-Year Budget - Phases 18-22 (11+ requirements, 5 phases)
 
 ## Phases
 
@@ -27,9 +27,12 @@
  (completed 2026-03-20)
 - [x] **Phase 19: Reminder UI** - Wire reminder controls to existing backend in event forms
  (completed 2026-03-20)
-- [x] **Phase 20: Multi-Year Budget** - Fix data integrity (carry-forward, year-scoping) and enable year navigation (completed 2026-03-21)
+- [x] **Phase 20: Multi-Year Budget** - Fix data integrity (carry-forward, year-scoping) and enable year navigation
+ (completed 2026-03-21)
  (0/2 plans)
-- [ ] **Phase 21: Year-over-Year Comparison** - Side-by-side annual totals with delta indicators
+- [x] **Phase 21: Year-over-Year Comparison** - Side-by-side annual totals with delta indicators
+ (completed 2026-03-21)
+- [ ] **Phase 22: Historical Year Import** - Backward-looking import of past-year income hours/rates, one-time expenses, and monthly expenses
 
 ## Phase Details
 
@@ -84,7 +87,7 @@ Plans:
   1. User can view side-by-side annual totals (income, expenses, balance) for selected year vs previous year
   2. Comparison handles years with partial or no data gracefully
   3. Summary is accessible from the budget overview page
-**Plans:** 2/2 plans complete
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 21-01-PLAN.md — YoY comparison API endpoint, UI card, i18n, tests
@@ -102,7 +105,22 @@ Plans:
 | 18. Event Privacy | 2/2 | Complete   | 2026-03-20 | - |
 | 19. Reminder UI | 1/1 | Complete   | 2026-03-20 | - |
 | 20. Multi-Year Budget | v2.1 | Complete    | 2026-03-21 | - |
-| 21. Year-over-Year Comparison | v2.1 | 0/? | Not started | - |
+| 21. Year-over-Year Comparison | 1/1 | Complete    | 2026-03-21 | - |
+| 22. Historical Year Import | v2.1 | 0/0 | Not planned | - |
+
+### Phase 22: Historical Year Import
+**Goal**: Users can import past-year budget data (income hours/rates, one-time expenses, monthly expenses) to enable accurate year-over-year comparison with different rate structures
+**Depends on**: Phase 21 (YoY comparison must exist before historical data feeds it)
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+  1. User can import one-time expenses for a past year via a structured format (What | How Much | Month)
+  2. User can import monthly recurring expenses for a past year in the same format
+  3. User can import income hours per month with multiple hourly rates (Month | Hours Rate 1 | Hours Rate 2 | Hours Rate 3) and the system calculates income from those
+  4. Imported past-year data appears correctly in the year-over-year comparison
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 22 to break down)
 
 ---
 
