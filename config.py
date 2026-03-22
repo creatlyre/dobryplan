@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     DEBUG: bool = False
-    SECRET_KEY: str = "your-secret-key-change-in-production"
+    SECRET_KEY: str
 
     SUPABASE_URL: str = Field(
         default_factory=lambda: os.getenv("SUPABASE_URL", "")
@@ -35,6 +35,6 @@ class Settings(BaseSettings):
 
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRY_HOURS: int = 8
-    DB_ENCRYPTION_KEY: str = "your-encryption-key-for-oauth-tokens"
+    DB_ENCRYPTION_KEY: str
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

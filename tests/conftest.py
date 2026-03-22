@@ -12,6 +12,11 @@ from app.auth.dependencies import get_current_user
 from app.database.database import Base, get_db
 from app.database.models import Calendar, User
 from config import Settings
+import os
+
+os.environ["SECRET_KEY"] = "test-secret-key"
+os.environ["DB_ENCRYPTION_KEY"] = "test-encryption-key"
+
 from main import app
 
 
@@ -76,7 +81,9 @@ class InMemoryStore:
             return current is not None and current >= target
         return False
 
-    def _apply_filters(self, rows: list[dict[str, Any]], params: dict[str, str] | None) -> list[dict[str, Any]]:
+    def _apply_filters(
+        self, rows: list[dict[str, Any]], params: dict[str, str] | None
+    ) -> list[dict[str, Any]]:
         if not params:
             return list(rows)
 
@@ -98,11 +105,15 @@ class InMemoryStore:
 
         return filtered
 
-    def select(self, table: str, params: dict[str, str], auth_token: str | None = None) -> list[dict[str, Any]]:
+    def select(
+        self, table: str, params: dict[str, str], auth_token: str | None = None
+    ) -> list[dict[str, Any]]:
         rows = self._apply_filters(self.tables.get(table, []), params)
         return [dict(item) for item in rows]
 
-    def insert(self, table: str, payload: dict[str, Any], auth_token: str | None = None) -> dict[str, Any]:
+    def insert(
+        self, table: str, payload: dict[str, Any], auth_token: str | None = None
+    ) -> dict[str, Any]:
         row = {key: self._normalize_value(value) for key, value in payload.items()}
         if not row.get("id"):
             row["id"] = str(uuid.uuid4())
@@ -117,23 +128,34 @@ class InMemoryStore:
         auth_token: str | None = None,
     ) -> dict[str, Any] | None:
         rows = self.tables.get(table, [])
-        matched = [row for row in rows if all(self._matches(row, key, raw) for key, raw in filters.items())]
+        matched = [
+            row
+            for row in rows
+            if all(self._matches(row, key, raw) for key, raw in filters.items())
+        ]
         if not matched:
             return None
 
-        normalized_payload = {key: self._normalize_value(value) for key, value in payload.items()}
+        normalized_payload = {
+            key: self._normalize_value(value) for key, value in payload.items()
+        }
         for row in matched:
             row.update(normalized_payload)
         return dict(matched[0])
 
-    def count(self, table: str, filters: dict[str, str], auth_token: str | None = None) -> int:
+    def count(
+        self, table: str, filters: dict[str, str], auth_token: str | None = None
+    ) -> int:
         return len(self._apply_filters(self.tables.get(table, []), filters))
 
-    def delete(self, table: str, filters: dict[str, str], auth_token: str | None = None) -> int:
+    def delete(
+        self, table: str, filters: dict[str, str], auth_token: str | None = None
+    ) -> int:
         rows = self.tables.get(table, [])
         original_len = len(rows)
         self.tables[table] = [
-            r for r in rows
+            r
+            for r in rows
             if not all(self._matches(r, k, v) for k, v in filters.items())
         ]
         return original_len - len(self.tables[table])
