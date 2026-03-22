@@ -322,20 +322,20 @@ class GoogleSyncService:
         )
         return items[0] if items else None
 
-    def _sync_recipients(self, event: Event) -> list[User]:
+    def _sync_recipients(self, event: Event, household_users: list[User] | None = None) -> list[User]:
         """Return the list of users who should receive this event via Google sync.
 
         Shared events go to all household users. Private events go only to the owner.
         """
-        users = self._household_users(event.calendar_id)
+        users = household_users if household_users is not None else self._household_users(event.calendar_id)
         visibility = getattr(event, "visibility", "shared") or "shared"
         if visibility == "private":
             return [u for u in users if u.id == event.created_by_user_id]
         return users
 
-    def sync_event_for_household(self, event: Event, deleted: bool = False) -> SyncResult:
-        users = self._sync_recipients(event)
-        all_household = self._household_users(event.calendar_id)
+    def sync_event_for_household(self, event: Event, deleted: bool = False, household_users: list[User] | None = None) -> SyncResult:
+        users = self._sync_recipients(event, household_users=household_users)
+        all_household = household_users if household_users is not None else self._household_users(event.calendar_id)
         recipient_ids = {u.id for u in users}
         non_recipients = [u for u in all_household if u.id not in recipient_ids]
         synced_users = 0
@@ -400,10 +400,17 @@ class GoogleSyncService:
         total_users = 0
         total_events = 0
         errors: list[str] = []
+
+        household_users_cache = {}
         for item in events:
             if not hasattr(item, "calendar_id"):
                 continue
-            result = self.sync_event_for_household(item, deleted=False)
+
+            cal_id = item.calendar_id
+            if cal_id not in household_users_cache:
+                household_users_cache[cal_id] = self._household_users(cal_id)
+
+            result = self.sync_event_for_household(item, deleted=False, household_users=household_users_cache[cal_id])
             total_users += result.users_synced
             total_events += result.events_synced
             errors.extend(result.errors)
