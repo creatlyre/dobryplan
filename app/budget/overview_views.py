@@ -28,7 +28,7 @@ async def overview_page(
             "user": user,
         },
     )
-    response = templates.TemplateResponse("budget_overview.html", context)
+    response = templates.TemplateResponse(request=request, name="budget_overview.html", context=context)
     set_locale_cookie_if_param(response, request)
     return response
 
@@ -43,6 +43,6 @@ async def import_page(
         request,
         {"request": request, "user": user},
     )
-    response = templates.TemplateResponse("budget_import.html", context)
+    response = templates.TemplateResponse(request=request, name="budget_import.html", context=context)
     set_locale_cookie_if_param(response, request)
     return response

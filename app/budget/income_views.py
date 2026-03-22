@@ -23,6 +23,6 @@ async def income_page(
             "user": user,
         },
     )
-    response = templates.TemplateResponse("budget_income.html", context)
+    response = templates.TemplateResponse(request=request, name="budget_income.html", context=context)
     set_locale_cookie_if_param(response, request)
     return response

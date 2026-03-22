@@ -32,6 +32,6 @@ async def budget_settings_page(
             "settings": settings,
         },
     )
-    response = templates.TemplateResponse("budget_settings.html", context)
+    response = templates.TemplateResponse(request=request, name="budget_settings.html", context=context)
     set_locale_cookie_if_param(response, request)
     return response
