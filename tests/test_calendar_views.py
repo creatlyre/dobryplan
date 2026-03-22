@@ -797,3 +797,118 @@ def test_reminder_ui_elements_in_event_entry_modal(authenticated_client):
     assert 'id="event-entry-reminder-counter"' in html
     assert "renderReminderChips" in html
     assert "formatReminderMinutes" in html
+
+
+# ── ECAT-03: Color-coded month grid and day view indicators ──────────────────
+
+
+def test_month_grid_renders_category_dot_for_categorized_event(authenticated_client):
+    """ECAT-03: Month grid event pills include category-dot span with color."""
+    now = datetime.utcnow().replace(microsecond=0)
+    # Get preset categories (lazy-seeded)
+    cat_resp = authenticated_client.get("/api/events/categories")
+    cats = cat_resp.json()
+    work_cat = next(c for c in cats if c["name"] == "Work")
+
+    # Create event with Work category
+    authenticated_client.post(
+        "/api/events",
+        json={
+            "title": "Phase 23 Test",
+            "start_at": (now + timedelta(hours=1)).isoformat(),
+            "end_at": (now + timedelta(hours=2)).isoformat(),
+            "timezone": "UTC",
+            "category_id": work_cat["id"],
+        },
+    )
+
+    html = authenticated_client.get(f"/calendar/month?year={now.year}&month={now.month}").text
+    assert "category-dot" in html
+    assert work_cat["color"] in html
+    assert f'data-category-id="{work_cat["id"]}"' in html
+
+
+def test_day_view_renders_category_color_indicator(authenticated_client):
+    """ECAT-03: Day event list shows category color left-border and name badge."""
+    now = datetime.utcnow().replace(hour=10, minute=0, second=0, microsecond=0)
+    cat_resp = authenticated_client.get("/api/events/categories")
+    health_cat = next(c for c in cat_resp.json() if c["name"] == "Health")
+
+    authenticated_client.post(
+        "/api/events",
+        json={
+            "title": "Morning Run",
+            "start_at": (now + timedelta(hours=1)).isoformat(),
+            "end_at": (now + timedelta(hours=2)).isoformat(),
+            "timezone": "UTC",
+            "category_id": health_cat["id"],
+        },
+    )
+
+    html = authenticated_client.get(f"/calendar/day?year={now.year}&month={now.month}&day={now.day}").text
+    assert "category-color" in html
+    assert health_cat["color"] in html
+    assert "Health" in html
+    assert f'data-category-id="{health_cat["id"]}"' in html
+
+
+# ── ECAT-04: Category filter UI ─────────────────────────────────────────────
+
+
+def test_category_filter_bar_rendered_on_calendar_page(authenticated_client):
+    """ECAT-04: Calendar page includes category filter bar with JS functions."""
+    html = _calendar_html(authenticated_client)
+    assert 'id="category-filter"' in html
+    assert 'id="category-filter-buttons"' in html
+    assert "loadCategories" in html
+    assert "toggleCategoryFilter" in html
+    assert "applyCategoryFilter" in html
+    assert "renderCategoryFilterButtons" in html
+
+
+# ── ECAT-05: Category selector in event create and edit forms ────────────────
+
+
+def test_category_dropdown_in_event_entry_modal(authenticated_client):
+    """ECAT-05: Event entry modal includes category select dropdown."""
+    html = _calendar_html(authenticated_client)
+    assert 'id="event-entry-category"' in html
+    assert "populateCategoryDropdowns" in html
+
+
+def test_category_dropdown_in_event_form(authenticated_client):
+    """ECAT-05: Simple event form partial includes category select dropdown."""
+    import os
+    form_path = os.path.join("app", "templates", "partials", "event_form.html")
+    with open(form_path, "r", encoding="utf-8") as f:
+        html = f.read()
+    assert 'id="event-category"' in html
+
+
+def test_event_submit_includes_category_id_in_payload(authenticated_client):
+    """ECAT-05: submitEventEntry JS sends category_id in payload."""
+    html = _calendar_html(authenticated_client)
+    assert "category_id" in html
+    assert "event-entry-category" in html
+
+
+def test_edit_prefill_passes_category_id(authenticated_client):
+    """ECAT-05: day_events edit button passes category_id to prefillEvent."""
+    now = datetime.utcnow().replace(hour=14, minute=0, second=0, microsecond=0)
+    cat_resp = authenticated_client.get("/api/events/categories")
+    personal_cat = next(c for c in cat_resp.json() if c["name"] == "Personal")
+
+    authenticated_client.post(
+        "/api/events",
+        json={
+            "title": "Reading Time",
+            "start_at": (now + timedelta(hours=1)).isoformat(),
+            "end_at": (now + timedelta(hours=2)).isoformat(),
+            "timezone": "UTC",
+            "category_id": personal_cat["id"],
+        },
+    )
+
+    html = authenticated_client.get(f"/calendar/day?year={now.year}&month={now.month}&day={now.day}").text
+    # Verify the edit button onclick passes category_id
+    assert personal_cat["id"] in html
