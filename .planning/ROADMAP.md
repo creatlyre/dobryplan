@@ -120,7 +120,7 @@
 | 20. Multi-Year Budget | v2.1 | 2/2 | Complete | 2026-03-21 |
 | 21. Year-over-Year Comparison | v2.1 | 1/1 | Complete | 2026-03-21 |
 | 22. Historical Year Import | v2.1 | 1/1 | Complete | 2026-03-21 |
-| 23. Event Categories & Colors | v3.0 | 0/2 | Planned | - |
+| 23. Event Categories & Colors | 1/2 | In Progress|  | - |
 | 24. Expense Categories & Charts | v3.0 | 0/? | Not started | - |
 | 25. Shopping List | v3.0 | 0/? | Not started | - |
 | 26. Notifications | v3.0 | 0/? | Not started | - |
