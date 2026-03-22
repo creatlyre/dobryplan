@@ -1,151 +1,156 @@
-# Project Research Summary
+﻿# Project Research Summary
 
-**Project:** CalendarPlanner v2.1 — Privacy, Reminders & Multi-Year Budget
-**Domain:** Household calendar + budget planner (2-user, Polish locale, Google Calendar sync)
-**Researched:** 2026-03-20
+**Project:** CalendarPlanner v3.0
+**Domain:** Household calendar + budget app — Dashboard, Notifications & Categories
+**Researched:** 2026-03-22
 **Confidence:** HIGH
 
 ## Executive Summary
 
-CalendarPlanner v2.1 is a feature-completion milestone that activates backend capabilities already built in v1.1–v2.0 but never exposed to users. Event privacy (visibility toggle, filtering) is ~90% shipped — the data model, repository filtering, sync pipeline, and even the form UI exist. Reminder configuration has a complete backend pipeline (schema, validation, Google sync) but zero UI. Multi-year budget browsing already works via year-parameterized API and navigation arrows. The research conclusion is clear: **this is primarily a frontend wiring and data-integrity milestone, not a greenfield build.** Zero new Python packages are needed. Zero database migrations are required for the core features.
+CalendarPlanner v3.0 extends a two-person household calendar and budget app (FastAPI + Jinja2/HTMX + Supabase) with five feature groups: event categories with color-coded calendar grid, expense categories with pie/bar charts and per-category budget limits, a shared shopping list, an in-app partner notification feed, and a unified dashboard home page. The existing stack handles all requirements with only two new dependencies — Chart.js via CDN for charts and aiosmtplib for optional email alerting. The architecture follows the proven repository-service-routes layered pattern already used across all modules, with 4 new Supabase tables and nullable FK additions to the existing events and expenses tables.
 
-The recommended approach is to validate existing implementations first (privacy), then wire missing UI to existing backends (reminders), then fix data-model gaps that make multi-year browsing inaccurate (carry-forward balance, recurring expense year-scoping), and finally build the one genuinely new feature (year-over-year comparison). The biggest risk is **data integrity in multi-year budget views**: the current single-row `BudgetSettings` and year-unscoped recurring expenses produce incorrect numbers for any year other than the current one. These must be fixed before shipping year navigation, or users will see wrong data and lose trust. The secondary risk is **Google Calendar sync consistency** — changing event visibility from shared to private must delete the event from the partner's Google Calendar, which is not currently handled.
+The recommended approach is to build features in strict dependency order: categories first (foundational data models), then shopping list (independent), then notifications (hooks into established CRUD), and dashboard last (read-only aggregator over all sources). This ordering emerged independently from all four research files and minimizes rework. The key risks are dashboard N+1 query latency over Supabase REST (mitigated by parallel fetching), large blast radius when adding category_id to existing models (mitigated by nullable fields with defaults), and over-notification in a two-person context (mitigated by batching and suppression rules).
+
+Email notifications should be deferred to v3.1. The in-app notification feed satisfies the core "what did my partner change?" use case without introducing SMTP infrastructure, DNS configuration, and deliverability concerns. This keeps v3.0 focused on high-value, low-risk features with well-established implementation patterns.
 
 ## Key Findings
 
 ### Recommended Stack
 
-No stack changes. The existing FastAPI 0.135.1 + Pydantic 2.10.6 + google-api-python-client 2.93.0 + Jinja2 + Supabase (httpx) + Tailwind CSS stack covers every v2.1 feature. No new pip packages, no version upgrades, no frontend libraries.
+| Technology | Purpose | Rationale |
+|---|---|---|
+| **Chart.js 4.5.1 (CDN)** | Pie/bar charts for expense category breakdown | 67KB gzipped, CDN script tag consistent with existing no-build approach. Covers pie + bar with tooltips and legends. |
+| **aiosmtplib 5.1.0** | Async email sending (if email notifications enabled) | Native asyncio SMTP client, zero dependencies. Pairs with FastAPI BackgroundTasks for fire-and-forget delivery. |
+| **FastAPI BackgroundTasks** | Non-blocking email dispatch | Already built-in. No Celery/Redis needed for 2-user volume. |
+| **CSS custom properties** | Event category color coding on calendar grid | Native, no library. --cat-work, --cat-personal, etc. |
 
-**Core technologies (all existing, all sufficient):**
-- **FastAPI**: Routes, dependency injection, query params for year navigation — all patterns proven in v2.0
-- **Pydantic**: `EventCreate`/`EventUpdate` already validate `visibility`, `reminder_minutes_list` with range constraints
-- **google-api-python-client**: Calendar v3 API stable; reminder overrides (max 5, popup/email, 0–40320 min) already implemented in `_event_body()`
-- **Vanilla JS + Jinja2 templates**: New UI (reminder chips, comparison table) follows existing patterns; no framework addition warranted
+**No changes to core stack.** Python/FastAPI, Supabase (PostgreSQL), Jinja2 templates, prebuilt Tailwind CSS, httpx — all remain as-is.
 
-**Explicitly rejected:** Alpine.js, htmx, Chart.js, any ORM, Celery, WebSocket/SSE, any new pip package.
+**What NOT to use:** WebSockets (polling is sufficient for 2 users), Celery/Redis (overkill), React/Vue/HTMX framework additions (stay with vanilla JS + HTMX), npm/bundler for Chart.js (CDN only), SQLAlchemy/ORM (continue SupabaseStore pattern).
 
 ### Expected Features
 
-**Must have (P1 — table stakes):**
-- Visibility toggle in event form (wired to existing `shared`/`private` field)
-- Private event filtering verified across ALL calendar view routes
-- Reminder on/off toggle with household defaults (30 min + 2 days)
-- Multi-year budget navigation (remove any frontend year restrictions)
-- Budget carry-forward balance (year N ending → year N+1 starting)
-- Year-over-year comparison summary (side-by-side annual totals)
+**Must Have (v3.0):**
 
-**Should have (P2 — differentiators):**
-- Custom reminder entries (add/remove up to 5 per event)
-- Lock icon indicator for private events on calendar grid
-- Color-coded YoY delta indicators (green ↑ improvement / red ↓ decline with percentages)
-- Reminder method choice (popup vs email)
+| Feature | Complexity | Dependencies |
+|---|---|---|
+| Event categories with color-coded calendar grid | Medium | New table, FK on events |
+| Expense categories with filter/group | Medium | New table, FK on expenses |
+| Expense category pie/bar charts (Chart.js) | Low | Expense categories |
+| Per-category budget limits with 80%/100% alerts | Medium | Expense categories |
+| Shared shopping list (text + checked/unchecked) | Low-Medium | Independent |
+| Shopping list string parsing ("milk, bread, eggs" -> 3 items) | Low | Shopping list |
+| In-app notification feed (partner activity log) | Medium | Events + expenses CRUD stable |
+| Dashboard home page (today's events, budget snapshot, notifications, shopping) | Low | All other features |
+| Dashboard quick-add (reuse existing modals) | Low | Dashboard |
 
-**Defer (v2.2+):**
-- User-level default reminder preferences
-- Budget data import (Excel/CSV)
-- Busy/free display for private events
-- Per-year budget settings UI
+**Defer to v3.1+:**
+
+| Feature | Reason |
+|---|---|
+| Email notifications | SMTP infrastructure disproportionate for v3.0; in-app feed sufficient |
+| Expense auto-categorization | Over-engineered; "remember last category for same name" is enough |
+| Full color picker | Curated 10-12 color palette is better UX on dark theme |
+| Multiple shopping lists | One list sufficient for 2-person household |
+| Dashboard widget customization | Fixed layout appropriate for 2 users with identical data |
+| Notification preference granularity | Single on/off toggle sufficient; per-type toggles add complexity |
 
 ### Architecture Approach
 
-The architecture is a clean layered stack: Jinja2 templates → FastAPI routes → service layer → repository layer → SupabaseStore (httpx). All v2.1 features modify existing files — **zero new files created, 5–7 existing files modified, zero database migrations.** The event privacy pipeline is fully wired end-to-end. Reminder UI needs 3 file modifications (modal HTML, calendar JS, day events partial). YoY comparison adds a service method + API endpoint + UI section to existing files.
+**4 new modules** following existing layered pattern:
 
-**Major components (all existing):**
-1. **Event pipeline** (models → schemas → repository → service → routes → templates) — privacy and reminders are field additions to this pipeline
-2. **Budget pipeline** (overview_service → overview_routes → budget_overview template) — comparison extends this with one new method + endpoint
-3. **Google Sync pipeline** (GoogleSyncService → `_event_body` → `_sync_recipients`) — must add `_retract_from_non_recipients` for visibility changes
+| Module | Responsibility | Key Pattern |
+|---|---|---|
+| app/categories/ | Shared category CRUD for events & expenses (separate tables, shared logic) | repository-service-routes |
+| app/shopping/ | Shopping list CRUD + comma/newline text parsing | repository-service-routes |
+| app/notifications/ | In-app feed, NotificationEmitter as side-effect in routes | Emitter called after CRUD success |
+| app/dashboard/ | Read-only aggregator over all other services | Composition, no owned data |
+
+**4 new Supabase tables:** event_categories, expense_categories, notifications, shopping_items (+ user_preferences for notification toggle). All need RLS policies matching existing household-access pattern.
+
+**2 altered tables:** events + expenses gain nullable category_id FK columns.
+
+**Key architectural decisions:**
+- Categories looked up at render time (not denormalized onto events) to avoid stale color drift
+- Notifications triggered by direct function calls from routes to NotificationEmitter, not an event bus
+- Dashboard service composes other services, never accesses repositories directly
+- Shopping list uses HTMX polling (hx-trigger="every 30s"), not WebSocket/SSE
+- Chart.js loaded only on pages that need charts, not in base.html
 
 ### Critical Pitfalls
 
-1. **Visibility change doesn't clean up partner's Google Calendar** — When event changes shared→private, it persists in partner's Google Calendar. Must add `_retract_from_non_recipients` deletion step in sync service. Ship WITH the visibility toggle, not after.
+| # | Pitfall | Severity | Mitigation | Phase |
+|---|---|---|---|---|
+| 1 | **Dashboard N+1 REST queries** — 6-10 sequential Supabase HTTP calls causing 1-4s latency | Critical | Parallelize with ThreadPoolExecutor or Supabase RPC; simple dict cache with 30-60s TTL | Dashboard |
+| 2 | **category_id blast radius** — adding FK to events/expenses touches 15+ files, breaks test fixtures | Critical | Nullable with default None; staged rollout (migration - model - UI); never require category on existing records | Categories |
+| 3 | **Over-notification** — every action by User A spams User B; bulk imports generate hundreds | Critical | Batch within 5-min windows; suppress during imports; never notify actor; respect event visibility | Notifications |
+| 5 | **Color accessibility on dark theme** — category colors invisible or indistinguishable on glassmorphism UI | Critical | Curated palette of 8-10 colors tested against dark background; always pair color with text label; use Tailwind 400-weight variants | Event Categories |
+| 7 | **False budget alerts from recurring expenses** — static limits + recurring/seasonal variation = constant noise | Moderate | Soft informational warnings only (never blocking); include recurring in calculations; default to no limits; ship limits after charts | Expense Categories |
 
-2. **Initial balance is not year-scoped** — `BudgetSettings.initial_balance` is a single value applied to ALL years. Year N+1 must compute its starting balance from year N's ending balance. Fix BEFORE enabling year navigation.
-
-3. **Recurring expenses appear in all years** — `get_by_calendar_year` fetches recurring expenses (`month=0`) without year filtering. A 2026 recurring expense shows in 2024 view. Add `year <= requested_year` filter to recurring expense queries.
-
-4. **Google Calendar API rejects >5 reminder overrides** — No list-length validation in schema. Events with 6+ reminders fail to sync silently. Add `max_length=5` to schema AND cap in UI.
-
-5. **Dual reminder fields create ambiguous state** — Both `reminder_minutes` (legacy int) and `reminder_minutes_list` (new list) coexist. UI must write exclusively to `reminder_minutes_list` and null out the legacy field. Migrate existing data.
-
-6. **Private event import doesn't enforce ownership** — Google Calendar import attributes all events to the importing user, bypassing `cp_owner_id`. Must validate ownership extended property on import to prevent partner claiming private events.
+**Additional moderate risks:** unbounded notification storage (30-day retention + pagination), i18n key parity across en.json/pl.json (parity test), category presets vs. custom two-source-of-truth (all categories in DB, seeded not hardcoded), chart library bloat (lazy-load Chart.js only on stats pages).
 
 ## Implications for Roadmap
 
-Based on combined research, dependency analysis, and pitfall ordering:
+All four research files independently converged on the same build order. Phases should follow strict dependency ordering:
 
-### Phase 1: Event Privacy — Validate & Harden
-**Rationale:** Already ~90% complete; needs verification, Google sync cleanup path, and import guard. Lowest effort, highest immediate trust impact. No dependencies on other features.
-**Delivers:** Fully working private events — invisible to partner on web AND Google Calendar, safe through import/export round-trips.
-**Features:** Visibility toggle verification, private event filtering across all views, lock icon indicator, sync retraction on visibility change, import ownership validation.
-**Avoids:** Pitfall 1 (sync cleanup), Pitfall 2 (export_month leak), Pitfall 8 (import ownership), Pitfall 11 (form population on edit).
-**Research needed:** NO — code is reviewed, patterns are clear, changes are well-scoped.
+### Phase 1: Event Categories & Calendar Grid Colors
+**Rationale:** Zero dependencies on other new features. Creates the app/categories/ module pattern reused by expense categories. Most visible UI improvement (color-coded calendar). Lowest risk starting point.
+**Delivers:** event_categories table, category CRUD API, 5 preset categories seeded per calendar, color-coded event chips on month grid, category picker on event forms.
+**Pitfalls to avoid:** #2 (nullable FK, staged rollout), #5 (curated dark-theme palette), #13 (all categories in DB).
+**Research needed:** No — well-established patterns.
 
-### Phase 2: Reminder UI — Wire Frontend to Existing Backend
-**Rationale:** Self-contained frontend task. Backend is complete (schema, validation, Google sync). No dependency on budget features. Clearing event-related work before moving to budget.
-**Delivers:** Reminder toggle with defaults, chip-based multi-reminder editor, Google Calendar sync of configured reminders.
-**Features:** Reminder on/off toggle, default presets (30 min + 2 days), add/remove custom entries (up to 5), i18n labels.
-**Avoids:** Pitfall 6 (max 5 overrides — enforce in schema + UI), Pitfall 7 (dual fields — write only to list, null legacy), Pitfall 9 (tri-state: none/default/custom), Pitfall 11 (populate reminders on edit).
-**Research needed:** NO — Google Calendar API constraints verified via Context7, UI pattern matches existing chip/pill design.
+### Phase 2: Expense Categories + Charts + Budget Limits
+**Rationale:** Reuses app/categories/ module from Phase 1. Chart.js integration is self-contained. Budget limits are natural extension of category model.
+**Delivers:** expense_categories table, category tagging on expenses, pie/bar charts via Chart.js, optional per-category budget limits with soft 80%/100% warnings.
+**Pitfalls to avoid:** #2 (nullable FK on expenses), #7 (soft warnings only, include recurring), #8 (lazy-load Chart.js).
+**Research needed:** No — extends Phase 1 patterns.
 
-### Phase 3: Multi-Year Budget — Fix Data Integrity & Enable Navigation
-**Rationale:** Must fix carry-forward balance and recurring expense scoping BEFORE users can navigate years, otherwise they see incorrect data. This is a data-integrity prerequisite for Phase 4.
-**Delivers:** Accurate budget data for any past/future year, carry-forward balance computation, year-scoped recurring expenses, polished year navigation UX.
-**Features:** Budget carry-forward balance, multi-year navigation (verified), recurring expense year filtering, "Calculations use current rates" disclaimer.
-**Avoids:** Pitfall 3 (initial balance not year-scoped), Pitfall 4 (recurring expenses in wrong years), Pitfall 5 (rates not year-versioned — document limitation, defer full fix).
-**Research needed:** MAYBE — carry-forward computation strategy (dynamic vs snapshot) needs validation during planning. Likely straightforward for <5 years of data.
+### Phase 3: Shared Shopping List
+**Rationale:** Fully independent, no cross-dependencies. Simplest new feature (basic CRUD + text parsing). Validates the new-module pattern before the more complex notification system.
+**Delivers:** shopping_items table, shopping list page, add/check-off/delete items, comma/newline text parsing, HTMX polling for partner sync.
+**Pitfalls to avoid:** #6 (no WebSocket — HTMX polling only), #10 (split on commas/newlines only, no NLP).
+**Research needed:** No — standard CRUD.
 
-### Phase 4: Year-over-Year Comparison — New Feature Build
-**Rationale:** Depends on Phase 3 (multi-year data must be accurate). The only genuinely new feature — new service method, new API endpoint, new UI section. Highest complexity.
-**Delivers:** Side-by-side annual summary comparison, delta calculations, expandable comparison panel in budget overview.
-**Features:** YoY comparison summary, delta indicators (color-coded), no-data vs zero distinction for empty years, i18n labels.
-**Avoids:** Pitfall 10 (misleading zeros — distinguish no-data from zero-value months).
-**Research needed:** NO — architecture doc provides complete service method design, API endpoint spec, and UI wireframe. Standard patterns.
+### Phase 4: In-App Notification Feed
+**Rationale:** Depends on events and expenses being category-aware for richer content. CRUD hooks must be stable before attaching side-effects. Most complex new feature — benefits from lessons learned in prior phases.
+**Delivers:** notifications + user_preferences tables, NotificationEmitter side-effects on event/expense/shopping mutations, bell icon with unread count in nav, notification list page, 30-day retention policy.
+**Pitfalls to avoid:** #3 (batch within 5-min windows, suppress imports, never self-notify), #9 (30-day retention, pagination), #12 (i18n parity).
+**Research needed:** Notification batching strategy may benefit from /gsd-research-phase to validate the 5-minute window approach.
 
-### Phase Ordering Rationale
-
-- **Privacy before reminders:** Both touch the event form, but privacy is nearly complete and validates existing code. Shipping privacy first means the form infrastructure is verified before adding reminder controls.
-- **Reminders before budget:** Clears all event-pipeline work before context-switching to budget pipeline. Reduces cognitive overhead.
-- **Multi-year data integrity before comparison:** Comparison is presentation of multi-year data. If the underlying data is wrong (Pitfalls 3, 4, 5), the comparison is meaningless. Fix the foundation first.
-- **Features grouped by pipeline:** Phases 1–2 are event pipeline. Phases 3–4 are budget pipeline. This minimizes file-switching and context loss.
+### Phase 5: Dashboard Home Page
+**Rationale:** Aggregates ALL other features — must be built last when data sources are stable and tested. Read-only composition means lowest risk of breaking other modules.
+**Delivers:** dashboard.html as new GET / landing page, today's events panel, 7-day preview, budget snapshot with category breakdown, unread notification count, shopping list summary, quick-add buttons.
+**Pitfalls to avoid:** #1 (parallel fetch with ThreadPoolExecutor, performance budget <500ms), #11 (graceful widget degradation, service composition only).
+**Research needed:** Dashboard parallel-fetch strategy may benefit from /gsd-research-phase to benchmark ThreadPoolExecutor vs. Supabase RPC.
 
 ### Research Flags
 
-**Phases likely needing deeper research during planning:**
-- **Phase 3 (Multi-Year Budget):** Carry-forward balance computation strategy and recurring expense year-scoping need validation. Edge cases around first-tracked-year and empty year handling.
-
-**Phases with standard patterns (skip `/gsd-research-phase`):**
-- **Phase 1 (Event Privacy):** Code exists, just needs hardening and testing.
-- **Phase 2 (Reminder UI):** Backend complete, UI follows existing chip pattern, Google API constraints documented.
-- **Phase 4 (YoY Comparison):** Architecture doc provides implementation spec, API design, and UI wireframe. Service reuses existing method.
+| Phase | Research Needed? | Reasoning |
+|---|---|---|
+| Phase 1: Event Categories | **No** | Follows existing module patterns exactly |
+| Phase 2: Expense Categories | **No** | Chart.js CDN integration is well-documented |
+| Phase 3: Shopping List | **No** | Simplest new feature |
+| Phase 4: Notifications | **Maybe** | 5-min window batching is the one novel pattern |
+| Phase 5: Dashboard | **Maybe** | ThreadPoolExecutor vs. RPC tradeoff affects implementation |
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
-|------|------------|-------|
-| Stack | HIGH | Zero changes needed — all versions verified against requirements.txt and codebase |
-| Features | HIGH | Feature inventory cross-referenced with existing schema, UI, and PROJECT.md requirements |
-| Architecture | HIGH | All claims verified against actual source code; file paths, method names, and data flows confirmed |
-| Pitfalls | HIGH | Each pitfall traced to specific code paths; Google API constraints verified via Context7 |
+|---|---|---|
+| Stack | **HIGH** | Only 2 new deps (Chart.js CDN, aiosmtplib). Both well-documented, high-download libraries. Rest is existing stack. |
+| Features | **HIGH** | Features derived from established household app patterns (Google Calendar, YNAB, Cozi). Clear scope boundaries. |
+| Architecture | **HIGH** | Follows existing codebase patterns exactly. All 4 new modules use proven repo-service-routes layering. Direct code inspection confirms compatibility. |
+| Pitfalls | **HIGH** | 13 pitfalls identified from direct codebase analysis, not theoretical. Mitigations are concrete and tested against actual code patterns. |
 
-**Overall confidence:** HIGH
-
-### Gaps to Address
-
-- **Budget settings rate versioning:** Research recommends deferring year-scoped rates (document limitation with UI disclaimer). If users report confusion about changed past-year data, escalate to v2.2.
-- **Sync error surfacing:** Silent exception swallowing in `sync_event_for_household` masks reminder and privacy sync failures. Not blocking for v2.1, but should be addressed soon.
-- **`export_month` privacy tightening:** Currently safe because `_sync_recipients` filters, but data is loaded into memory unfiltered. Strengthen by passing `requesting_user_id` during privacy phase.
-- **Empty year UX:** Navigating to years with no data should show a graceful empty state, not zeros. Needs design decision during Phase 3/4 planning.
+**Gaps to address during planning:**
+- Dashboard parallel-fetch approach needs benchmarking (ThreadPoolExecutor vs. Supabase RPC vs. simple sequential with caching)
+- Notification batching window (5 minutes) is a reasonable default but should be validated during Phase 4 planning
+- Chart.js vs. CSS/SVG for pie charts — STACK recommends Chart.js, PITFALLS suggests CSS/SVG first. **Recommendation: Use Chart.js** — pie charts require it, and 67KB gzipped is acceptable for the stats page only
+- Email notifications scope (v3.0 vs v3.1) — STACK includes aiosmtplib, FEATURES defers email. **Recommendation: Defer email to v3.1.** Install aiosmtplib only when needed
 
 ## Sources
 
-### Primary (HIGH confidence)
-- `/googleapis/google-api-python-client` via Context7 — Calendar v3 Event.reminders spec: max 5 overrides, popup/email methods, 0–40320 minutes range
-- Direct codebase analysis — models.py, schemas.py, repository.py, service.py, sync/service.py, routes.py, templates, JS, locale files
-
-### Secondary (MEDIUM confidence)
-- Google Calendar, Apple Calendar, Outlook, YNAB, Toshl — competitor/domain analysis for feature patterns and defaults
-
----
-*Research completed: 2026-03-20*
-*Ready for roadmap: yes*
+- **STACK.md:** Chart.js 4.5.1 (npmjs.com, chartjs.org docs), aiosmtplib 5.1.0 (pypi.org, readthedocs), FastAPI BackgroundTasks (fastapi.tiangolo.com)
+- **FEATURES.md:** Domain patterns from Google Calendar, YNAB, Cozi Family Organizer, FamilyWall, Goodbudget. Existing codebase analysis (models.py, expense_schemas.py, month_grid.html, budget_stats.html)
+- **ARCHITECTURE.md:** Direct code inspection of all existing modules. Supabase RLS patterns from existing migrations. Repository/Service/Routes pattern analysis
+- **PITFALLS.md:** Direct codebase analysis of supabase_store.py (sync httpx singleton), repository mapper patterns, budget_stats.html (CSS bar charts), dark theme classes in month_grid.html. WCAG 2.1 contrast requirements

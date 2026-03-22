@@ -1,394 +1,610 @@
-# Architecture Research: v2.1 Feature Integration
+# Architecture Research
 
-**Domain:** Household calendar + budget planner — event privacy, reminder UI, multi-year budget
-**Researched:** 2026-03-20
-**Confidence:** HIGH (all findings verified against source code)
+**Domain:** Household calendar + budget app — v3.0 integration
+**Researched:** 2026-03-22
+**Confidence:** HIGH
 
-## Current System Architecture
-
-```
-┌───────────────────────────────────────────────────────────────────┐
-│                     Jinja2 Templates + HTMX + JS                  │
-│  ┌──────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  │
-│  │ calendar │  │ event_entry  │  │ budget_over  │  │ day_evts │  │
-│  │  .html   │  │  _modal.html │  │  view.html   │  │  .html   │  │
-│  └────┬─────┘  └──────┬───────┘  └──────┬───────┘  └────┬─────┘  │
-├───────┴────────────────┴────────────────┴────────────────┴────────┤
-│                    FastAPI Route Layer                             │
-│  ┌──────────────┐  ┌──────────────┐  ┌────────────────────────┐   │
-│  │ events/      │  │ budget/      │  │ views/ + budget/*_views│   │
-│  │  routes.py   │  │  *_routes.py │  │  calendar_routes.py    │   │
-│  └──────┬───────┘  └──────┬───────┘  └────────────┬───────────┘   │
-├─────────┴──────────────────┴──────────────────────┴───────────────┤
-│                    Service Layer                                   │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐     │
-│  │ EventService │  │ OverviewSvc  │  │  GoogleSyncService   │     │
-│  └──────┬───────┘  └──────┬───────┘  └──────────┬───────────┘     │
-├─────────┴──────────────────┴────────────────────┴─────────────────┤
-│                    Repository Layer                                │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │
-│  │ EventRepo    │  │ ExpenseRepo  │  │ HoursRepo    │             │
-│  │              │  │ EarningsRepo │  │ SettingsRepo │             │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘             │
-├─────────┴──────────────────┴────────────────┴─────────────────────┤
-│                    SupabaseStore (httpx singleton)                 │
-│  select / insert / update / delete → Supabase REST (PostgREST)    │
-└───────────────────────────────────────────────────────────────────┘
-```
-
-### Existing Layer Pattern (all modules follow this)
+## System Overview
 
 ```
-routes.py       → FastAPI router, input validation, auth dependency
-service.py      → Business logic, cross-repo coordination
-repository.py   → SupabaseStore CRUD, row↔dataclass mapping
-schemas.py      → Pydantic models for request/response
-views.py        → HTML template rendering routes (Jinja2)
+                          ┌──────────────────────────────────────────────┐
+                          │              FastAPI Application             │
+                          │  main.py — mounts routers, middleware        │
+                          └──────────────┬─────────────────────────────┬─┘
+                                         │                             │
+         ┌───────────────────────────────┼─────────────────────────────┼───────────────────────┐
+         │ Router Layer (routes.py / views.py per module)              │                       │
+         │                                                            │                       │
+  EXISTING MODULES                                    NEW MODULES (v3.0)                      │
+  ┌──────────────┐  ┌──────────────┐            ┌───────────────┐  ┌──────────────┐           │
+  │  app/auth/   │  │ app/events/  │            │ app/dashboard/ │  │app/notifica- │           │
+  │  routes.py   │  │  routes.py   │            │  routes.py     │  │  tions/      │           │
+  │  supabase_   │  │  service.py  │◄──MODIFY──►│  service.py    │  │  routes.py   │           │
+  │  auth.py     │  │  repository  │ add categ  │  (aggregator)  │  │  service.py  │           │
+  └──────────────┘  │  schemas.py  │ fields     └───────────────┘  │  repository  │           │
+                    │  nlp.py      │                                │  email.py    │           │
+  ┌──────────────┐  │  ocr.py      │            ┌───────────────┐  └──────────────┘           │
+  │  app/budget/ │  └──────────────┘            │ app/shopping/  │                            │
+  │  expense_*   │◄──MODIFY: add                │  routes.py     │  ┌──────────────┐          │
+  │  income_*    │   category fields            │  service.py    │  │ app/categories│          │
+  │  overview_*  │                              │  repository.py │  │  routes.py    │          │
+  │  views.py    │                              │  schemas.py    │  │  service.py   │          │
+  └──────────────┘                              └───────────────┘  │  repository   │          │
+                                                                   └──────────────┘          │
+  ┌──────────────┐  ┌──────────────┐                                                         │
+  │  app/sync/   │  │  app/users/  │                                                         │
+  │  service.py  │  │  repository  │                                                         │
+  └──────────────┘  └──────────────┘                                                         │
+         │                                                                                    │
+         └────────────────────────────────┬───────────────────────────────────────────────────┘
+                                          │
+         ┌────────────────────────────────▼────────────────────────────┐
+         │ Data Layer                                                  │
+         │  app/database/supabase_store.py — httpx REST to Supabase   │
+         │  app/database/models.py         — @dataclass domain models │
+         │  app/database/database.py       — get_db() → SupabaseStore │
+         └────────────────────────────────┬────────────────────────────┘
+                                          │
+         ┌────────────────────────────────▼──────────────────────────┐
+         │ Supabase PostgreSQL                                       │
+         │  EXISTING: users, calendars, calendar_invitations,        │
+         │            events, budget_settings, monthly_hours,        │
+         │            additional_earnings, expenses,                  │
+         │            carry_forward_overrides                         │
+         │                                                           │
+         │  NEW (v3.0): event_categories, expense_categories,        │
+         │              notifications, shopping_items,                │
+         │              expense_category_budgets, user_preferences    │
+         └───────────────────────────────────────────────────────────┘
 ```
 
----
+## Component Responsibilities
 
-## Feature-by-Feature Integration Analysis
+### Existing Modules (no architectural changes)
 
-### Feature 1: Event Privacy Controls (Visibility Toggle)
+| Component | Responsibility | Pattern |
+|-----------|---------------|---------|
+| `app/auth/` | Cookie-based JWT auth, Supabase auth, Google OAuth | dependencies.py exports `get_current_user` |
+| `app/events/` | Event CRUD, NLP parsing, OCR, recurrence expansion | repository → service → routes |
+| `app/budget/` | Income, expenses, overview, settings, stats | `*_repository.py`, `*_service.py`, `*_routes.py`, `*_views.py` |
+| `app/sync/` | Google Calendar push sync | service.py orchestrates per-user GCal API |
+| `app/users/` | User/calendar/invitation CRUD | repository → service → routes |
+| `app/views/` | Calendar HTML page routes (Jinja2) | calendar_routes.py returns template responses |
+| `app/database/` | SupabaseStore (httpx REST), dataclass models, get_db() | Singleton httpx client, PostgREST API |
+| `app/i18n.py` | Locale resolution, translation, template injection | `inject_template_i18n()`, JSON locale files |
 
-**Status: ALREADY FULLY IMPLEMENTED — no new components needed**
+### New Modules (v3.0)
 
-The entire privacy pipeline is wired end-to-end across all layers:
+| Component | Responsibility | Pattern |
+|-----------|---------------|---------|
+| `app/dashboard/` | Aggregator: today's events, 7-day preview, budget snapshot, notifications | service.py calls into events + budget + notifications services |
+| `app/notifications/` | In-app notification feed + email dispatch | repository → service → routes; `email.py` for SMTP/Resend |
+| `app/categories/` | Shared category definitions for events & expenses | repository → service → routes |
+| `app/shopping/` | Shared shopping list CRUD + text parsing | repository → service → routes |
 
-| Layer | File | What Exists |
-|-------|------|-------------|
-| Model | `app/database/models.py` | `Event.visibility: str = "shared"` field |
-| Schema | `app/events/schemas.py` | `visibility: Literal["shared", "private"]` on Create, Update, Response |
-| Repository | `app/events/repository.py` | `_visible_to()` static method filters private events on all list queries |
-| Service | `app/events/service.py` | Privacy guard in `update_event()` and `delete_event()` — returns "Event not found" for unauthorized access |
-| Sync | `app/sync/service.py` | `_sync_recipients()` routes private events only to owner's Google Calendar; `_event_body()` stores `cp_visibility` in extended properties |
-| UI Modal | `partials/event_entry_modal.html` | `<select id="event-entry-visibility">` with shared/private options + help text |
-| UI Day View | `partials/day_events.html` | Passes `event.visibility` to `prefillEvent()` edit callback |
-| JS Submit | `calendar.html` | `submitEventEntry()` includes `visibility` in POST/PUT payload; `prefillEvent()` restores select value on edit |
-| i18n | `locales/en.json`, `pl.json` | `qa.visibility`, `qa.visibility_shared`, `qa.visibility_private`, `qa.visibility_help` keys |
+## New Modules — Detailed Structure
 
-**Conclusion:** This feature is complete. Validate with existing tests. No architecture changes needed.
+### 1. `app/categories/` — Category Management
 
----
-
-### Feature 2: Reminder Configuration UI
-
-**Status: Backend fully wired, UI controls missing — modify 3 existing files**
-
-#### Existing Backend (complete, no changes needed)
-
-| Layer | File | What Exists |
-|-------|------|-------------|
-| Model | `app/database/models.py` | `reminder_minutes: int \| None`, `reminder_minutes_list: list[int]`, `effective_reminders` property |
-| Schema | `app/events/schemas.py` | `reminder_minutes_list: Optional[List[int]]` with boundary validation (0–40320 min = 4 weeks max) |
-| Repository | `app/events/repository.py` | `create()` and `update()` read/write `reminder_minutes_list`; `_to_event()` maps from DB row |
-| Sync | `app/sync/service.py` | `_event_body()` builds Google Calendar `reminders: { useDefault: false, overrides: [{method: "popup", minutes: N}] }` from `effective_reminders` |
-| API | `app/events/routes.py` | `POST /api/events` and `PUT /api/events/{id}` accept `reminder_minutes_list` in JSON body |
-
-#### Missing: UI Layer Only (3 files to modify)
-
-**1. `app/templates/partials/event_entry_modal.html`** — Add reminder section to the form:
-- Toggle checkbox: "Reminders" / "Przypomnienia"
-- When toggled ON: render default chips (30 min + 2880 min / 2 days)
-- Each chip: removable pill with `✕` button
-- "Add reminder" button opens inline select/input for custom value
-- Place after the visibility field, before the recurrence fields
-
-**2. `app/templates/calendar.html`** (JS section) — Wire reminder data into existing flow:
-- `submitEventEntry()`: collect reminder values from chips, include `reminder_minutes_list: [30, 2880]` in payload
-- `prefillEvent()`: accept `reminder_minutes_list` parameter, populate chips when editing existing event
-- `resetEventEntryForm()`: clear reminder chips
-- New helper: `addReminderChip(minutes)`, `removeReminderChip(index)`, `getReminderList()`
-
-**3. `app/templates/partials/day_events.html`** — Show reminder indicator (optional, low priority):
-- Small 🔔 icon or text when `event.effective_reminders` is non-empty
-
-#### Data Flow (unchanged API contract)
+Shared categorical system used by both events and expenses.
 
 ```
-User toggles reminders ON → default chips appear [30min, 2 days]
-User adds/removes chips → UI state updates
-User clicks Save → submitEventEntry()
-  → POST/PUT /api/events { ..., reminder_minutes_list: [30, 2880] }
-    → EventService.create_event() / EventRepository.create()
-      → INSERT/UPDATE in Supabase events table
-    → GoogleSyncService.sync_event_for_household()
-      → _event_body() reads effective_reminders
-      → Google Calendar API: reminders.overrides = [{popup, 30}, {popup, 2880}]
+app/categories/
+├── __init__.py
+├── models.py          # EventCategory, ExpenseCategory dataclasses
+├── repository.py      # CategoryRepository (CRUD for both types)
+├── schemas.py         # Pydantic: CategoryCreate, CategoryUpdate, CategoryResponse
+├── service.py         # CategoryService — validation, defaults seeding
+└── routes.py          # API: /api/categories/events, /api/categories/expenses
 ```
 
-**No database migration.** Column `reminder_minutes_list` (JSONB array) already exists in events table.
-**No new Python files.** Backend API already accepts and processes the data.
+**Why a shared module:** Both event and expense categories are scoped to `calendar_id`, share color/icon semantics, and need CRUD. Separate modules would duplicate 80% of the logic. However, they use **separate tables** (`event_categories`, `expense_categories`) because their extra fields differ (expenses have `budget_limit`, events don't).
 
----
+**Preset seeding:** On first access per calendar, seed default event categories (Work, Personal, Health, Errands, Social) and default expense categories (Housing, Food, Transport, Utilities, Entertainment, Health, Other). The service checks if categories exist for that calendar before seeding.
 
-### Feature 3: Multi-Year Budget Browsing
+### 2. `app/notifications/` — In-App Feed + Email Alerts
 
-**Status: Core functionality already works — verify and refine UX**
+```
+app/notifications/
+├── __init__.py
+├── models.py          # Notification dataclass
+├── repository.py      # NotificationRepository — insert, list, mark-read
+├── schemas.py         # NotificationCreate, NotificationResponse
+├── service.py         # NotificationService — create-and-dispatch logic
+├── email.py           # Email sender (Resend API or SMTP)
+└── routes.py          # API: /api/notifications (GET list, POST mark-read)
+```
 
-#### What Already Works
-
-| Component | File | Status |
-|-----------|------|--------|
-| API endpoint | `app/budget/overview_routes.py` | `GET /api/budget/overview?year=N` — accepts any integer year |
-| Service | `app/budget/overview_service.py` | `get_year_overview(calendar_id, year)` — fully year-parameterized |
-| Expense repo | `app/budget/expense_repository.py` | `get_by_calendar_year(calendar_id, year)` — queries by year + unions recurring (month=0) |
-| Income repos | `app/budget/income_repository.py` | `get_by_calendar_year(calendar_id, year)` — queries by year |
-| Year picker UI | `app/templates/budget_overview.html` | `year-prev`/`year-next` buttons, `currentYear` JS state, fully event-wired |
-| Year display | `app/templates/budget_overview.html` | `#year-display` updates on navigation, `reload()` re-fetches and re-renders |
-
-#### Architecture Concern: BudgetSettings Not Year-Scoped
-
-`BudgetSettings` has one row per `calendar_id` with `rate_1`, `rate_2`, `rate_3`, `zus_costs`, `accounting_costs`, `initial_balance` — **no year column**. Viewing past years applies current rates retroactively.
-
-| Approach | Complexity | Accuracy | Recommendation |
-|----------|-----------|----------|----------------|
-| A: Keep single settings, document limitation | None | Approximate for past years | **Use this for v2.1** |
-| B: Add `year` column to BudgetSettings | DB migration + per-year UI | Historically accurate | Defer to v3+ if users request it |
-
-**Decision: Approach A.** The core multi-year navigation already works. The rates issue is an edge case (rates rarely change for this household use case). Document it in the UI with a note like "Calculations use current rates."
-
-#### Modifications Needed
-
-**1. `app/templates/budget_overview.html`** — Minor UX polish:
-- Highlight current year in the year picker (bold/distinctive styling)
-- Optional: limit backward navigation to a sensible range (e.g., current year − 5)
-
-**2. Income/Expense view pages** — Verify year consistency:
-- Check if `budget_income.html` and `budget_expenses.html` handle year navigation
-- If they hardcode current year, add year param support to match overview
-
-**No new Python files. No database migration.**
-
----
-
-### Feature 4: Year-over-Year Summary Comparison
-
-**Status: COMPLETELY NEW — extend 3 existing files**
-
-This feature requires a new service method, a new API endpoint, and a new UI section. All added to existing files.
-
-#### Components to Add
-
-| Type | File to Modify | What to Add |
-|------|---------------|-------------|
-| Service method | `app/budget/overview_service.py` | `get_year_comparison(calendar_id, years: list[int])` |
-| API endpoint | `app/budget/overview_routes.py` | `GET /api/budget/overview/compare?years=2025,2026` |
-| UI section | `app/templates/budget_overview.html` | Comparison panel below the main overview table |
-| i18n keys | `app/locales/en.json`, `pl.json` | Comparison labels |
-
-#### Service Method Design
+**Notification trigger pattern:** Notifications are created as a **side-effect** in existing service methods. Rather than modifying every service, use a lightweight emitter pattern:
 
 ```python
-# In overview_service.py — reuses existing get_year_overview()
-def get_year_comparison(self, calendar_id: str, years: list[int]) -> dict:
-    summaries = []
-    for year in sorted(years):
-        overview = self.get_year_overview(calendar_id, year)
-        months = overview["months"]
-        summaries.append({
-            "year": year,
-            "total_net": round(sum(m["net"] for m in months), 2),
-            "total_additional": round(sum(m["additional_earnings"] for m in months), 2),
-            "total_recurring_expenses": round(sum(m["recurring_expenses"] for m in months), 2),
-            "total_onetime_expenses": round(sum(m["onetime_expenses"] for m in months), 2),
-            "total_balance": round(sum(m["monthly_balance"] for m in months), 2),
-            "final_account_balance": months[-1]["account_balance"] if months else 0,
-            "initial_balance": overview["initial_balance"],
-        })
-    return {"summaries": summaries}
+# app/notifications/emitter.py
+class NotificationEmitter:
+    def __init__(self, notification_service: NotificationService):
+        self.svc = notification_service
+
+    def on_event_created(self, event: Event, actor_user_id: str, calendar_id: str):
+        """Notify the other household member about a new event."""
+        self.svc.create_for_partner(
+            calendar_id=calendar_id,
+            actor_user_id=actor_user_id,
+            type="event_created",
+            payload={"event_id": event.id, "title": event.title},
+        )
 ```
 
-**Key design decision:** Reuse `get_year_overview()` rather than duplicating calculation logic. Each call makes ~4 DB queries (settings, hours, earnings, expenses), so comparing 2–3 years = 8–12 queries total. Acceptable for this two-user app.
+This emitter is called from `EventService.create_event()` and `EventService.update_event()` after the DB write succeeds. The notification service resolves the partner user from `calendar_id` and creates the notification row + optionally sends email.
 
-#### API Endpoint Design
+**Email dispatch:** Use an async background approach. Since the app is synchronous (httpx, not httpx.AsyncClient for DB), email is sent inline via a simple HTTP call to Resend API (or SMTP). Keep it simple — one POST request per notification. If it fails, the in-app notification still exists; email failure is logged but not retried.
+
+**User preferences for email:** Add a `user_preferences` table (or a `notification_email_enabled` column on `users`) to let each user toggle email notifications on/off.
+
+### 3. `app/dashboard/` — Dashboard Home Page
+
+```
+app/dashboard/
+├── __init__.py
+├── service.py         # DashboardService — aggregates data from other services
+├── routes.py          # View: GET /dashboard (HTML), API: GET /api/dashboard (JSON)
+└── views.py           # Template route returning dashboard.html
+```
+
+**Aggregator pattern:** `DashboardService` does NOT own data. It composes:
+- `EventService.list_day_expanded()` → today's events
+- `EventService.list_month_expanded()` → next 7 days (filter client-side or add a `list_range()` method)
+- `OverviewService.get_month_data()` → current month budget snapshot
+- `NotificationRepository.list_unread()` → recent notifications count/preview
+- `ShoppingService.list_items()` → shopping list summary
 
 ```python
-# In overview_routes.py — parse comma-separated years, cap at 5
-@router.get("/compare")
-async def compare_years(
-    years: str = Query(...),
-    user=Depends(get_current_user),
-    db=Depends(get_db),
-):
-    year_list = [int(y) for y in years.split(",") if y.strip().isdigit()][:5]
-    if len(year_list) < 2:
-        raise HTTPException(status_code=400, detail="At least 2 years required")
-    service = _service(db)
-    data = service.get_year_comparison(user.calendar_id, year_list)
-    return {"data": data}
+class DashboardService:
+    def __init__(self, event_svc, overview_svc, notification_repo, shopping_svc):
+        self.events = event_svc
+        self.overview = overview_svc
+        self.notifications = notification_repo
+        self.shopping = shopping_svc
+
+    def get_dashboard_data(self, calendar_id: str, user_id: str, year: int, month: int, day: int):
+        return {
+            "today_events": self.events.list_day_expanded(calendar_id, year, month, day, requesting_user_id=user_id),
+            "budget_snapshot": self.overview.get_month_data(calendar_id, year, month),
+            "unread_notifications": self.notifications.count_unread(calendar_id, user_id),
+            "shopping_count": self.shopping.count_pending(calendar_id),
+        }
 ```
 
-**Note:** Register this endpoint BEFORE the parameterized `/compare` won't conflict with existing routes since there's no `GET /api/budget/overview/{param}` pattern.
+**Root route change:** Currently `GET /` renders `calendar.html`. For v3.0, `GET /` should render `dashboard.html` instead. The calendar moves to `GET /calendar`. This is a one-line change in `main.py`. Add a nav link "Calendar" to the bottom nav / top nav alongside existing "Budget" link.
 
-#### UI Design
-
-Comparison renders as an expandable section below the year overview table:
+### 4. `app/shopping/` — Shared Shopping List
 
 ```
-[← 2025 →]                              [Compare ▼]
-
-| Month | Net | Additional | Rec.Exp | One-time | Balance | Account |
-|-------|-----|------------|---------|----------|---------|---------|
-| Jan   | ... | ...        | ...     | ...      | ...     | ...     |
-...
-
-── Year Comparison ────────────────────────────────────────
-| Year | Net Income | Additional | Expenses | Balance | Final Account |
-|------|------------|------------|----------|---------|---------------|
-| 2025 | 120,000    | 5,000      | 80,000   | 45,000  | 95,000        |
-| 2026 | 130,000    | 6,000      | 85,000   | 51,000  | 146,000       |
-| Δ    | +10,000    | +1,000     | +5,000   | +6,000  | +51,000       |
+app/shopping/
+├── __init__.py
+├── models.py          # ShoppingItem dataclass
+├── repository.py      # ShoppingRepository — add, list, check-off, delete
+├── schemas.py         # ShoppingItemCreate, ShoppingItemResponse
+├── service.py         # ShoppingService — text parsing, CRUD
+└── routes.py          # API: /api/shopping (CRUD), view: /shopping (HTML)
 ```
 
-The comparison button toggles this section. By default it compares current year with previous year. Color-code deltas: green for improvements, red for regressions.
+**Text parsing:** Accept a multi-line or comma-separated string, split into individual items. No NLP needed — just `split()` on newlines/commas, strip whitespace, filter empty. Simple and reliable.
 
-#### Data Flow
+**Shared by design:** Shopping items are scoped to `calendar_id` (same as events, expenses). Both household members see the same list. No per-user filtering.
 
-```
-User clicks "Compare" → JS fetches comparison
-  → GET /api/budget/overview/compare?years=2025,2026
-    → OverviewService.get_year_comparison()
-      → get_year_overview(cal_id, 2025)  # reuses existing
-      → get_year_overview(cal_id, 2026)  # reuses existing
-      → aggregates totals, returns summaries
-    → Returns { summaries: [{year: 2025, ...}, {year: 2026, ...}] }
-  → JS renders comparison table with delta row
-```
+## Modified Modules
 
----
+### `app/events/` — Add Category Support
 
-## Summary: New vs Modified Components
+| File | Change | Impact |
+|------|--------|--------|
+| `models.py` | Add `category_id: str \| None = None` and `category_color: str \| None = None` to `Event` dataclass | Low — additive field |
+| `schemas.py` | Add `category_id: Optional[str] = None` to `EventCreate` and `EventUpdate` | Low — optional field |
+| `repository.py` | Include `category_id` in `create()`, `update()`, and `_to_event()` mapping | Low — one field per method |
+| `service.py` | Pass through `category_id`; optionally validate category exists | Low |
 
-| Feature | New Files | Modified Files | DB Migration |
-|---------|-----------|----------------|--------------|
-| Event privacy | 0 | 0 (already complete) | None |
-| Reminder UI | 0 | 3 (modal HTML, calendar JS, day events HTML) | None |
-| Multi-year budget | 0 | 1–3 (overview HTML, possibly income/expense views) | None |
-| YoY comparison | 0 | 3 (overview_service.py, overview_routes.py, overview HTML) | None |
-| i18n keys | 0 | 2 (en.json, pl.json) | None |
+**Calendar grid color-coding:** The `_to_event()` mapper joins or looks up the category color. Two approaches:
+1. **Denormalize:** Store `category_color` on the event row (simpler, one fewer query). Update color if category changes.
+2. **Join:** Fetch categories once per month grid load, build a color map client-side.
 
-**Total: 0 new files created, 5–7 existing files modified, 0 database migrations.**
+**Recommendation:** Option 2 (join at view layer). Fetch `GET /api/categories/events?calendar_id=X` once when rendering `month_grid.html`, pass the color map into the template. This avoids denormalization drift and keeps the events table clean. The categories list is small (5–20 items) so the extra query is negligible.
 
-### i18n Additions Required
+### `app/budget/expense_*` — Add Category Support
 
-Both `app/locales/en.json` and `app/locales/pl.json` need keys for:
+| File | Change | Impact |
+|------|--------|--------|
+| `models.py` (database) | Add `category_id: str \| None = None` to `Expense` dataclass | Low |
+| `expense_schemas.py` | Add `category_id: Optional[str] = None` to `ExpenseCreate`, `ExpenseUpdate` | Low |
+| `expense_repository.py` | Include `category_id` in `create()`, `update()`, `_to_expense()` | Low |
+| `expense_service.py` | Add `get_by_category()` method for chart breakdowns | Medium |
 
-- **Reminder UI:** toggle label, default reminder descriptions (e.g., "30 minutes", "2 days"), add button, chip display format
-- **Comparison UI:** compare button label, table headers, delta row label, "no data" state
-- **Budget year note:** "Calculations use current rates" disclaimer (if shown)
+### `app/budget/overview_*` — Category Breakdown in Charts
 
----
+| File | Change | Impact |
+|------|--------|--------|
+| `overview_service.py` | Add `get_category_breakdown(calendar_id, year)` method | Medium — new aggregation |
+| `overview_routes.py` | Add `GET /api/budget/overview/categories?year=X` endpoint | Low |
 
-## Recommended Build Order
+### `main.py` — Register New Routers
 
-Dependencies determine the sequence:
+```python
+# New imports
+from app.dashboard.views import router as dashboard_views_router
+from app.notifications.routes import router as notifications_router
+from app.categories.routes import router as categories_router
+from app.shopping.routes import router as shopping_router
 
-```
-Phase 1: Event Privacy (tests only — validate existing implementation)
-  └── Depends on: nothing
-  └── Risk: LOW — code reviewed, appears complete
-
-Phase 2: Reminder UI (frontend wiring to existing backend)
-  └── Depends on: nothing new in backend
-  └── Touches: event_entry_modal.html, calendar.html JS, day_events.html
-  └── Risk: LOW — backend contract is stable
-
-Phase 3: Multi-Year Budget Browsing (verify/polish existing)
-  └── Depends on: nothing new
-  └── Touches: budget_overview.html (minor UX), verify income/expense views
-  └── Risk: LOW — year picker already functional
-
-Phase 4: Year-over-Year Comparison (new service + API + UI)
-  └── Depends on: multi-year browsing working correctly (Phase 3)
-  └── Touches: overview_service.py, overview_routes.py, budget_overview.html
-  └── Risk: MEDIUM — new API endpoint, new JS rendering
+# Register
+app.include_router(dashboard_views_router)
+app.include_router(notifications_router)
+app.include_router(categories_router)
+app.include_router(shopping_router)
 ```
 
-**Phase ordering rationale:**
-1. Privacy first — zero effort if already done, just validate.
-2. Reminders — self-contained frontend task, backend ready, clears the event feature work.
-3. Multi-year browsing — must work correctly before comparison builds on top of it.
-4. YoY comparison — highest complexity, uses `get_year_overview()` which must be solid for arbitrary years.
+**Root route:** Change `GET /` from rendering `calendar.html` to rendering `dashboard.html` (or redirect to `/dashboard`).
 
----
+### `app/templates/base.html` — Navigation Updates
+
+Add to both top nav and mobile bottom nav:
+- "Dashboard" (home icon) → `/dashboard` or `/`
+- "Shopping" (list icon) → `/shopping`
+- Notification bell icon with unread count badge (top nav only)
+
+### `app/locales/en.json` + `pl.json` — New Translation Keys
+
+Add keys for all new UI strings: dashboard labels, notification messages, category names, shopping list labels. Follow existing flat key convention (e.g., `dashboard.title`, `notifications.empty`, `shopping.add_item`, `categories.work`).
+
+### `config.py` — Optional Email Config
+
+```python
+# Add to Settings class
+RESEND_API_KEY: str = ""                    # or SMTP_* settings
+NOTIFICATION_EMAIL_FROM: str = "noreply@synco.app"
+NOTIFICATION_EMAIL_ENABLED: bool = False    # opt-in
+```
+
+## Data Flow
+
+### Dashboard Load (`GET /` or `GET /dashboard`)
+
+```
+Browser → GET /dashboard
+  → auth middleware validates cookie JWT
+  → DashboardService.get_dashboard_data(calendar_id, user_id, today)
+    ├── EventService.list_day_expanded(calendar_id, today)
+    │     └── SupabaseStore.select("events", ...) + recurrence expansion
+    ├── OverviewService.get_month_data(calendar_id, year, month)
+    │     └── SupabaseStore.select("budget_settings"|"expenses"|"monthly_hours", ...)
+    ├── NotificationRepository.count_unread(calendar_id, user_id)
+    │     └── SupabaseStore.count("notifications", ...)
+    └── ShoppingService.count_pending(calendar_id)
+          └── SupabaseStore.count("shopping_items", ...)
+  → Jinja2 renders dashboard.html with aggregated context
+  → HTML response with HTMX partials for lazy-loading panels
+```
+
+### Notification Creation (side-effect of event mutation)
+
+```
+Browser → POST /api/events  (create event)
+  → EventService.create_event(calendar_id, user_id, payload)
+    └── EventRepository.create() → new Event row
+  → NotificationEmitter.on_event_created(event, user_id, calendar_id)
+    └── NotificationService.create_for_partner(...)
+      ├── Resolve partner_user_id from calendar_id
+      ├── SupabaseStore.insert("notifications", {...})
+      └── IF partner.notification_email_enabled:
+            email.send_notification(partner.email, message)
+  → Return EventResponse to browser
+```
+
+### Shopping List Add (text parsing)
+
+```
+Browser → POST /api/shopping  { "text": "mleko, chleb, masło" }
+  → ShoppingService.parse_and_add(calendar_id, user_id, text)
+    ├── Split text by commas/newlines → ["mleko", "chleb", "masło"]
+    └── For each item: ShoppingRepository.create(calendar_id, name=item)
+  → Return list of ShoppingItemResponse
+```
+
+### Category-Colored Calendar Grid
+
+```
+Browser → GET /calendar/month?year=2026&month=3
+  → CalendarRoutes.month_grid()
+    ├── EventService.list_month_expanded(calendar_id, year, month)
+    └── CategoryRepository.list_event_categories(calendar_id)
+  → Template receives events + category_color_map
+  → Jinja2 renders month_grid.html with colored event dots/chips
+```
+
+### Expense Category Chart
+
+```
+Browser → GET /api/budget/overview/categories?year=2026
+  → OverviewService.get_category_breakdown(calendar_id, year)
+    ├── ExpenseRepository.get_by_calendar_year(calendar_id, year)
+    └── CategoryRepository.list_expense_categories(calendar_id)
+  → Group expenses by category_id, sum amounts
+  → Return { categories: [{ name, color, total, budget_limit, percent_used }] }
+  → Frontend renders pie/bar chart via Chart.js <canvas> or inline SVG
+```
+
+## Database Changes
+
+### New Tables
+
+```sql
+-- 1. Event Categories
+create table public.event_categories (
+  id uuid primary key default gen_random_uuid(),
+  calendar_id text not null references public.calendars(id) on delete cascade,
+  name text not null,
+  color text not null default '#6366f1',   -- hex color
+  icon text,                                -- optional emoji or icon key
+  sort_order int not null default 0,
+  is_default boolean not null default false, -- preset vs custom
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (calendar_id, name)
+);
+
+-- 2. Expense Categories
+create table public.expense_categories (
+  id uuid primary key default gen_random_uuid(),
+  calendar_id text not null references public.calendars(id) on delete cascade,
+  name text not null,
+  color text not null default '#6366f1',
+  icon text,
+  sort_order int not null default 0,
+  budget_limit numeric,                     -- optional per-category monthly limit
+  is_default boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (calendar_id, name)
+);
+
+-- 3. Notifications
+create table public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  calendar_id text not null references public.calendars(id) on delete cascade,
+  recipient_user_id text not null references public.users(id) on delete cascade,
+  actor_user_id text references public.users(id) on delete set null,
+  type text not null,                       -- 'event_created', 'event_updated', 'event_deleted', 'expense_added', ...
+  title text not null,
+  body text,
+  payload jsonb default '{}',               -- { event_id, expense_id, etc. }
+  is_read boolean not null default false,
+  email_sent boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index idx_notifications_recipient_unread
+  on public.notifications(recipient_user_id, is_read)
+  where is_read = false;
+
+-- 4. Shopping Items
+create table public.shopping_items (
+  id uuid primary key default gen_random_uuid(),
+  calendar_id text not null references public.calendars(id) on delete cascade,
+  name text not null,
+  is_checked boolean not null default false,
+  added_by_user_id text references public.users(id) on delete set null,
+  checked_by_user_id text references public.users(id) on delete set null,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- 5. User Preferences (notification settings)
+create table public.user_preferences (
+  id uuid primary key default gen_random_uuid(),
+  user_id text not null references public.users(id) on delete cascade unique,
+  email_notifications boolean not null default false,
+  notification_types jsonb default '["event_created","event_updated","event_deleted"]',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+```
+
+### Altered Tables
+
+```sql
+-- Add category_id to events (nullable FK)
+alter table public.events
+  add column category_id uuid references public.event_categories(id) on delete set null;
+
+-- Add category_id to expenses (nullable FK)
+alter table public.expenses
+  add column category_id uuid references public.expense_categories(id) on delete set null;
+```
+
+### Row Level Security (RLS)
+
+All new tables need RLS policies following the same pattern as `carry_forward_overrides`:
+
+```sql
+-- Pattern: user can access rows where calendar_id matches their calendar
+create policy "Household access" on public.<table>
+  for all
+  using (
+    calendar_id in (
+      select u.calendar_id from public.users u
+      where u.google_id::text = auth.uid()::text
+         or lower(u.email::text) = lower(coalesce(auth.jwt() ->> 'email', ''))
+    )
+  )
+  with check (
+    calendar_id in (
+      select u.calendar_id from public.users u
+      where u.google_id::text = auth.uid()::text
+         or lower(u.email::text) = lower(coalesce(auth.jwt() ->> 'email', ''))
+    )
+  );
+```
+
+For `notifications`, add an additional policy restricting reads to `recipient_user_id = auth.uid()` for user-level scoping.
+
+For `user_preferences`, restrict to `user_id` matching the authenticated user.
+
+## Templates (New)
+
+| Template | Route | Content |
+|----------|-------|---------|
+| `dashboard.html` | `GET /` or `/dashboard` | Today panel, 7-day preview, budget snapshot card, notification feed, quick-add button, shopping summary |
+| `shopping.html` | `GET /shopping` | Full shopping list with add form, check-off, delete |
+| `notifications.html` | `GET /notifications` | Full notification history with read/unread |
+| `partials/notification_bell.html` | Included in `base.html` nav | Bell icon + unread count badge (HTMX polled or SSE) |
+| `partials/dashboard_events.html` | HTMX partial | Today's events panel |
+| `partials/dashboard_budget.html` | HTMX partial | Budget snapshot card |
+| `partials/category_picker.html` | Included in event/expense forms | Dropdown/chip selector for category |
+| `partials/expense_chart.html` | HTMX partial on overview | Pie/bar chart by expense category |
 
 ## Patterns to Follow
 
-### Pattern: Chip-Based Multi-Value Input (Reminders)
+### Pattern 1: Repository → Service → Routes (existing)
 
-Match existing glass UI design system. Use removable pill/chip components:
+Every new module follows the same layered pattern already used throughout the app:
 
-```html
-<div id="reminder-chips" class="flex flex-wrap gap-1">
-  <span class="rounded-full bg-white/10 px-2 py-0.5 text-xs border border-white/20">
-    30 min <button class="ml-1 opacity-60 hover:opacity-100">✕</button>
-  </span>
-</div>
+```
+routes.py  →  service.py  →  repository.py  →  SupabaseStore
+  (HTTP)       (business)     (data mapping)     (REST API)
 ```
 
-Consistent with the date badge style in `day_events.html` (`rounded-full bg-white/10 px-3 py-1 text-xs`).
+- **Routes** handle HTTP, auth, request/response.
+- **Services** handle validation, business rules, orchestration.
+- **Repositories** handle Supabase REST calls and dataclass mapping.
+- **Schemas** are Pydantic models for request validation.
 
-### Pattern: Reuse Service Methods for Aggregation
+### Pattern 2: View Routes for HTML Pages
 
-Don't duplicate budget calculation logic. The comparison endpoint calls `get_year_overview()` per year:
+HTML-serving routes go in `views.py` (or `*_views.py`), separate from API `routes.py`:
 
 ```python
-# Good: reuse
-summaries = {y: self.get_year_overview(cal_id, y) for y in years}
-
-# Bad: copy-paste monthly calculation loop into comparison method
+# app/dashboard/views.py
+@router.get("/dashboard", response_class=HTMLResponse)
+async def dashboard_page(request, user=Depends(get_current_user), db=Depends(get_db)):
+    context = inject_template_i18n(request, {"request": request, "user": user, ...})
+    return templates.TemplateResponse("dashboard.html", context)
 ```
 
-### Pattern: Follow Existing Budget JS Structure
+### Pattern 3: Notification as Side-Effect
 
-The budget overview uses an IIFE with internal `currentYear` state, `reload()` function, and event delegation. The comparison UI should follow the same pattern — add to the existing IIFE, not a separate script block.
+Don't build an event bus. Keep it simple: after a successful write in EventService or ExpenseService, call `NotificationEmitter.on_X()`. The emitter is injected at the route level:
 
----
+```python
+# In routes.py
+emitter = NotificationEmitter(NotificationService(NotificationRepository(db)))
+event = service.create_event(calendar_id, user_id, payload)
+emitter.on_event_created(event, user_id, calendar_id)
+```
+
+This keeps services pure (no notification dependency) and makes testing easy (don't inject emitter in tests).
+
+### Pattern 4: Chart Rendering — Chart.js
+
+For expense category charts, use **Chart.js** via CDN (`<canvas>` with JS). More interactive than inline SVG (hover tooltips, legend toggle). Load Chart.js only on the budget stats / overview pages to avoid payload on other pages. The app already uses script tags for JS in templates, so this is consistent.
 
 ## Anti-Patterns to Avoid
 
-### Anti-Pattern: Year-Scoped BudgetSettings in v2.1
+### Anti-Pattern 1: Event Bus / Message Queue Overhead
+**What:** Building a pub/sub system for notifications.
+**Why bad:** Two users, ~5 notification types. A message queue is overkill.
+**Instead:** Direct function calls from routes to NotificationEmitter.
 
-Adding a `year` column to `BudgetSettings` would cascade into:
-- Database migration
-- Settings UI showing year selector ("which year's rates am I editing?")
-- Backfill logic for existing data
-- Every budget query needing year-aware settings lookup
-- Income calculation engine changes
+### Anti-Pattern 2: Denormalizing Category Colors onto Events
+**What:** Storing the hex color on every event row.
+**Why bad:** If category color changes, all events have stale colors.
+**Instead:** Look up colors from the small categories table at render time.
 
-Excessive for v2.1. Defer if historical rate accuracy becomes a real user need.
+### Anti-Pattern 3: Background Task Workers for Email
+**What:** Using Celery/RQ for async email sends.
+**Why bad:** The app runs as a single Uvicorn process. Adding a task queue is disproportionate for ~2 emails/day.
+**Instead:** Inline HTTP POST to Resend API (or SMTP). If it fails, log and move on — the in-app notification still exists.
 
-### Anti-Pattern: Separate Comparison Page
+### Anti-Pattern 4: Separate Category Tables per Domain
+**What:** `app/events/categories.py` + `app/budget/categories.py` with duplicated logic.
+**Why bad:** Duplicated CRUD, duplicated seeding, duplicated schemas.
+**Instead:** Shared `app/categories/` module with separate tables but one repository class handling both.
 
-Don't create `/budget/comparison` with a new template. Keep it as an expandable section in `budget_overview.html`. Avoids:
-- New sidebar link and navigation complexity
-- Template duplication
-- State sync between pages (which year is selected where?)
+## Suggested Build Order
 
-### Anti-Pattern: Reminder Defaults in Database
+Build features in dependency order — foundational data first, then consumers.
 
-Default reminders (30 min + 2 days) should be UI-only defaults populated by JavaScript when the toggle is turned on. Don't add a user preferences table for reminder defaults. If a user unchecks reminders, send `reminder_minutes_list: []`.
+### Phase 1: Event Categories + Colors
+**Why first:**
+- Zero dependencies on other new features.
+- Only modifies the events module (additive `category_id` field).
+- Enables calendar grid color-coding immediately, which is the most visible UI improvement.
+- Creates the category module pattern that expense categories reuse.
 
-### Anti-Pattern: Creating New Reminder Service/Repository
+**Includes:**
+- `event_categories` table + migration + RLS
+- `app/categories/` module (repository, service, schemas, routes)
+- Modify `app/events/` to pass `category_id`
+- Modify `month_grid.html` for color-coded events
+- Preset category seeding
+- i18n keys for category names
 
-The reminder data is part of the Event model. No separate `ReminderService` or `ReminderRepository` — it flows through the existing `EventService` → `EventRepository` pipeline. The `reminder_minutes_list` is just another field on the event.
+### Phase 2: Expense Categories + Charts
+**Why second:**
+- Reuses the `app/categories/` module from Phase 1.
+- Only extends the budget module (additive `category_id` on expenses).
+- Chart rendering is self-contained.
 
----
+**Includes:**
+- `expense_categories` table + migration (with `budget_limit`)
+- Extend `app/categories/` for expense categories
+- Modify `app/budget/expense_*` to include `category_id`
+- Add `get_category_breakdown()` to overview service
+- Chart.js integration on budget stats page
+- Per-category budget limit alerts
+- i18n keys
 
-## Scalability Considerations
+### Phase 3: Notifications (In-App + Email)
+**Why third:**
+- Depends on events and expenses being category-aware (richer notification content).
+- The notification emitter hooks into event/expense mutation endpoints which should be stable.
+- Email is opt-in and can be toggled later.
 
-| Concern | Current (2 users) | Notes |
-|---------|-------------------|-------|
-| Comparison API | 2–3 calls to `get_year_overview()` per request (~8–12 DB queries) | Acceptable; add caching only if >5 years compared |
-| Reminder storage | JSONB array column on events table | Fine for any reasonable reminder count per event |
-| Year navigation | Unbounded year picker | Limit to current year ± 10 in UI for UX |
-| Privacy filtering | In-memory filter via `_visible_to()` after full table load | Fine for household scale (~hundreds of events); add PostgREST filter if event count grows significantly |
-| Budget year queries | 4 DB round-trips per year view | Acceptable; batch into single RPC if latency becomes an issue |
+**Includes:**
+- `notifications` + `user_preferences` tables + migrations
+- `app/notifications/` module
+- NotificationEmitter integrated into event/expense routes
+- Notification list page + API
+- Email dispatch via Resend (opt-in)
+- Bell icon in base.html nav with unread count
+- i18n keys
+
+### Phase 4: Shared Shopping List
+**Why fourth:**
+- Fully independent feature — no dependency on categories or notifications.
+- Could theoretically be built in parallel with Phase 3, but sequencing reduces cognitive load.
+- Simplest new feature (basic CRUD + text parsing).
+
+**Includes:**
+- `shopping_items` table + migration
+- `app/shopping/` module
+- Shopping list page + API
+- Text parsing (comma/newline split)
+- i18n keys
+
+### Phase 5: Dashboard Home Page
+**Why last:**
+- Depends on ALL other features — it aggregates events, budget, notifications, and shopping.
+- Building it last means all data sources are stable and tested.
+- The aggregator service is simple once individual services are proven.
+
+**Includes:**
+- `app/dashboard/` module (aggregator service, views)
+- `dashboard.html` template
+- Change `GET /` from calendar to dashboard
+- Add "Calendar" nav link (since calendar moves to `/calendar`)
+- Navigation restructure in `base.html`
+- i18n keys
 
 ## Sources
 
-- Direct codebase analysis: all model, schema, repository, service, route, template, and JS files reviewed
-- Existing patterns verified against v1.0–v2.0 implementation
-- Confidence: HIGH — all claims verified against actual source code
+- Existing codebase analysis (HIGH confidence — direct code inspection of all modules)
+- Established FastAPI + Jinja2 patterns from existing app modules (HIGH confidence)
+- Supabase RLS patterns from existing `carry_forward_overrides` migration (HIGH confidence)
+- Repository/Service/Routes pattern consistently used across all existing modules (HIGH confidence)
