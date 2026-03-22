@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 import uuid
+import concurrent.futures
 
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -458,13 +459,19 @@ class GoogleSyncService:
                         .execute()
                     )
                     items = response.get("items", [])
-                    for item in items:
-                        try:
-                            add_count, update_count = self._upsert_google_event(user.calendar_id, user.id, item)
-                            imported += add_count
-                            updated += update_count
-                        except Exception as exc:
-                            errors.append(f"{item.get('id', 'unknown')}: {exc}")
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+                        future_to_item = {
+                            executor.submit(self._upsert_google_event, user.calendar_id, user.id, item): item
+                            for item in items
+                        }
+                        for future in concurrent.futures.as_completed(future_to_item):
+                            item = future_to_item[future]
+                            try:
+                                add_count, update_count = future.result()
+                                imported += add_count
+                                updated += update_count
+                            except Exception as exc:
+                                errors.append(f"{item.get('id', 'unknown')}: {exc}")
 
                     page_token = response.get("nextPageToken")
                     if not page_token:

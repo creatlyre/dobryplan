@@ -89,3 +89,59 @@ class TestCacheControlHeaders:
         resp = client.get("/", follow_redirects=False)
         cache = resp.headers.get("Cache-Control", "")
         assert "max-age=604800" not in cache
+
+class TestConcurrentImport:
+    """PERF-04: Validate concurrent upserts."""
+
+    def test_import_month_concurrency_speedup(self, monkeypatch):
+        """Verify _upsert_google_event uses thread pool to be faster than sequential."""
+        import time
+        from app.sync.service import GoogleSyncService
+
+        class FakeDB:
+            def select(self, *args, **kwargs):
+                time.sleep(0.005)
+                return []
+            def insert(self, *args, **kwargs):
+                time.sleep(0.005)
+                return {"id": "fake"}
+            def update(self, *args, **kwargs):
+                time.sleep(0.005)
+                return {"id": "fake"}
+
+        service = GoogleSyncService(FakeDB())
+        service.user_repo = None # prevent lookup
+
+        # Override extract methods so they don't break with fake event
+        monkeypatch.setattr(service, "_extract_cp_event_id", lambda x: None)
+        monkeypatch.setattr(service, "_extract_cp_visibility", lambda x: "shared")
+
+        items = [{"id": f"g_event_{i}", "summary": f"Event {i}", "start": {"dateTime": "2026-03-18T10:00:00Z"}, "end": {"dateTime": "2026-03-18T11:00:00Z"}} for i in range(50)]
+
+        # We test speed sequentially vs using the internal thread pool logic
+        # But wait, import_month is a big method. Let's just verify the function runs fast.
+
+        start_time = time.time()
+
+        # Mocking credentials and google service
+        class FakeService:
+            def events(self):
+                return self
+            def list(self, *args, **kwargs):
+                return self
+            def execute(self):
+                return {"items": items}
+
+        monkeypatch.setattr(service, "_google_service", lambda x: FakeService())
+        monkeypatch.setattr(service, "_import_calendar_ids", lambda s, u: ["primary"])
+        monkeypatch.setattr(service, "_credentials_for_user", lambda u: "creds")
+
+        class FakeUser:
+            id = "user_1"
+            calendar_id = "cal_1"
+
+        res = service.import_month(FakeUser(), 2026, 3)
+        conc_time = time.time() - start_time
+
+        assert res.events_imported == 50
+        assert conc_time < 0.25, f"Expected < 0.25s, got {conc_time:.2f}s"
