@@ -43,6 +43,13 @@
         <p class="mt-1 text-xs text-white/40">{{ t('qa.visibility_help') }}</p>
       </div>
 
+      <div>
+        <label for="event-entry-category" class="mb-1 block text-xs font-medium uppercase tracking-wide text-white/60">{{ t('category.label') }}</label>
+        <select id="event-entry-category" class="glass-input">
+          <option value="">{{ t('category.none') }}</option>
+        </select>
+      </div>
+
       <!-- Reminders Section -->
       <div id="event-entry-reminders-section">
         <div class="flex items-center justify-between mb-2">

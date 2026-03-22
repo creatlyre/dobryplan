@@ -16,7 +16,8 @@
             <button class="min-h-[84px] sm:min-h-[100px] rounded-xl border p-2 text-left transition-all duration-150 cursor-pointer {{ 'bg-indigo-500/30 border-indigo-400/60 shadow-lg' if day == today else 'bg-white/[0.04] border-white/10 hover:bg-white/[0.11] hover:border-white/22' }}" data-year="{{ day.year }}" data-month="{{ day.month }}" data-day="{{ day.day }}" onclick="loadDay({{ day.year }}, {{ day.month }}, {{ day.day }})" aria-label="{{ day.day }}/{{ day.month }}/{{ day.year }} – {{ items|length }} {{ t('month.more') }}">
                 <div class="font-semibold {{ 'text-indigo-200' if day == today else 'text-white/75' }}">{{ day.day }}</div>
                 {% for event in items[:2] %}
-                <div class="truncate mt-0.5 text-xs bg-indigo-500/25 text-indigo-200 rounded px-1 py-0.5" title="{{ event.start_at.strftime('%H:%M') }} {{ event.title }}">{{ event.start_at.strftime('%H:%M') }} {% if event.visibility == 'private' %}🔒 {% endif %}{{ event.title }}</div>
+                {% set cat = category_map.get(event.category_id) if event.category_id else None %}
+                <div class="truncate mt-0.5 text-xs rounded px-1 py-0.5 flex items-center gap-1" data-category-id="{{ event.category_id or '' }}" style="background: {{ (cat.color + '40') if cat else 'rgba(99,102,241,0.25)' }}; color: {{ cat.color if cat else '#a5b4fc' }}">{% if cat %}<span class="category-dot inline-block w-1.5 h-1.5 rounded-full shrink-0" style="background:{{ cat.color }}"></span>{% endif %}{{ event.start_at.strftime('%H:%M') }} {% if event.visibility == 'private' %}🔒 {% endif %}{{ event.title }}</div>
                 {% endfor %}
                 {% if items|length > 2 %}
                 <div class="text-xs text-white/50 mt-0.5">+{{ items|length - 2 }} {{ t('month.more') }}</div>

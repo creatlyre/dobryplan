@@ -7,6 +7,10 @@
 
 <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
     <section class="space-y-4 lg:col-span-3">
+        <div id="category-filter" class="glass rounded-2xl p-3 flex flex-wrap items-center gap-2">
+          <span class="text-xs font-medium text-white/60">{{ t('category.filter') }}:</span>
+          <div id="category-filter-buttons" class="flex flex-wrap gap-2"></div>
+        </div>
         <div id="month-grid" hx-get="/calendar/month?year={{ now.year }}&month={{ now.month }}" hx-trigger="load" hx-swap="innerHTML">
             <div class="glass rounded-2xl p-4 text-white/50">{{ t('calendar.loading_calendar') }}</div>
         </div>
@@ -156,7 +160,11 @@ const I18N = {
   reminderToggleOn: {{ t('reminder.toggle_on')|tojson }},
   reminderToggleOff: {{ t('reminder.toggle_off')|tojson }},
   reminderMaxReached: {{ t('reminder.max_reached')|tojson }},
-  reminderRemoveLabel: {{ t('reminder.remove_label')|tojson }}
+  reminderRemoveLabel: {{ t('reminder.remove_label')|tojson }},
+  categoryNone: {{ t('category.none')|tojson }},
+  categoryLabel: {{ t('category.label')|tojson }},
+  categoryFilter: {{ t('category.filter')|tojson }},
+  categoryFilterAll: {{ t('category.filter_all')|tojson }}
 };
 
 function pad2(value) {
@@ -174,6 +182,100 @@ let currentYear = {{ now.year }};
 let currentMonth = {{ now.month }};
 let currentDay = {{ now.day }};
 
+/* ── Category system ──────────────────────────────────────────── */
+let categoriesCache = [];
+let activeCategories = new Set(['all']);
+
+async function loadCategories() {
+  try {
+    const res = await fetch('/api/events/categories');
+    if (res.ok) {
+      categoriesCache = await res.json();
+      populateCategoryDropdowns();
+      renderCategoryFilterButtons();
+    }
+  } catch (_) {}
+}
+
+function populateCategoryDropdowns() {
+  ['event-entry-category', 'event-category'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const current = sel.value;
+    sel.innerHTML = '<option value="">' + I18N.categoryNone + '</option>';
+    categoriesCache.forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat.id;
+      opt.textContent = cat.name;
+      opt.style.color = cat.color;
+      sel.appendChild(opt);
+    });
+    if (current) sel.value = current;
+  });
+}
+
+function renderCategoryFilterButtons() {
+  const container = document.getElementById('category-filter-buttons');
+  if (!container) return;
+  container.innerHTML = '';
+  // "All" button
+  const allBtn = document.createElement('button');
+  allBtn.className = 'category-filter-btn rounded-full px-3 py-1 text-xs font-medium transition-all ' +
+    (activeCategories.has('all') ? 'bg-white/20 text-white border border-white/30' : 'bg-white/5 text-white/50 border border-white/10 hover:bg-white/10');
+  allBtn.dataset.category = 'all';
+  allBtn.textContent = I18N.categoryFilterAll;
+  allBtn.addEventListener('click', () => toggleCategoryFilter('all'));
+  container.appendChild(allBtn);
+  // Per-category buttons
+  categoriesCache.forEach(cat => {
+    const btn = document.createElement('button');
+    const isActive = activeCategories.has('all') || activeCategories.has(cat.id);
+    btn.className = 'category-filter-btn rounded-full px-3 py-1 text-xs font-medium transition-all flex items-center gap-1.5 ' +
+      (isActive ? 'border border-white/30' : 'bg-white/5 text-white/50 border border-white/10 hover:bg-white/10');
+    if (isActive) {
+      btn.style.background = cat.color + '30';
+      btn.style.color = cat.color;
+      btn.style.borderColor = cat.color + '60';
+    }
+    btn.dataset.category = cat.id;
+    btn.innerHTML = '<span class="inline-block w-2 h-2 rounded-full" style="background:' + cat.color + '"></span>' + cat.name;
+    btn.addEventListener('click', () => toggleCategoryFilter(cat.id));
+    container.appendChild(btn);
+  });
+}
+
+function toggleCategoryFilter(categoryId) {
+  if (categoryId === 'all') {
+    activeCategories = new Set(['all']);
+  } else {
+    activeCategories.delete('all');
+    if (activeCategories.has(categoryId)) {
+      activeCategories.delete(categoryId);
+    } else {
+      activeCategories.add(categoryId);
+    }
+    if (activeCategories.size === 0) {
+      activeCategories = new Set(['all']);
+    }
+  }
+  renderCategoryFilterButtons();
+  applyCategoryFilter();
+}
+
+function applyCategoryFilter() {
+  const showAll = activeCategories.has('all');
+  // Filter month grid event pills
+  document.querySelectorAll('#month-grid [data-category-id]').forEach(el => {
+    const catId = el.dataset.categoryId;
+    el.style.display = (showAll || activeCategories.has(catId) || (!catId && showAll)) ? '' : 'none';
+  });
+  // Filter day events list items
+  document.querySelectorAll('#day-events [data-category-id]').forEach(el => {
+    const catId = el.dataset.categoryId;
+    el.style.display = (showAll || activeCategories.has(catId) || (!catId && showAll)) ? '' : 'none';
+  });
+}
+
 function setMonthState(year, month) {
   currentYear = year;
   currentMonth = month;
@@ -183,7 +285,7 @@ function loadDay(year, month, day) {
   currentYear = year;
   currentMonth = month;
   currentDay = day;
-  htmx.ajax('GET', `/calendar/day?year=${year}&month=${month}&day=${day}`, '#day-events');
+  htmx.ajax('GET', `/calendar/day?year=${year}&month=${month}&day=${day}`, '#day-events').then(() => applyCategoryFilter());
 }
 
 function selectedDayIsoDate() {
@@ -200,6 +302,8 @@ function resetEventForm() {
   document.getElementById('event-repeat').value = '';
   document.getElementById('event-repeat-count').value = '';
   document.getElementById('event-repeat-until').value = '';
+  const catSel = document.getElementById('event-category');
+  if (catSel) catSel.value = '';
 }
 
 function prefillEvent(id, title, description, startAt, endAt) {
@@ -208,6 +312,8 @@ function prefillEvent(id, title, description, startAt, endAt) {
   document.getElementById('event-description').value = description;
   document.getElementById('event-start').value = startAt;
   document.getElementById('event-end').value = endAt;
+  const catSel = document.getElementById('event-category');
+  if (catSel) catSel.value = '';
 }
 
 function buildRRule() {
@@ -233,6 +339,7 @@ function buildRRule() {
 async function refreshPanels() {
   await htmx.ajax('GET', `/calendar/month?year=${currentYear}&month=${currentMonth}`, '#month-grid');
   await htmx.ajax('GET', `/calendar/day?year=${currentYear}&month=${currentMonth}&day=${currentDay}`, '#day-events');
+  applyCategoryFilter();
 }
 
 const eventEntryModal = document.getElementById('event-entry-modal');
@@ -380,6 +487,8 @@ function resetEventEntryForm() {
   setRemindersEnabled(true);
   renderReminderChips();
   updateReminderAddState();
+  const entryCatSel = document.getElementById('event-entry-category');
+  if (entryCatSel) entryCatSel.value = '';
   updateEventEntryValidation();
 }
 
@@ -436,12 +545,14 @@ function populateEventEntryFromDateTimeLocal(startAt, endAt) {
   }
 }
 
-function prefillEvent(eventId, title, description, startAt, endAt, visibility, reminderMinutesList) {
+function prefillEvent(eventId, title, description, startAt, endAt, visibility, reminderMinutesList, categoryId) {
   resetEventEntryForm();
   eventEntryIdInput.value = eventId || '';
   eventEntryTitleInput.value = title || '';
   eventEntryDescriptionInput.value = description || '';
   eventEntryVisibilityInput.value = visibility || 'shared';
+  const entryCatSel = document.getElementById('event-entry-category');
+  if (entryCatSel) entryCatSel.value = categoryId || '';
   if (reminderMinutesList && reminderMinutesList.length > 0) {
     currentReminders = [...reminderMinutesList];
     eventEntryRemindersToggle.checked = true;
@@ -575,6 +686,7 @@ async function submitEventEntry(keepOpen) {
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
     rrule: buildEventEntryRRule(),
     visibility: eventEntryVisibilityInput.value,
+    category_id: document.getElementById('event-entry-category')?.value || null,
     reminder_minutes_list: eventEntryRemindersToggle.checked ? currentReminders : []
   };
 
@@ -1685,5 +1797,13 @@ loadSyncStatus();
     });
   });
 }());
+</script>
+
+<script>
+/* ── Category initialization & HTMX re-filter ── */
+loadCategories();
+document.body.addEventListener('htmx:afterSwap', () => {
+  applyCategoryFilter();
+});
 </script>
 {% endblock %}

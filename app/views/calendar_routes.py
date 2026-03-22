@@ -29,6 +29,8 @@ async def month_grid(
 ):
     service = _service(db)
     events = service.list_month_expanded(user.calendar_id, year, month, requesting_user_id=user.id)
+    categories = service.list_categories(user.calendar_id)
+    category_map = {cat.id: cat for cat in categories}
 
     days = calendar.Calendar(firstweekday=0).monthdatescalendar(year, month)
 
@@ -46,6 +48,7 @@ async def month_grid(
             "request": request,
             "weeks": days,
             "event_map": event_map,
+            "category_map": category_map,
             "display_year": year,
             "display_month": month,
             "display_month_name": calendar.month_name[month],
@@ -71,12 +74,15 @@ async def day_events(
 ):
     service = _service(db)
     events = service.list_day_expanded(user.calendar_id, year, month, day, requesting_user_id=user.id)
+    categories = service.list_categories(user.calendar_id)
+    category_map = {cat.id: cat for cat in categories}
 
     context = inject_template_i18n(
         request,
         {
             "request": request,
             "events": events,
+            "category_map": category_map,
             "date_label": f"{year:04d}-{month:02d}-{day:02d}",
         },
     )

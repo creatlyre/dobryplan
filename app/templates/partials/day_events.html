@@ -6,14 +6,15 @@
     {% if events %}
     <ul class="space-y-2">
         {% for event in events %}
-        <li class="rounded-xl border border-white/10 bg-white/[0.04] p-3 transition-colors hover:bg-white/[0.08]">
+        {% set cat = category_map.get(event.category_id) if event.category_id else None %}
+        <li class="rounded-xl border border-white/10 bg-white/[0.04] p-3 transition-colors hover:bg-white/[0.08]" data-category-id="{{ event.category_id or '' }}" style="{{ ('border-left: 3px solid ' + cat.color) if cat else '' }}">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="font-medium text-white">{% if event.visibility == 'private' %}🔒 {% endif %}{{ event.title }}</div>
+                    <div class="font-medium text-white flex items-center gap-2">{% if event.visibility == 'private' %}🔒 {% endif %}{{ event.title }}{% if cat %}<span class="category-color inline-block rounded-full px-2 py-0.5 text-xs" style="background:{{ cat.color }}20; color:{{ cat.color }}">{{ cat.name }}</span>{% endif %}</div>
                     <div class="text-xs text-white/50 mt-0.5">{{ event.start_at.strftime('%H:%M') }} – {{ event.end_at.strftime('%H:%M') }}</div>
                 </div>
                 <div class="flex gap-2 ml-2 shrink-0">
-                    <button class="glass-btn-info rounded-lg px-3 py-2 text-xs font-medium min-h-[44px]" onclick="prefillEvent({{ event.id|tojson|e }}, {{ event.title|tojson|e }}, {{ (event.description or '')|tojson|e }}, {{ event.start_at.strftime('%Y-%m-%dT%H:%M')|tojson|e }}, {{ event.end_at.strftime('%Y-%m-%dT%H:%M')|tojson|e }}, {{ event.visibility|default('shared')|tojson|e }}, {{ (event.reminder_minutes_list or [])|tojson|e }})">{{ t('day.edit') }}</button>
+                    <button class="glass-btn-info rounded-lg px-3 py-2 text-xs font-medium min-h-[44px]" onclick="prefillEvent({{ event.id|tojson|e }}, {{ event.title|tojson|e }}, {{ (event.description or '')|tojson|e }}, {{ event.start_at.strftime('%Y-%m-%dT%H:%M')|tojson|e }}, {{ event.end_at.strftime('%Y-%m-%dT%H:%M')|tojson|e }}, {{ event.visibility|default('shared')|tojson|e }}, {{ (event.reminder_minutes_list or [])|tojson|e }}, {{ (event.category_id or '')|tojson|e }})">{{ t('day.edit') }}</button>
                     <button class="glass-btn-danger rounded-lg px-3 py-2 text-xs font-medium min-h-[44px]" onclick="deleteEvent({{ event.id|tojson|e }})">{{ t('day.delete') }}</button>
                 </div>
             </div>
