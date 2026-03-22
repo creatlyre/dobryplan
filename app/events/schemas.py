@@ -4,6 +4,21 @@ from typing import List, Literal, Optional
 from pydantic import BaseModel, Field, field_validator
 
 
+class CategoryCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=50)
+    color: str = Field(pattern=r'^#[0-9a-fA-F]{6}$')
+
+
+class CategoryResponse(BaseModel):
+    id: str
+    calendar_id: str
+    name: str
+    color: str
+    is_preset: bool
+    sort_order: int
+    model_config = {"from_attributes": True}
+
+
 class EventCreate(BaseModel):
     title: str = Field(min_length=1, max_length=255)
     description: Optional[str] = None
@@ -12,6 +27,7 @@ class EventCreate(BaseModel):
     timezone: str = "UTC"
     rrule: Optional[str] = None
     visibility: Literal["shared", "private"] = "shared"
+    category_id: Optional[str] = None
     reminder_minutes: Optional[int] = None
     reminder_minutes_list: Optional[List[int]] = None
 
@@ -35,6 +51,7 @@ class EventUpdate(BaseModel):
     timezone: Optional[str] = None
     rrule: Optional[str] = None
     visibility: Optional[Literal["shared", "private"]] = None
+    category_id: Optional[str] = None
     reminder_minutes: Optional[int] = None
     reminder_minutes_list: Optional[List[int]] = None
 
@@ -51,6 +68,7 @@ class EventResponse(BaseModel):
     is_deleted: bool
     rrule: Optional[str] = None
     visibility: str = "shared"
+    category_id: Optional[str] = None
     reminder_minutes: Optional[int] = None
     reminder_minutes_list: List[int] = []
 

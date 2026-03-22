@@ -3,9 +3,9 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
-from app.database.models import Event
+from app.database.models import Event, EventCategory
 from app.database.supabase_store import SupabaseStore
-from app.events.schemas import EventCreate, EventUpdate
+from app.events.schemas import CategoryCreate, EventCreate, EventUpdate
 
 
 def _to_iso(dt: datetime | None) -> str | None:
@@ -44,8 +44,22 @@ def _to_event(row: dict[str, Any]) -> Event:
         last_edited_by_user_id=row.get("last_edited_by_user_id"),
         is_deleted=bool(row.get("is_deleted", False)),
         visibility=row.get("visibility") or "shared",
+        category_id=row.get("category_id"),
         reminder_minutes=row.get("reminder_minutes"),
         reminder_minutes_list=row.get("reminder_minutes_list") or [],
+    )
+
+
+def _to_category(row: dict[str, Any]) -> EventCategory:
+    return EventCategory(
+        id=row.get("id", ""),
+        calendar_id=row.get("calendar_id", ""),
+        name=row.get("name", ""),
+        color=row.get("color", "#6366f1"),
+        is_preset=bool(row.get("is_preset", False)),
+        sort_order=int(row.get("sort_order", 0)),
+        created_at=_parse_dt(row.get("created_at")),
+        updated_at=_parse_dt(row.get("updated_at")),
     )
 
 
@@ -68,6 +82,7 @@ class EventRepository:
                 "rrule": payload.rrule,
                 "is_deleted": False,
                 "visibility": payload.visibility,
+                "category_id": getattr(payload, "category_id", None),
                 "reminder_minutes": getattr(payload, "reminder_minutes", None),
                 "reminder_minutes_list": getattr(payload, "reminder_minutes_list", None) or [],
             },
@@ -166,3 +181,49 @@ class EventRepository:
         ]
         events = self._visible_to(events, requesting_user_id)
         return sorted(events, key=lambda item: item.start_at or datetime.min)
+
+    # ── Category methods ─────────────────────────────────────────────────
+
+    _PRESET_CATEGORIES = [
+        {"name": "Work", "color": "#6366f1", "sort_order": 1},
+        {"name": "Personal", "color": "#06b6d4", "sort_order": 2},
+        {"name": "Health", "color": "#10b981", "sort_order": 3},
+        {"name": "Errands", "color": "#f59e0b", "sort_order": 4},
+        {"name": "Social", "color": "#ec4899", "sort_order": 5},
+    ]
+
+    def list_categories(self, calendar_id: str) -> list[EventCategory]:
+        rows = self.db.select(
+            "event_categories",
+            {"calendar_id": f"eq.{calendar_id}", "order": "sort_order.asc"},
+        )
+        return [_to_category(row) for row in rows]
+
+    def create_category(self, calendar_id: str, payload: CategoryCreate) -> EventCategory:
+        row = self.db.insert(
+            "event_categories",
+            {
+                "calendar_id": calendar_id,
+                "name": payload.name,
+                "color": payload.color,
+                "is_preset": False,
+                "sort_order": 100,
+            },
+        )
+        return _to_category(row)
+
+    def seed_preset_categories(self, calendar_id: str) -> list[EventCategory]:
+        results: list[EventCategory] = []
+        for preset in self._PRESET_CATEGORIES:
+            row = self.db.insert(
+                "event_categories",
+                {
+                    "calendar_id": calendar_id,
+                    "name": preset["name"],
+                    "color": preset["color"],
+                    "is_preset": True,
+                    "sort_order": preset["sort_order"],
+                },
+            )
+            results.append(_to_category(row))
+        return results

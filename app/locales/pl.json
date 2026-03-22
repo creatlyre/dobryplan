@@ -355,5 +355,22 @@
   "budget.import_col_rate2": "Stawka 2",
   "budget.import_col_rate3": "Stawka 3",
   "budget.import_col_name": "Nazwa",
-  "budget.import_col_amount": "Kwota"
+  "budget.import_col_amount": "Kwota",
+  "category.label": "Kategoria",
+  "category.select": "Wybierz kategorię",
+  "category.none": "Brak kategorii",
+  "category.work": "Praca",
+  "category.personal": "Osobiste",
+  "category.health": "Zdrowie",
+  "category.errands": "Sprawy",
+  "category.social": "Spotkania",
+  "category.custom": "Własna",
+  "category.create": "Utwórz kategorię",
+  "category.name": "Nazwa kategorii",
+  "category.color": "Kolor",
+  "category.save": "Zapisz",
+  "category.cancel": "Anuluj",
+  "category.filter": "Filtruj wg kategorii",
+  "category.filter_all": "Wszystkie kategorie",
+  "category.filter_clear": "Wyczyść filtr"
 }

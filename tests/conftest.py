@@ -27,6 +27,7 @@ class InMemoryStore:
             "calendars": [],
             "calendar_invitations": [],
             "events": [],
+            "event_categories": [],
             "budget_settings": [],
             "monthly_hours": [],
             "additional_earnings": [],
@@ -172,6 +173,8 @@ class InMemoryStore:
             table = "calendar_invitations"
         elif item.__class__.__name__ == "Event":
             table = "events"
+        elif item.__class__.__name__ == "EventCategory":
+            table = "event_categories"
         elif item.__class__.__name__ == "BudgetSettings":
             table = "budget_settings"
         elif item.__class__.__name__ == "MonthlyHours":
@@ -201,6 +204,8 @@ class InMemoryStore:
             table = "calendar_invitations"
         elif _item.__class__.__name__ == "Event":
             table = "events"
+        elif _item.__class__.__name__ == "EventCategory":
+            table = "event_categories"
         elif _item.__class__.__name__ == "BudgetSettings":
             table = "budget_settings"
         elif _item.__class__.__name__ == "MonthlyHours":

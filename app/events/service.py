@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from app.events.recurrence import expand_event, validate_rrule
 from app.events.repository import EventRepository
-from app.events.schemas import EventCreate, EventUpdate
+from app.events.schemas import CategoryCreate, EventCreate, EventUpdate
 
 
 class EventService:
@@ -79,3 +79,14 @@ class EventService:
             expanded.extend(expand_event(root, range_start, range_end))
 
         return sorted(expanded, key=lambda item: item.start_at)
+
+    # ── Category methods ─────────────────────────────────────────────────
+
+    def list_categories(self, calendar_id: str):
+        categories = self.repository.list_categories(calendar_id)
+        if not categories:
+            categories = self.repository.seed_preset_categories(calendar_id)
+        return categories
+
+    def create_category(self, calendar_id: str, payload: CategoryCreate):
+        return self.repository.create_category(calendar_id, payload)

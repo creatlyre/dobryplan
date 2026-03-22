@@ -9,7 +9,7 @@ from app.database.database import get_db
 from app.events.nlp import NLPService, ParseResult
 from app.events.ocr import OCRService
 from app.events.repository import EventRepository
-from app.events.schemas import EventCreate, EventResponse, EventUpdate
+from app.events.schemas import CategoryCreate, CategoryResponse, EventCreate, EventResponse, EventUpdate
 from app.events.service import EventService
 from app.i18n import resolve_locale, translate
 from app.sync.service import GoogleSyncService
@@ -150,6 +150,20 @@ async def parse_event_from_image(
         raw_text=result.raw_text,
         errors=result.errors,
     )
+
+
+@router.get("/categories", response_model=list[CategoryResponse])
+async def list_categories(user=Depends(get_current_user), db=Depends(get_db)):
+    service = _service(db)
+    categories = service.list_categories(user.calendar_id)
+    return categories
+
+
+@router.post("/categories", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)
+async def create_category(payload: CategoryCreate, user=Depends(get_current_user), db=Depends(get_db)):
+    service = _service(db)
+    category = service.create_category(user.calendar_id, payload)
+    return category
 
 
 @router.post("", response_model=EventResponse, status_code=status.HTTP_201_CREATED)

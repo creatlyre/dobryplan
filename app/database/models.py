@@ -44,6 +44,18 @@ class CalendarInvitation:
 
 
 @dataclass
+class EventCategory:
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    calendar_id: str = ""
+    name: str = ""
+    color: str = "#6366f1"
+    is_preset: bool = False
+    sort_order: int = 0
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+@dataclass
 class Event:
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     calendar_id: str = ""
@@ -61,6 +73,7 @@ class Event:
     last_edited_by_user_id: str | None = None
     is_deleted: bool = False
     visibility: str = "shared"
+    category_id: str | None = None
     reminder_minutes: int | None = None
     reminder_minutes_list: list[int] = field(default_factory=list)
 

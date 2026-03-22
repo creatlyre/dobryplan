@@ -355,5 +355,22 @@
   "budget.import_col_rate2": "Rate 2",
   "budget.import_col_rate3": "Rate 3",
   "budget.import_col_name": "Name",
-  "budget.import_col_amount": "Amount"
+  "budget.import_col_amount": "Amount",
+  "category.label": "Category",
+  "category.select": "Select category",
+  "category.none": "No category",
+  "category.work": "Work",
+  "category.personal": "Personal",
+  "category.health": "Health",
+  "category.errands": "Errands",
+  "category.social": "Social",
+  "category.custom": "Custom",
+  "category.create": "Create category",
+  "category.name": "Category name",
+  "category.color": "Color",
+  "category.save": "Save",
+  "category.cancel": "Cancel",
+  "category.filter": "Filter by category",
+  "category.filter_all": "All categories",
+  "category.filter_clear": "Clear filter"
 }

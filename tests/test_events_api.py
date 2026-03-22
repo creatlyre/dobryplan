@@ -522,3 +522,86 @@ def test_reminder_list_rejects_over_max_value(authenticated_client):
 
     response = authenticated_client.post("/api/events", json=payload)
     assert response.status_code == 422
+
+
+# ── Category tests ────────────────────────────────────────────────────────────
+
+
+def test_list_categories_returns_presets(authenticated_client):
+    """GET /api/events/categories returns 5 preset categories (lazy-seeded)."""
+    response = authenticated_client.get("/api/events/categories")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 5
+    names = [c["name"] for c in data]
+    assert "Work" in names
+    assert "Personal" in names
+    assert "Health" in names
+    assert "Errands" in names
+    assert "Social" in names
+    # All presets
+    assert all(c["is_preset"] for c in data)
+    # Sorted by sort_order
+    assert data[0]["name"] == "Work"
+    assert data[4]["name"] == "Social"
+
+
+def test_create_custom_category(authenticated_client):
+    """POST /api/events/categories with valid data creates custom category."""
+    response = authenticated_client.post(
+        "/api/events/categories",
+        json={"name": "School", "color": "#8b5cf6"},
+    )
+    assert response.status_code == 201
+    data = response.json()
+    assert data["name"] == "School"
+    assert data["color"] == "#8b5cf6"
+    assert data["is_preset"] is False
+
+
+def test_create_category_invalid_color(authenticated_client):
+    """POST /api/events/categories with invalid color format returns 422."""
+    response = authenticated_client.post(
+        "/api/events/categories",
+        json={"name": "Bad Color", "color": "red"},
+    )
+    assert response.status_code == 422
+
+
+def test_create_event_with_category(authenticated_client):
+    """POST /api/events with category_id stores and returns category_id."""
+    # First, get categories to get a valid ID
+    cat_resp = authenticated_client.get("/api/events/categories")
+    category_id = cat_resp.json()[0]["id"]
+
+    now = datetime.utcnow().replace(microsecond=0)
+    payload = _payload("Categorized", now + timedelta(hours=1), now + timedelta(hours=2))
+    payload["category_id"] = category_id
+
+    response = authenticated_client.post("/api/events", json=payload)
+    assert response.status_code == 201
+    assert response.json()["category_id"] == category_id
+
+
+def test_update_event_category(authenticated_client):
+    """PATCH/PUT event with new category_id updates it."""
+    # Get categories
+    cat_resp = authenticated_client.get("/api/events/categories")
+    cats = cat_resp.json()
+    cat_a = cats[0]["id"]
+    cat_b = cats[1]["id"]
+
+    # Create event with category A
+    now = datetime.utcnow().replace(microsecond=0)
+    payload = _payload("Cat switch", now + timedelta(hours=1), now + timedelta(hours=2))
+    payload["category_id"] = cat_a
+    create = authenticated_client.post("/api/events", json=payload)
+    event_id = create.json()["id"]
+
+    # Update to category B
+    update = authenticated_client.put(
+        f"/api/events/{event_id}",
+        json={"category_id": cat_b},
+    )
+    assert update.status_code == 200
+    assert update.json()["category_id"] == cat_b
