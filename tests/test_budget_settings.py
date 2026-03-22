@@ -7,7 +7,6 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.auth.dependencies import get_current_user
-from app.database.database import get_db
 from app.database.models import Calendar, User
 from config import Settings
 from main import app
