@@ -36,6 +36,10 @@
 ### v3.0 Dashboard, Notifications & Categories (Phases 23-27)
 
 - [ ] **Phase 23: Event Categories & Colors** — Preset + custom categories with curated colors, color-coded calendar grid, category filtering
+  **Plans:** 2 plans
+  Plans:
+  - [ ] 23-01-PLAN.md — Backend foundation: DB migration, models, category CRUD API, event category_id integration
+  - [ ] 23-02-PLAN.md — Frontend: category selector in forms, color-coded grid/day view, category filter bar
 - [ ] **Phase 24: Expense Categories & Charts** — Expense categorization, category selector in forms, pie/bar chart spending breakdown
 - [ ] **Phase 25: Shopping List** — Shared household shopping list with add/delete/check-off, multi-item paste
 - [ ] **Phase 26: Notifications** — In-app notification feed with bell badge, partner change alerts, email toggle, event reminders
@@ -53,7 +57,7 @@
   3. Calendar month grid shows color-coded indicators (dot or border) for each event's category
   4. User can filter calendar view to show only events from selected categories
   5. Category selector appears in both event create and edit modal forms
-**Plans**: TBD
+**Plans**: 2 plans (23-01, 23-02)
 
 ### Phase 24: Expense Categories & Charts
 **Goal**: Users can categorize expenses and see spending breakdowns by category
@@ -116,7 +120,7 @@
 | 20. Multi-Year Budget | v2.1 | 2/2 | Complete | 2026-03-21 |
 | 21. Year-over-Year Comparison | v2.1 | 1/1 | Complete | 2026-03-21 |
 | 22. Historical Year Import | v2.1 | 1/1 | Complete | 2026-03-21 |
-| 23. Event Categories & Colors | v3.0 | 0/? | Not started | - |
+| 23. Event Categories & Colors | v3.0 | 0/2 | Planned | - |
 | 24. Expense Categories & Charts | v3.0 | 0/? | Not started | - |
 | 25. Shopping List | v3.0 | 0/? | Not started | - |
 | 26. Notifications | v3.0 | 0/? | Not started | - |
