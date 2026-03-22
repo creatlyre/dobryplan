@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.1
-milestone_name: Privacy, Reminders & Multi-Year Budget
-status: archived
-stopped_at: Milestone archived
-last_updated: "2026-03-22T21:30:00.000Z"
+milestone: v3.0
+milestone_name: Dashboard, Notifications & Categories
+status: defining-requirements
+stopped_at: Defining requirements
+last_updated: "2026-03-22T22:00:00.000Z"
 last_activity: 2026-03-22
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 7
-  completed_plans: 7
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Session State
@@ -20,13 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** A shared calendar both partners can edit that stays in sync with Google Calendar.
-**Current focus:** Planning next milestone
+**Current focus:** v3.0 — Dashboard, Notifications & Categories
 
 ## Position
 
-**Milestone:** v2.1 Privacy, Reminders & Multi-Year Budget — ARCHIVED 2026-03-22
-Status: Milestone Archived (15/15 requirements, 270 tests passing)
-Last activity: 2026-03-22
+**Milestone:** v3.0 Dashboard, Notifications & Categories
+Status: Defining requirements
+Last activity: 2026-03-22 — Milestone v3.0 started
 
 [██████████░░░░░░░░░░] 2/4 phases
 

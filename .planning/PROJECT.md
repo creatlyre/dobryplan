@@ -59,7 +59,16 @@ A shared calendar both partners can edit that stays in sync with Google Calendar
 
 ### Active
 
-(None — planning next milestone)
+**Current Milestone: v3.0 — Dashboard, Notifications & Categories**
+
+**Goal:** Add a unified dashboard home page, partner notifications (in-app + email), event categories with color coding, expense categories with budget limits and charts, and a shared shopping list.
+
+**Target features:**
+- Dashboard home page — today's events, next 7 days preview, current month budget snapshot, quick-add
+- Notifications — in-app activity feed + optional email alerts for partner event changes
+- Event categories & colors — preset categories (Work, Personal, Health, Errands, Social) + custom, color-coded on calendar grid
+- Expense categories — tag expenses, filter/group, pie/bar chart breakdown, per-category budget limits with alerts
+- Shared shopping list — add/delete items, accepts string input to parse, both users share the list
 
 ### Out of Scope additions from v2.0/v3.0
 
@@ -117,4 +126,4 @@ A shared calendar both partners can edit that stays in sync with Google Calendar
 | TSV paste for historical import | Simple, no file upload needed | ✓ Shipped v2.1 |
 
 ---
-*Last updated: 2026-03-22 after v2.1 milestone archived*
+*Last updated: 2026-03-22 after v3.0 milestone started*
