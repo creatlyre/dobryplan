@@ -296,6 +296,37 @@
     });
   }
 
+  // Keyword → category name mapping (EN + PL) for smart auto-detection
+  const categoryKeywords = {
+    'Groceries': ['grocery','groceries','food','milk','bread','meat','fruit','vegetables','supermarket','lidl','biedronka','żabka','zabka','auchan','carrefour','zakupy','spożywcze','spozywcze','jedzenie','mleko','chleb','mięso','mieso','owoce','warzywa'],
+    'Rent': ['rent','czynsz','lease','najm','najem','wynajem','mieszkanie','apartment','flat'],
+    'Utilities': ['electric','electricity','gas','water','heating','internet','phone','wifi','mobile','energia','prąd','prad','gaz','woda','ogrzewanie','telefon','media','rachunki','rachunek'],
+    'Transport': ['transport','fuel','petrol','diesel','gas station','uber','taxi','bus','train','tram','metro','parking','toll','benzyna','paliwo','bilet','komunikacja','mpk','bolt','pkl'],
+    'Entertainment': ['netflix','spotify','hbo','disney','cinema','movie','game','gaming','concert','theatre','theater','kino','film','gra','gry','koncert','teatr','youtube','steam','playstation','xbox','subscription','subskrypcja','rozrywka'],
+    'Health': ['doctor','pharmacy','medicine','dentist','hospital','medical','health','gym','fitness','lekarz','apteka','leki','dentysta','szpital','zdrowie','siłownia','silownia','badania','rehabilitacja','okulista'],
+    'Education': ['course','book','school','university','tuition','training','learn','workshop','kurs','książka','ksiazka','szkoła','szkola','uniwersytet','nauka','szkolenie','studia','uczelnia','korepetycje'],
+    'Other': []
+  };
+
+  function detectCategory(name) {
+    if (!name || !categories.length) return '';
+    var lower = name.toLowerCase();
+    var words = lower.split(/\s+/);
+    for (var catName in categoryKeywords) {
+      var keywords = categoryKeywords[catName];
+      for (var i = 0; i < keywords.length; i++) {
+        for (var w = 0; w < words.length; w++) {
+          if (words[w].indexOf(keywords[i]) !== -1 || keywords[i].indexOf(words[w]) !== -1 && words[w].length >= 3) {
+            // Find the category by name
+            var match = categories.find(function(c) { return c.name === catName; });
+            if (match) return match.id;
+          }
+        }
+      }
+    }
+    return '';
+  }
+
   async function loadExpenses() {
     const res = await fetch('/api/budget/expenses?year=' + currentYear);
     const json = await res.json();
@@ -501,6 +532,7 @@
         document.getElementById('rec-name').value = '';
         document.getElementById('rec-amount').value = '';
         document.getElementById('rec-category').value = '';
+        recCatManual = false;
       } else {
         onetimeData.push(json.data);
         renderOnetime();
@@ -508,6 +540,7 @@
         document.getElementById('ot-name').value = '';
         document.getElementById('ot-amount').value = '';
         document.getElementById('ot-category').value = '';
+        otCatManual = false;
       }
       showToast(labels.added);
     }
@@ -716,6 +749,25 @@
   // Event listeners
   document.getElementById('rec-add-btn').addEventListener('click', () => addExpense(true));
   document.getElementById('ot-add-btn').addEventListener('click', () => addExpense(false));
+
+  // Smart category auto-detection on name input
+  var recCatManual = false, otCatManual = false;
+  document.getElementById('rec-name').addEventListener('input', function() {
+    if (recCatManual) return;
+    var sel = document.getElementById('rec-category');
+    var detected = detectCategory(this.value);
+    sel.value = detected;
+  });
+  document.getElementById('ot-name').addEventListener('input', function() {
+    if (otCatManual) return;
+    var sel = document.getElementById('ot-category');
+    var detected = detectCategory(this.value);
+    sel.value = detected;
+  });
+  // If user manually picks a category, stop auto-detecting for that form
+  document.getElementById('rec-category').addEventListener('change', function() { recCatManual = true; });
+  document.getElementById('ot-category').addEventListener('change', function() { otCatManual = true; });
+
   document.getElementById('rec-bulk-btn').addEventListener('click', () => openBulkModal('recurring'));
   document.getElementById('ot-bulk-btn').addEventListener('click', () => openBulkModal('onetime'));
   document.getElementById('rec-delete-all-btn').addEventListener('click', () => deleteAll('recurring'));
