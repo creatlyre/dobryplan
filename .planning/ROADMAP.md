@@ -40,13 +40,13 @@
   Plans:
   - [x] 32-01-PLAN.md — PWA manifest, icons, service worker, offline shell, install prompt
   - [x] 32-02-PLAN.md — TWA config, Android build docs, native app deferral
-- [ ] Phase 33: Go-to-Market, Pricing, and Launch Funnel (3 plans)
+- [x] Phase 33: Go-to-Market, Pricing, and Launch Funnel (3 plans) — completed 2026-03-23
   **Goal:** Pricing page with SaaS tiers and self-hosted purchase, landing page, legal pages, Docker CI/CD to GHCR, and launch checklist
   **Requirements:** [GTM-01, GTM-02, GTM-03, GTM-04, GTM-05]
   Plans:
-  - [ ] 33-01-PLAN.md — Pricing page, annual billing, self-hosted checkout flow
-  - [ ] 33-02-PLAN.md — Landing page, legal pages (terms, privacy, refund), footer links
-  - [ ] 33-03-PLAN.md — Docker CI/CD to GHCR, docker-compose update, LAUNCH.md
+  - [x] 33-01-PLAN.md — Pricing page, annual billing, self-hosted checkout flow
+  - [x] 33-02-PLAN.md — Landing page, legal pages (terms, privacy, refund), footer links
+  - [x] 33-03-PLAN.md — Docker CI/CD to GHCR, docker-compose update, LAUNCH.md
 
 </details>
 
@@ -109,7 +109,7 @@
 | 30. SaaS Production Platform and Operations | v4.0 | 2/2 | Complete | 2026-03-23 |
 | 31. Paid Self-Hosted Distribution | v4.0 | Complete    | 2026-03-23 | - |
 | 32. Mobile Distribution Path (PWA + Android Wrapper) | v4.0 | Complete    | 2026-03-23 | - |
-| 33. Go-to-Market, Pricing, and Launch Funnel | v4.0 | 0/3 | Planned | - |
+| 33. Go-to-Market, Pricing, and Launch Funnel | 2/3 | In Progress|  | - |
 
 ---
 

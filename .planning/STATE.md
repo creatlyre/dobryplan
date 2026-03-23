@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
+status: executing
 stopped_at: Phase 30 context gathered
-last_updated: "2026-03-23T19:12:30.983Z"
+last_updated: "2026-03-23T19:25:02.970Z"
 last_activity: 2026-03-23
 progress:
   total_phases: 14
   completed_phases: 10
-  total_plans: 21
+  total_plans: 24
   completed_plans: 21
 ---
 
@@ -20,15 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** A shared calendar both partners can edit that stays in sync with Google Calendar.
-**Current focus:** Phase 31 — self-hosted
+**Current focus:** Phase 33 complete — v4.0 milestone wrapping up
 
 ## Position
 
 **Milestone:** v4.0 Monetization Foundation
-**Status:** Ready to plan
+**Status:** Phase 33 complete — all execution phases done (28 plans pending)
 Last activity: 2026-03-23
 
-[██████░░░░░░░░░░░░░░] 3/6 phases — 6 plans completed
+[██████████████████░░] 5/6 phases — 12 plans completed
 
 ## Accumulated Context
 
@@ -45,9 +45,9 @@ Previous milestone archived. See `.planning/milestones/v3.0-ROADMAP.md` for full
 
 ## Session Continuity
 
-Last session: 2026-03-23T17:06:45.461Z
-Stopped at: Phase 30 context gathered
-Next action: `/gsd-plan-phase 31` for Paid Self-Hosted Distribution
+Last session: 2026-03-23
+Stopped at: Phase 33 complete
+Next action: Phase 28 (Licensing) still unchecked — verify and close, or archive v4.0 milestone
 
 ## Session Log
 
@@ -58,3 +58,6 @@ Next action: `/gsd-plan-phase 31` for Paid Self-Hosted Distribution
 - 2026-03-23: Phase 28 executed — licensing, commercial terms, NOTICE
 - 2026-03-23: Phase 29 executed — Stripe billing, entitlements, billing settings UI (2 plans, 4 tasks)
 - 2026-03-23: Phase 30 executed — Dockerfile, Railway, security headers, CORS, rate limiting, logging, Sentry, health checks (2 plans, 4 tasks)
+- 2026-03-23: Phase 31 executed — License key system, Docker Compose, setup guide, upgrade docs
+- 2026-03-23: Phase 32 executed — PWA manifest, service worker, offline shell, TWA config
+- 2026-03-23: Phase 33 executed — Pricing page, landing page, legal pages, Docker CI/CD, LAUNCH.md (3 plans, 6 tasks, 446 tests passing)
