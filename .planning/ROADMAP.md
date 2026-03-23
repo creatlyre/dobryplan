@@ -28,7 +28,12 @@
   Plans:
   - [x] 30-01-PLAN.md — Dockerfile, environment config, Railway deployment
   - [x] 30-02-PLAN.md — Security headers, CORS, rate limiting, logging, Sentry, health checks
-- [ ] Phase 31: Paid Self-Hosted Distribution
+- [ ] Phase 31: Paid Self-Hosted Distribution (2 plans)
+  **Goal:** Docker Compose package with license-key verification, setup guide, upgrade path, and changelog for paid self-hosted buyers
+  **Requirements:** [SHS-01, SHS-02, SHS-03, SHS-04]
+  Plans:
+  - [ ] 31-01-PLAN.md — License key system, Docker Compose package
+  - [ ] 31-02-PLAN.md — Setup guide, upgrade docs, changelog, license tests
 - [ ] Phase 32: Mobile Distribution Path (PWA + Android Wrapper)
 - [ ] Phase 33: Go-to-Market, Pricing, and Launch Funnel
 
@@ -91,7 +96,7 @@
 | 28. Licensing and Commercial Terms Foundation | 2/2 | Complete    | 2026-03-23 | - |
 | 29. Billing, Plans, and Entitlements Core | v4.0 | 0/2 | Planned | - |
 | 30. SaaS Production Platform and Operations | v4.0 | 2/2 | Complete | 2026-03-23 |
-| 31. Paid Self-Hosted Distribution | v4.0 | 0/0 | Planned | - |
+| 31. Paid Self-Hosted Distribution | v4.0 | 0/2 | Planned | - |
 | 32. Mobile Distribution Path (PWA + Android Wrapper) | v4.0 | 0/0 | Planned | - |
 | 33. Go-to-Market, Pricing, and Launch Funnel | v4.0 | 0/0 | Planned | - |
 
