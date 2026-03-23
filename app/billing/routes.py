@@ -28,8 +28,13 @@ async def create_checkout(
     service: BillingService = Depends(_get_billing_service),
 ):
     base_url = str(request.base_url).rstrip("/")
-    success_url = f"{base_url}/billing/settings?session_id={{CHECKOUT_SESSION_ID}}"
-    cancel_url = f"{base_url}/billing/settings"
+
+    if body.plan == "self_hosted":
+        success_url = f"{base_url}/pricing?purchased=true"
+        cancel_url = f"{base_url}/pricing"
+    else:
+        success_url = f"{base_url}/billing/settings?session_id={{CHECKOUT_SESSION_ID}}"
+        cancel_url = f"{base_url}/billing/settings"
 
     try:
         checkout_url = service.create_checkout_session(
@@ -38,6 +43,7 @@ async def create_checkout(
             plan=body.plan,
             success_url=success_url,
             cancel_url=cancel_url,
+            billing_period=body.billing_period,
         )
         return JSONResponse({"url": checkout_url})
     except ValueError as e:

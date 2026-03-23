@@ -6,11 +6,12 @@ from typing import Literal, Optional
 from pydantic import BaseModel, field_validator
 
 
-VALID_PLANS = ("pro", "family_plus")
+VALID_PLANS = ("pro", "family_plus", "self_hosted")
 
 
 class CheckoutRequest(BaseModel):
     plan: str
+    billing_period: Literal["monthly", "annual"] = "monthly"
 
     @field_validator("plan")
     @classmethod

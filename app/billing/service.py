@@ -15,9 +15,20 @@ settings = Settings()
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 PLAN_PRICE_MAP = {
-    "pro": settings.STRIPE_PRO_PRICE_ID,
-    "family_plus": settings.STRIPE_FAMILY_PLUS_PRICE_ID,
+    ("pro", "monthly"): settings.STRIPE_PRO_PRICE_ID,
+    ("pro", "annual"): settings.STRIPE_PRO_ANNUAL_PRICE_ID,
+    ("family_plus", "monthly"): settings.STRIPE_FAMILY_PLUS_PRICE_ID,
+    ("family_plus", "annual"): settings.STRIPE_FAMILY_PLUS_ANNUAL_PRICE_ID,
+    "self_hosted": settings.STRIPE_SELF_HOSTED_PRICE_ID,
 }
+
+
+def _resolve_plan_from_price_id(price_id: str) -> str | None:
+    """Reverse-lookup plan name from a Stripe price ID."""
+    for key, pid in PLAN_PRICE_MAP.items():
+        if pid == price_id:
+            return key[0] if isinstance(key, tuple) else key
+    return None
 
 
 class BillingService:
@@ -31,10 +42,14 @@ class BillingService:
         plan: str,
         success_url: str,
         cancel_url: str,
+        billing_period: str = "monthly",
     ) -> str:
-        price_id = PLAN_PRICE_MAP.get(plan)
+        if plan == "self_hosted":
+            price_id = PLAN_PRICE_MAP.get("self_hosted")
+        else:
+            price_id = PLAN_PRICE_MAP.get((plan, billing_period))
         if not price_id:
-            raise ValueError(f"No Stripe price configured for plan: {plan}")
+            raise ValueError(f"No Stripe price configured for plan: {plan} ({billing_period})")
 
         # Get or create Stripe customer
         sub = self.repo.get_subscription(user_id)
@@ -50,8 +65,9 @@ class BillingService:
                 status="active",
             )
 
+        mode = "payment" if plan == "self_hosted" else "subscription"
         session = stripe.checkout.Session.create(
-            mode="subscription",
+            mode=mode,
             customer=stripe_customer_id,
             line_items=[{"price": price_id, "quantity": 1}],
             success_url=success_url,
@@ -105,9 +121,21 @@ class BillingService:
         plan = metadata.get("plan", "pro")
         customer_id = session.get("customer")
         subscription_id = session.get("subscription")
+        mode = session.get("mode")
 
         if not user_id:
             logger.warning("checkout.session.completed without user_id in metadata")
+            return
+
+        if mode == "payment" and plan == "self_hosted":
+            # One-time self-hosted purchase — log event, no subscription record
+            self.repo.log_billing_event(
+                user_id=user_id,
+                event_type="self_hosted_purchase",
+                plan="self_hosted",
+                stripe_event_id=event.get("id"),
+                metadata={"session_id": session.get("id"), "mode": "payment"},
+            )
             return
 
         self.repo.upsert_subscription(
@@ -137,10 +165,7 @@ class BillingService:
         new_plan = None
         if items:
             price_id = items[0].get("price", {}).get("id")
-            for plan_key, pid in PLAN_PRICE_MAP.items():
-                if pid == price_id:
-                    new_plan = plan_key
-                    break
+            new_plan = _resolve_plan_from_price_id(price_id)
 
         existing = self.repo.get_subscription(user_id)
         old_plan = existing.plan if existing else "free"

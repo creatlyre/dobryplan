@@ -48,7 +48,10 @@ class Settings(BaseSettings):
     STRIPE_WEBHOOK_SECRET: str = ""
     STRIPE_PUBLISHABLE_KEY: str = ""
     STRIPE_PRO_PRICE_ID: str = ""
+    STRIPE_PRO_ANNUAL_PRICE_ID: str = ""
     STRIPE_FAMILY_PLUS_PRICE_ID: str = ""
+    STRIPE_FAMILY_PLUS_ANNUAL_PRICE_ID: str = ""
+    STRIPE_SELF_HOSTED_PRICE_ID: str = ""
 
     ENVIRONMENT: str = "development"
     ALLOWED_ORIGINS: str = ""
