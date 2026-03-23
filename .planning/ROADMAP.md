@@ -52,12 +52,12 @@
   Plans:
   - [x] 25-01-PLAN.md — Backend: DB migration, models, keyword JSON, repository, service with auto-categorization, API routes
   - [x] 25-02-PLAN.md — Frontend: shopping view, template with section-grouped display, nav links, i18n, tests
-- [ ] **Phase 26: Notifications** — In-app notification feed with bell badge, partner change alerts, email toggle, event reminders
+- [x] **Phase 26: Notifications** — In-app notification feed with bell badge, partner change alerts, email toggle, event reminders
   **Plans:** 3 plans
   Plans:
-  - [ ] 26-01-PLAN.md — Backend foundation: DB migration, models, notification repository, service, API routes
-  - [ ] 26-02-PLAN.md — Service hooks in event/expense/income, SMTP email alerts, reminder notification check, i18n
-  - [ ] 26-03-PLAN.md — Frontend: bell icon with unread badge, notification dropdown, mark-read/dismiss actions, email toggle
+  - [x] 26-01-PLAN.md — Backend foundation: DB migration, models, notification repository, service, API routes
+  - [x] 26-02-PLAN.md — Service hooks in event/expense/income, SMTP email alerts, reminder notification check, i18n
+  - [x] 26-03-PLAN.md — Frontend: bell icon with unread badge, notification dropdown, mark-read/dismiss actions, email toggle
 - [ ] **Phase 27: Dashboard** — Home page with today's events, 7-day preview, budget snapshot, quick-add buttons
 
 ## Phase Details
@@ -142,7 +142,7 @@
 | 23. Event Categories & Colors | 2/2 | Complete   | 2026-03-22 | - |
 | 24. Expense Categories & Charts | 2/2 | Complete    | 2026-03-23 | - |
 | 25. Shopping List | v3.0 | 2/2 | Complete | 2026-03-23 |
-| 26. Notifications | v3.0 | 0/? | Not started | - |
+| 26. Notifications | v3.0 | 3/3 | Complete | 2026-03-23 |
 | 27. Dashboard | v3.0 | 0/2 | Planned | - |
 
 ---
