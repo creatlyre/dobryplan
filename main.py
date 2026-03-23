@@ -23,6 +23,7 @@ from app.auth.dependencies import get_current_user
 from app.auth.routes import router as auth_router
 from app.events.routes import router as events_router
 from app.i18n import inject_template_i18n, set_locale_cookie_if_param
+from app.licensing.middleware import LicenseCheckMiddleware
 from app.middleware.auth_middleware import SessionValidationMiddleware
 from app.middleware.security import SecurityHeadersMiddleware
 from app.budget.routes import router as budget_router
@@ -115,6 +116,12 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # --- Middleware (outermost first) ---
 
+app.add_middleware(
+    LicenseCheckMiddleware,
+    environment=_settings.ENVIRONMENT,
+    license_key=_settings.SYNCO_LICENSE_KEY,
+    license_secret=_settings.SYNCO_LICENSE_SECRET,
+)
 app.add_middleware(SecurityHeadersMiddleware, environment=_settings.ENVIRONMENT)
 
 if _settings.ALLOWED_ORIGINS:

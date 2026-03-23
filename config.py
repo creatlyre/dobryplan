@@ -52,6 +52,8 @@ class Settings(BaseSettings):
 
     ENVIRONMENT: str = "development"
     ALLOWED_ORIGINS: str = ""
+    SYNCO_LICENSE_KEY: str = ""
+    SYNCO_LICENSE_SECRET: str = ""
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "text"
     WEB_CONCURRENCY: int = 3
