@@ -73,6 +73,18 @@ class NLPService:
         },
     }
 
+    # Pre-compiled regex patterns for time keywords to avoid redundant compilation
+    COMPILED_TIME_DEFAULTS = {
+        "en": {re.compile(k): v for k, v in TIME_DEFAULTS["en"].items()},
+        "pl": {
+            re.compile(k): v
+            for k, v in {
+                **TIME_DEFAULTS["en"],
+                **TIME_DEFAULTS["pl"],
+            }.items()
+        },
+    }
+
     # Relative date keywords: word -> day offset from context_date
     RELATIVE_KEYWORDS = {
         "en": {"tomorrow": 1, "today": 0, "yesterday": -1},
@@ -578,9 +590,11 @@ class NLPService:
         if locale == "pl" and re.search(r"\bo\s+\d{1,2}\b", text.lower()):
             return True
         text_lower = text.lower()
-        merged_time = {**self.TIME_DEFAULTS.get("en", {}), **self.TIME_DEFAULTS.get(locale, {})}
-        for pattern in merged_time:
-            if re.search(pattern, text_lower):
+        compiled_patterns = self.COMPILED_TIME_DEFAULTS.get(
+            locale, self.COMPILED_TIME_DEFAULTS["en"]
+        )
+        for pattern in compiled_patterns:
+            if pattern.search(text_lower):
                 return True
         return False
 
@@ -621,9 +635,11 @@ class NLPService:
 
         # Semantic time keywords (locale-keyed, merged with English fallback)
         text_lower = text.lower()
-        merged_time = {**self.TIME_DEFAULTS.get("en", {}), **self.TIME_DEFAULTS.get(locale, {})}
-        for pattern, (keyword_hour, keyword_minute) in merged_time.items():
-            if re.search(pattern, text_lower):
+        compiled_patterns = self.COMPILED_TIME_DEFAULTS.get(
+            locale, self.COMPILED_TIME_DEFAULTS["en"]
+        )
+        for pattern, (keyword_hour, keyword_minute) in compiled_patterns.items():
+            if pattern.search(text_lower):
                 return keyword_hour, keyword_minute
 
         return hour, minute
