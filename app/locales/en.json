@@ -2,6 +2,7 @@
   "app.name": "Synco",
   "app.calendar_title": "Calendar - Synco",
   "app.invite_title": "Invite Member - Synco",
+  "app.calendar_short": "Calendar",
   "nav.logout": "Logout",
   "calendar.title": "Calendar",
   "calendar.loading_calendar": "Loading calendar...",

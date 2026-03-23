@@ -46,29 +46,34 @@
     <!-- 7-Day Preview Card -->
     <div class="glass rounded-2xl p-6">
       <h2 class="text-lg font-semibold mb-4">{{ t('dashboard.week_preview') }}</h2>
-      <div class="space-y-2">
+      <div class="space-y-1">
         {% for day in week_preview %}
-          <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
-            <div class="w-16 flex-shrink-0">
-              <span class="text-xs uppercase opacity-60">{{ day.day_name }}</span>
-              <span class="ml-1 text-sm font-semibold">{{ day.date.day }}</span>
-            </div>
-            <div class="flex-1 flex flex-wrap gap-1.5">
-              {% if day.events %}
-                {% for event in day.events %}
-                  {% if event.category_id and event.category_id in category_map %}
-                    <span class="inline-block text-xs px-2 py-0.5 rounded-full text-white truncate max-w-[140px]" style="background-color: {{ category_map[event.category_id].color }}">{{ event.title }}</span>
-                  {% else %}
-                    <span class="inline-block text-xs px-2 py-0.5 rounded-full bg-white/20 text-white truncate max-w-[140px]">{{ event.title }}</span>
-                  {% endif %}
-                {% endfor %}
-                {% if day.overflow > 0 %}
-                  <span class="inline-block text-xs px-2 py-0.5 rounded-full bg-white/10 opacity-60">+{{ day.overflow }}</span>
-                {% endif %}
-              {% else %}
+          <div class="rounded-lg hover:bg-white/5 transition-colors p-2">
+            <div class="flex items-center gap-3 mb-1">
+              <span class="text-xs uppercase opacity-60 w-8">{{ day.day_name }}</span>
+              <span class="text-sm font-semibold w-6">{{ day.date.day }}</span>
+              {% if not day.events %}
                 <span class="text-xs opacity-30">{{ t('dashboard.no_events') }}</span>
               {% endif %}
             </div>
+            {% if day.events %}
+              <div class="ml-[56px] space-y-1">
+                {% for event in day.events %}
+                  <div class="flex items-center gap-2 text-xs">
+                    {% if event.category_id and event.category_id in category_map %}
+                      <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: {{ category_map[event.category_id].color }}"></span>
+                    {% else %}
+                      <span class="w-2 h-2 rounded-full flex-shrink-0 bg-white/30"></span>
+                    {% endif %}
+                    <span class="opacity-50 flex-shrink-0 font-mono">{{ event.start_at.strftime('%H:%M') }}</span>
+                    <span class="truncate">{{ event.title }}</span>
+                  </div>
+                {% endfor %}
+                {% if day.overflow > 0 %}
+                  <span class="text-xs opacity-40 ml-4">+{{ day.overflow }} {{ t('dashboard.more_events') }}</span>
+                {% endif %}
+              </div>
+            {% endif %}
           </div>
         {% endfor %}
       </div>
