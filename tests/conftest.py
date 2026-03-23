@@ -36,6 +36,11 @@ class InMemoryStore:
             "shopping_sections": [],
             "shopping_items": [],
             "shopping_keyword_overrides": [],
+            "subscriptions": [],
+            "billing_events": [],
+            "expense_categories": [],
+            "notification_preferences": [],
+            "notifications": [],
         }
 
     @staticmethod
@@ -186,6 +191,10 @@ class InMemoryStore:
             table = "additional_earnings"
         elif item.__class__.__name__ == "CarryForwardOverride":
             table = "carry_forward_overrides"
+        elif item.__class__.__name__ == "Subscription":
+            table = "subscriptions"
+        elif item.__class__.__name__ == "BillingEvent":
+            table = "billing_events"
         else:
             raise ValueError(f"Unsupported model for add(): {item.__class__.__name__}")
 
