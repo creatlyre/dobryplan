@@ -28,18 +28,18 @@
   Plans:
   - [x] 30-01-PLAN.md — Dockerfile, environment config, Railway deployment
   - [x] 30-02-PLAN.md — Security headers, CORS, rate limiting, logging, Sentry, health checks
-- [ ] Phase 31: Paid Self-Hosted Distribution (2 plans)
+- [x] Phase 31: Paid Self-Hosted Distribution (2 plans) — completed 2026-03-23
   **Goal:** Docker Compose package with license-key verification, setup guide, upgrade path, and changelog for paid self-hosted buyers
   **Requirements:** [SHS-01, SHS-02, SHS-03, SHS-04]
   Plans:
-  - [ ] 31-01-PLAN.md — License key system, Docker Compose package
-  - [ ] 31-02-PLAN.md — Setup guide, upgrade docs, changelog, license tests
-- [ ] Phase 32: Mobile Distribution Path (PWA + Android Wrapper) (2 plans)
-  **Goal:** Installable PWA with manifest, icons, service worker offline shell, install prompt, and Bubblewrap-generated TWA for Android distribution
+  - [x] 31-01-PLAN.md — License key system, Docker Compose package
+  - [x] 31-02-PLAN.md — Setup guide, upgrade docs, changelog, license tests
+- [x] Phase 32: Mobile Distribution Path (PWA + Android Wrapper) (2 plans) — completed 2026-03-23
+  **Goal:** PWA foundation (manifest, service worker, offline shell, install prompt) and Android TWA distribution path
   **Requirements:** [MOB-01, MOB-02, MOB-03]
   Plans:
-  - [ ] 32-01-PLAN.md — PWA manifest, icons, service worker, install prompt
-  - [ ] 32-02-PLAN.md — TWA Android wrapper, build docs, native deferral
+  - [x] 32-01-PLAN.md — PWA manifest, icons, service worker, offline shell, install prompt
+  - [x] 32-02-PLAN.md — TWA config, Android build docs, native app deferral
 - [ ] Phase 33: Go-to-Market, Pricing, and Launch Funnel
 
 </details>
@@ -102,7 +102,7 @@
 | 29. Billing, Plans, and Entitlements Core | v4.0 | 0/2 | Planned | - |
 | 30. SaaS Production Platform and Operations | v4.0 | 2/2 | Complete | 2026-03-23 |
 | 31. Paid Self-Hosted Distribution | v4.0 | Complete    | 2026-03-23 | - |
-| 32. Mobile Distribution Path (PWA + Android Wrapper) | v4.0 | 0/0 | Planned | - |
+| 32. Mobile Distribution Path (PWA + Android Wrapper) | v4.0 | Complete    | 2026-03-23 | - |
 | 33. Go-to-Market, Pricing, and Launch Funnel | v4.0 | 0/0 | Planned | - |
 
 ---

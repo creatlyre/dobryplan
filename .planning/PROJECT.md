@@ -10,7 +10,9 @@ A shared calendar both partners can edit that stays in sync with Google Calendar
 
 ## Current State
 
-- v4.0 monetization milestone in progress (Phases 28-31 complete as of 2026-03-23).
+- v4.0 monetization milestone in progress (Phases 28-32 complete as of 2026-03-23).
+- PWA foundation: web app manifest, service worker (offline shell), install prompt, app icons, root-level routes.
+- Android TWA distribution: Bubblewrap config, build docs (PWABuilder + CLI paths), Digital Asset Links guide.
 - Licensing foundation: AGPL-3.0 dual-license model with commercial terms (COMMERCIAL-LICENSE.md, MONETIZATION.md, NOTICE).
 - Self-hosted distribution: Docker Compose package with HMAC license key verification, setup guide, upgrade docs.
 - Dashboard home page: today's events, 7-day preview, budget snapshot, quick-add buttons.
