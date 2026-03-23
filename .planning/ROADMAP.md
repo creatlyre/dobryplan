@@ -80,7 +80,7 @@
 | 25. Shopping List | v3.0 | 2/2 | Complete | 2026-03-23 |
 | 26. Notifications | v3.0 | 3/3 | Complete | 2026-03-23 |
 | 27. Dashboard | v3.0 | 2/2 | Complete | 2026-03-23 |
-| 28. Licensing and Commercial Terms Foundation | 1/2 | In Progress|  | - |
+| 28. Licensing and Commercial Terms Foundation | 2/2 | Complete   | 2026-03-23 | - |
 | 29. Billing, Plans, and Entitlements Core | v4.0 | 0/0 | Planned | - |
 | 30. SaaS Production Platform and Operations | v4.0 | 0/0 | Planned | - |
 | 31. Paid Self-Hosted Distribution | v4.0 | 0/0 | Planned | - |
