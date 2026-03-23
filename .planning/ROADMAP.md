@@ -49,6 +49,11 @@
   - [ ] 24-02-PLAN.md — Frontend: category selector in forms, category display/filter in expense list, pie/bar charts on stats page
 - [ ] **Phase 25: Shopping List** — Shared household shopping list with add/delete/check-off, multi-item paste
 - [ ] **Phase 26: Notifications** — In-app notification feed with bell badge, partner change alerts, email toggle, event reminders
+  **Plans:** 3 plans
+  Plans:
+  - [ ] 26-01-PLAN.md — Backend foundation: DB migration, models, notification repository, service, API routes
+  - [ ] 26-02-PLAN.md — Service hooks in event/expense/income, SMTP email alerts, reminder notification check, i18n
+  - [ ] 26-03-PLAN.md — Frontend: bell icon with unread badge, notification dropdown, mark-read/dismiss actions, email toggle
 - [ ] **Phase 27: Dashboard** — Home page with today's events, 7-day preview, budget snapshot, quick-add buttons
 
 ## Phase Details
