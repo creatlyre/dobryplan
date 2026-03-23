@@ -108,29 +108,36 @@ class OverviewService:
             return True
         return False
 
-    def _compute_carry_forward(self, calendar_id: str, year: int, settings, auth_token: str | None = None) -> dict:
+    def _compute_carry_forward(self, calendar_id: str, year: int, settings, auth_token: str | None = None, prior_overview: dict | None = None, bounds: dict | None = None) -> dict:
         # Check for manual override first
         if self.carry_forward_repo:
             override = self.carry_forward_repo.get(calendar_id, year, auth_token=auth_token)
             if override:
                 return {"type": "override", "amount": round(override.amount, 2), "source_year": year - 1}
 
-        bounds = self.get_year_bounds(calendar_id)
+        if bounds is None:
+            bounds = self.get_year_bounds(calendar_id)
         global_initial = settings.initial_balance if settings else 0
 
         if year <= bounds["min_year"]:
             return {"type": "initial", "amount": round(global_initial, 2), "source_year": None}
 
         prior_year = year - 1
-        prior_has_data = self._year_has_data(calendar_id, prior_year)
+        if prior_overview is not None:
+            prior_has_data = prior_overview.get("has_data", False)
+        else:
+            prior_has_data = self._year_has_data(calendar_id, prior_year)
+
         if not prior_has_data:
             return {"type": "no_prior_data", "amount": 0, "source_year": prior_year}
 
-        prior_overview = self.get_year_overview(calendar_id, prior_year, auth_token=auth_token)
+        if prior_overview is None:
+            prior_overview = self.get_year_overview(calendar_id, prior_year, auth_token=auth_token, bounds=bounds)
+
         dec_balance = prior_overview["months"][11]["account_balance"]
         return {"type": "carry_forward", "amount": round(dec_balance, 2), "source_year": prior_year}
 
-    def get_year_overview(self, calendar_id: str, year: int, auth_token: str | None = None) -> dict:
+    def get_year_overview(self, calendar_id: str, year: int, auth_token: str | None = None, prior_overview: dict | None = None, bounds: dict | None = None) -> dict:
         settings = self.settings_repo.get_by_calendar(calendar_id)
         hours_list = self.hours_repo.get_by_calendar_year(calendar_id, year)
         earnings_list = self.earnings_repo.get_by_calendar_year(calendar_id, year)
@@ -142,7 +149,7 @@ class OverviewService:
         zus = settings.zus_costs if settings else 0
         acc = settings.accounting_costs if settings else 0
 
-        carry_forward = self._compute_carry_forward(calendar_id, year, settings, auth_token=auth_token)
+        carry_forward = self._compute_carry_forward(calendar_id, year, settings, auth_token=auth_token, prior_overview=prior_overview, bounds=bounds)
         effective_initial = carry_forward["amount"]
 
         hours_by_month = {h.month: h for h in hours_list}
@@ -196,16 +203,24 @@ class OverviewService:
                 "account_balance": round(running_balance, 2),
             })
 
+        has_data = bool(hours_list)
+        if not has_data:
+            has_data = any(e.month != 0 for e in earnings_list)
+        if not has_data:
+            has_data = any(e.month != 0 and not e.recurring for e in expenses_list)
+
         return {
             "year": year,
+            "has_data": has_data,
             "initial_balance": round(effective_initial, 2),
             "carry_forward": carry_forward,
             "months": months,
         }
 
     def get_year_comparison(self, calendar_id: str, year: int, auth_token: str | None = None) -> dict:
-        selected = self.get_year_overview(calendar_id, year, auth_token=auth_token)
-        previous = self.get_year_overview(calendar_id, year - 1, auth_token=auth_token)
+        bounds = self.get_year_bounds(calendar_id)
+        previous = self.get_year_overview(calendar_id, year - 1, auth_token=auth_token, bounds=bounds)
+        selected = self.get_year_overview(calendar_id, year, auth_token=auth_token, prior_overview=previous, bounds=bounds)
 
         def _sum_totals(data: dict) -> dict:
             months = data["months"]
