@@ -2,6 +2,57 @@
 
 *A living document updated after each milestone. Lessons feed forward into future planning.*
 
+## Milestone: v3.0 — Dashboard, Notifications & Categories
+
+**Shipped:** 2026-03-23
+**Phases:** 5 | **Plans:** 11
+
+### What Was Built
+- Event categories: preset + custom with curated palette, lazy-seeded on first GET, color-coded calendar grid indicators, category filter bar
+- Expense categories: preset + custom, CSS-only pie/bar charts on stats page, smart keyword auto-detection from JSON dictionary
+- Shared shopping list: Biedronka store-section auto-grouping (10 sections, 150+ keywords), multi-item paste, keyword learning, section picker UI
+- In-app notifications: bell icon with unread badge (HTMX 30s polling), partner activity alerts for events/expenses/income, SMTP email toggle, event reminder notifications
+- Dashboard home page: today's events, 7-day preview, budget snapshot (monthly balance, top categories), quick-add buttons, responsive 2-column grid
+- 61 new tests, 331 total passing
+
+### What Worked
+- Lazy-seeding pattern for categories (create on first GET) eliminated migration seeding complexity
+- CSS-only conic-gradient charts — zero chart library dependencies, visually effective
+- Notification hooks in routes (matching GoogleSync pattern) with try/except wrapping — never breaks CRUD operations
+- Category architecture from Phase 23 transferred cleanly to Phase 24 (expense categories)
+- Shopping keyword JSON approach — extensible without code changes
+- Dashboard as home page redirect (/ → /dashboard) improved landing experience
+
+### What Was Inefficient
+- No VERIFICATION.md for any v3.0 phase (5/5 missing) — documentation debt accumulated again
+- Missing SUMMARY frontmatter requirements-completed in phases 25 and 27
+- Milestone audit flagged `tech_debt` status — all functional but process documentation gaps persist
+- Bulk operations (bulk_create_expenses, bulk_delete_expenses, bulk_save_hours) skip notification hooks — accepted as design choice to avoid spam on import
+- Auth redirect handler missing /calendar and /shopping routes — LOW severity integration gap
+
+### Patterns Established
+- Lazy-seeded categories: preset items created on first API GET if none exist for user
+- CSS conic-gradient donut chart: pure CSS pie chart without any chart library
+- Keyword-based auto-categorization: JSON dictionary lookup for expense/shopping categorization
+- HTMX polling for notification badge: 30-second interval, dropdown loaded on click
+- Dashboard aggregation service: single service pulling from multiple subsystems (events, budget, expenses)
+- Section-grouped shopping display: items auto-organized by store section with emoji headers
+
+### Key Lessons
+1. Verification discipline is still the #1 process gap — 5 milestones in and still skipping VERIFICATION.md
+2. Lazy-seeding is superior to migration seeding for user-specific preset data — simpler and more flexible
+3. CSS-only charts are sufficient for household-scale data — no need for chart libraries
+4. Notification hooks should NEVER break the primary operation — try/except wrapping is mandatory
+5. Store-section auto-grouping from keywords works surprisingly well for grocery shopping optimization
+6. Dashboard aggregation pattern benefits from graceful degradation — missing budget data shows setup CTA instead of error
+
+### Cost Observations
+- 5 phases completed in 2 days (2026-03-22 → 2026-03-23)
+- 60 commits, 164 files changed, 9,992 insertions, 12,336 deletions
+- Notable: Large deletion count from CSS rebuild and template refactoring during v3.0
+
+---
+
 ## Milestone: v2.1 — Privacy, Reminders & Multi-Year Budget
 
 **Shipped:** 2026-03-22
@@ -146,6 +197,7 @@
 | v2.0 (12-15) | 4 | 10 | Budget feature module — clean execution, full test coverage |
 | v2.0 (16-17) | 2 | 4 | Small scope, but stale verification artifacts caused significant audit overhead |
 | v2.1 | 5 | 7 | UAT-driven verification for UI phases, bonus features added in-flight during UAT, dedicated stats dashboard |
+| v3.0 | 5 | 11 | Largest feature set — 5 new modules (categories, shopping, notifications, dashboard), verification still skipped |
 
 ### Cumulative Quality
 
@@ -156,6 +208,7 @@
 | v2.0 (12-15) | 214 | Budget settings, income, expenses, year overview |
 | v2.0 (16-17) | 230 | Month detail CRUD, CDN removal, pooling, cache headers |
 | v2.1 | 270 | Privacy, reminders, multi-year budget, YoY stats dashboard, historical import |
+| v3.0 | 331 | Event/expense categories, shopping list, notifications, dashboard |
 
 ### Top Lessons (Verified Across Milestones)
 

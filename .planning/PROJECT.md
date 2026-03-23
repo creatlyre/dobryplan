@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A shared household calendar web application that lets two people (e.g., partners/spouses) collaboratively manage their schedule from a single source of truth. It supports recurring and one-time events, push sync to Google Calendar, natural-language event requests, image-based event extraction, and full Polish/English localization — keeping both users aligned on the family schedule across all devices.
+A shared household calendar and finance web application that lets two people (e.g., partners/spouses) collaboratively manage their schedule, budget, and shopping from a single source of truth. It supports recurring and one-time events with category color coding, push sync to Google Calendar, natural-language event requests, image-based event extraction, a full household budget tracker with expense categorization and charts, a shared shopping list with store-section auto-grouping, partner activity notifications, and a unified dashboard — all with Polish/English localization.
 
 ## Core Value
 
@@ -10,18 +10,20 @@ A shared calendar both partners can edit that stays in sync with Google Calendar
 
 ## Current State
 
-- v2.1 shipped on 2026-03-21.
+- v3.0 shipped on 2026-03-23.
+- Dashboard home page: today's events, 7-day preview, budget snapshot, quick-add buttons.
+- In-app notifications: bell icon with unread badge, partner change alerts, SMTP email toggle, event reminders.
+- Event categories & colors: preset + custom categories, curated palette, color-coded calendar grid, category filtering.
+- Expense categories & charts: categorization, CSS-only pie/bar charts, smart keyword auto-detection.
+- Shared shopping list: Biedronka store-section auto-grouping, multi-item paste, keyword learning.
 - Event privacy: visibility toggle, lock icons, partner filtering, sync retraction to Google Calendar.
 - Reminder UI: chip-based multi-reminder form with toggle, add/remove (up to 5), edit prefill, GCal sync.
 - Multi-year budget: year navigation with carry-forward balance, manual override, year bounds.
-- Year-over-year comparison: side-by-side annual totals with color-coded delta arrows.
-- Historical import: TSV paste for past-year income hours/rates, one-time & recurring expenses.
-- Full household budget tracker: income calculation from 3 hourly rates, expense management, 12-month year overview with running balance.
+- Full household budget tracker: income calculation from 3 hourly rates, expense management, 12-month year overview.
 - Full Polish/English localization with language switcher, persisted preference, and locale-aware NLP/OCR parsing.
-- Budget stats dashboard with yearly summary cards, monthly bar chart, best/worst months, and YoY comparison.
-- 270 tests passing across auth, events, calendar, NLP, sync, budget, and performance.
-- ~8,137 LOC Python (app + tests), plus HTML templates, CSS, and JSON locale files.
-- Planning artifacts for v1.0, v1.1, v2.0, v2.1 archived under `.planning/milestones/`.
+- 331 tests passing across auth, events, calendar, NLP, sync, budget, shopping, dashboard, and performance.
+- ~10,686 LOC Python (6,106 app + 4,580 tests), plus HTML templates, CSS, and JSON locale files.
+- Planning artifacts for v1.0, v1.1, v2.0, v2.1, v3.0 archived under `.planning/milestones/`.
 
 ## Requirements
 
@@ -57,18 +59,29 @@ A shared calendar both partners can edit that stays in sync with Google Calendar
 - ✓ Year-over-year summary comparison — income, expenses, balance totals side-by-side — v2.1
 - ✓ Historical year import — TSV paste for past-year data (income hours, expenses) — v2.1
 
+- ✓ Event categories with preset + custom, curated palette colors — v3.0
+- ✓ Color-coded calendar grid indicators and category filtering — v3.0
+- ✓ Expense categories with preset + custom, pie/bar chart spending breakdown — v3.0
+- ✓ Expense category auto-detection from keywords — v3.0
+- ✓ Shared shopping list with Biedronka store-section auto-grouping — v3.0
+- ✓ Multi-item paste for shopping list (comma/newline separated) — v3.0
+- ✓ In-app notification feed with bell icon and unread badge — v3.0
+- ✓ Partner change notifications for events, expenses, and income — v3.0
+- ✓ Optional SMTP email alerts for partner activity — v3.0
+- ✓ Event reminder notifications at configured times — v3.0
+- ✓ Dashboard home page with today's events, 7-day preview, budget snapshot — v3.0
+- ✓ Quick-add buttons on dashboard for events and expenses — v3.0
+
 ### Active
 
-**Current Milestone: v3.0 — Dashboard, Notifications & Categories**
+*(No active milestone — start next with `/gsd-new-milestone`)*
 
-**Goal:** Add a unified dashboard home page, partner notifications (in-app + email), event categories with color coding, expense categories with budget limits and charts, and a shared shopping list.
-
-**Target features:**
-- Dashboard home page — today's events, next 7 days preview, current month budget snapshot, quick-add
-- Notifications — in-app activity feed + optional email alerts for partner event changes
-- Event categories & colors — preset categories (Work, Personal, Health, Errands, Social) + custom, color-coded on calendar grid
-- Expense categories — tag expenses, filter/group, pie/bar chart breakdown, per-category budget limits with alerts
-- Shared shopping list — add/delete items, accepts string input to parse, both users share the list
+**Candidates for next milestone:**
+- Per-category budget limits with 80%/100% spending alerts (BLIM-01, BLIM-02)
+- Shopping list check-off/uncheck (SHOP-03)
+- Shopping list change notifications (NOTIF-09)
+- Daily digest email (NOTIF-10)
+- Notification preference granularity (NOTIF-11)
 
 ### Out of Scope additions from v2.0/v3.0
 
@@ -124,6 +137,13 @@ A shared calendar both partners can edit that stays in sync with Google Calendar
 | Carry-forward balance computation | Prior year ending balance → next year starting balance | ✓ Shipped v2.1 |
 | Unicode arrows for YoY deltas | No icon library dependency | ✓ Shipped v2.1 |
 | TSV paste for historical import | Simple, no file upload needed | ✓ Shipped v2.1 |
+| Lazy-seeded categories | Preset categories created on first GET — no migration seeding | ✓ Shipped v3.0 |
+| CSS-only conic-gradient charts | No chart library dependency — pure CSS donut + bars | ✓ Shipped v3.0 |
+| Keyword-based category auto-detection | Pattern matching from JSON keywords instead of ML | ✓ Shipped v3.0 |
+| Biedronka store-section layout | Optimized for user's actual supermarket for route shopping | ✓ Shipped v3.0 |
+| Notification hooks in routes (not services) | Matches GoogleSync pattern, try/except wrapping | ✓ Shipped v3.0 |
+| HTMX polling for notification badge | 30s poll interval — simple, no WebSocket needed | ✓ Shipped v3.0 |
+| Dashboard as home page (/ → /dashboard) | Most useful landing page; calendar moved to /calendar | ✓ Shipped v3.0 |
 
 ---
-*Last updated: 2026-03-22 after v3.0 milestone started*
+*Last updated: 2026-03-23 after v3.0 milestone completed*
