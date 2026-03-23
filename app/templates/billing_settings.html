@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('billing.settings_title') }} - {{ t('app.name') }}{% endblock %}
+
+{% block page_heading %}{{ t('billing.settings_title') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+
+  {# Payment issue warning #}
+  {% if plan_status == 'past_due' %}
+  <div class="glass rounded-2xl p-4 border border-amber-500/30 bg-amber-500/10">
+    <div class="flex items-start gap-3">
+      <svg class="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <p class="text-sm text-amber-200">{{ t('billing.payment_issue_warning') }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+  {# Current plan card #}
+  <div class="glass rounded-2xl p-6">
+    <h2 class="text-lg font-semibold mb-4" style="font-family: var(--font-display);">{{ t('billing.current_plan') }}</h2>
+
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        {% if user_plan == 'pro' %}
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-sm font-medium">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            {{ t('billing.plan_pro') }}
+          </span>
+        {% elif user_plan == 'family_plus' %}
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-sm font-medium">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            {{ t('billing.plan_family_plus') }}
+          </span>
+        {% else %}
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/70 text-sm font-medium">
+            {{ t('billing.plan_free') }}
+          </span>
+        {% endif %}
+
+        {% if plan_status == 'active' %}
+          <span class="text-xs text-emerald-400">{{ t('billing.status_active') }}</span>
+        {% elif plan_status == 'past_due' %}
+          <span class="text-xs text-amber-400">{{ t('billing.status_past_due') }}</span>
+        {% elif plan_status == 'canceled' %}
+          <span class="text-xs text-red-400">{{ t('billing.status_canceled') }}</span>
+        {% endif %}
+      </div>
+
+      {% if user_plan != 'free' and has_stripe_customer %}
+      <button id="manage-sub-btn" class="glass-btn-secondary rounded-xl px-4 py-2 text-sm font-medium min-h-[44px]">
+        {{ t('billing.manage_subscription') }}
+      </button>
+      {% endif %}
+    </div>
+
+    {% if current_period_end and user_plan != 'free' %}
+    <p class="text-xs text-white/50 mt-3">
+      {% if cancel_at_period_end %}
+        {{ t('billing.cancels_on') }}: {{ current_period_end.strftime('%Y-%m-%d') }}
+      {% else %}
+        {{ t('billing.renews_on') }}: {{ current_period_end.strftime('%Y-%m-%d') }}
+      {% endif %}
+    </p>
+    {% endif %}
+  </div>
+
+  {# Upgrade section (only for free users) #}
+  {% if user_plan == 'free' %}
+  <div class="glass rounded-2xl p-6">
+    <h2 class="text-lg font-semibold mb-2" style="font-family: var(--font-display);">{{ t('billing.upgrade') }}</h2>
+    <p class="text-sm text-white/60 mb-6">{{ t('billing.upgrade_description') }}</p>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      {# Pro plan #}
+      <div class="rounded-xl border border-indigo-500/30 bg-indigo-500/5 p-5 flex flex-col">
+        <div class="flex items-center gap-2 mb-3">
+          <svg class="w-5 h-5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span class="font-semibold">{{ t('billing.plan_pro') }}</span>
+        </div>
+        <p class="text-sm text-white/60 mb-4 flex-grow">{{ t('billing.pro_features') }}</p>
+        <div class="flex items-baseline gap-1 mb-4">
+          <span class="text-2xl font-bold">19,99 zł</span>
+          <span class="text-xs text-white/50">{{ t('billing.per_month') }}</span>
+        </div>
+        <button class="billing-checkout-btn glass-btn-primary rounded-xl px-4 py-2.5 text-sm font-medium min-h-[44px] w-full" data-plan="pro">
+          {{ t('billing.choose_plan') }}
+        </button>
+      </div>
+
+      {# Family Plus plan #}
+      <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5 flex flex-col">
+        <div class="flex items-center gap-2 mb-3">
+          <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span class="font-semibold">{{ t('billing.plan_family_plus') }}</span>
+        </div>
+        <p class="text-sm text-white/60 mb-4 flex-grow">{{ t('billing.family_plus_features') }}</p>
+        <div class="flex items-baseline gap-1 mb-4">
+          <span class="text-2xl font-bold">34,99 zł</span>
+          <span class="text-xs text-white/50">{{ t('billing.per_month') }}</span>
+        </div>
+        <button class="billing-checkout-btn glass-btn-primary rounded-xl px-4 py-2.5 text-sm font-medium min-h-[44px] w-full" data-plan="family_plus">
+          {{ t('billing.choose_plan') }}
+        </button>
+      </div>
+    </div>
+
+    {# Free plan comparison #}
+    <div class="mt-4 rounded-xl border border-white/10 bg-white/5 p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="font-medium text-sm">{{ t('billing.plan_free') }}</span>
+        <span class="text-xs text-white/40">({{ t('billing.current_plan') }})</span>
+      </div>
+      <p class="text-sm text-white/50">{{ t('billing.free_features') }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+document.querySelectorAll('.billing-checkout-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const plan = this.dataset.plan;
+        this.disabled = true;
+        this.textContent = '...';
+        try {
+            const res = await fetch('/api/billing/checkout', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({plan: plan})
+            });
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                alert(data.detail || 'Error creating checkout session');
+                this.disabled = false;
+                this.textContent = '{{ t("billing.choose_plan") }}';
+            }
+        } catch(e) {
+            alert('Network error');
+            this.disabled = false;
+            this.textContent = '{{ t("billing.choose_plan") }}';
+        }
+    });
+});
+
+const manageBtn = document.getElementById('manage-sub-btn');
+if (manageBtn) {
+    manageBtn.addEventListener('click', async function() {
+        this.disabled = true;
+        try {
+            const res = await fetch('/api/billing/portal', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            });
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                alert(data.detail || 'Error opening billing portal');
+                this.disabled = false;
+            }
+        } catch(e) {
+            alert('Network error');
+            this.disabled = false;
+        }
+    });
+}
+</script>
+{% endblock %}

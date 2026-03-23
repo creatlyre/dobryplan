@@ -31,6 +31,7 @@ from app.shopping.routes import router as shopping_router
 from app.shopping.views import router as shopping_views_router
 from app.dashboard.routes import router as dashboard_router
 from app.billing.routes import router as billing_router
+from app.billing.views import router as billing_views_router
 
 app = FastAPI(
     title="Synco",
@@ -73,6 +74,7 @@ app.include_router(shopping_router)
 app.include_router(shopping_views_router)
 app.include_router(dashboard_router)
 app.include_router(billing_router)
+app.include_router(billing_views_router)
 
 
 @app.get("/", response_class=HTMLResponse)

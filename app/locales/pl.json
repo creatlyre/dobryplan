@@ -470,5 +470,26 @@
   "dashboard.monthly_balance": "Bilans miesi\u0105ca",
   "dashboard.income": "Przychody",
   "dashboard.expenses": "Wydatki",
-  "dashboard.top_categories": "Top kategorie"
+  "dashboard.top_categories": "Top kategorie",
+
+  "billing.nav_link": "Plan",
+  "billing.settings_title": "Rozliczenia i plan",
+  "billing.current_plan": "Aktualny plan",
+  "billing.plan_free": "Darmowy",
+  "billing.plan_pro": "Pro",
+  "billing.plan_family_plus": "Family Plus",
+  "billing.status_active": "Aktywny",
+  "billing.status_past_due": "Zaleg\u0142a p\u0142atno\u015b\u0107",
+  "billing.status_canceled": "Anulowany",
+  "billing.upgrade": "Ulepsz",
+  "billing.upgrade_description": "Odblokuj funkcje premium dla Twojego gospodarstwa",
+  "billing.manage_subscription": "Zarz\u0105dzaj subskrypcj\u0105",
+  "billing.renews_on": "Odnawia si\u0119",
+  "billing.cancels_on": "Ko\u0144czy si\u0119",
+  "billing.payment_issue_warning": "Wyst\u0105pi\u0142 problem z p\u0142atno\u015bci\u0105. Zaktualizuj metod\u0119 p\u0142atno\u015bci.",
+  "billing.free_features": "Kalendarz i bud\u017cet, 1 w\u0142asna kategoria, podstawowa lista zakup\u00f3w",
+  "billing.pro_features": "Nieograniczone kategorie, wykresy wydatk\u00f3w, zaawansowane NLP/OCR, priorytetowe wsparcie",
+  "billing.family_plus_features": "Wszystko z Pro + wi\u0119cej przestrzeni, alerty email, priorytetowe wsparcie",
+  "billing.per_month": "/miesi\u0105c",
+  "billing.choose_plan": "Wybierz plan"
 }

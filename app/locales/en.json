@@ -470,5 +470,26 @@
   "dashboard.monthly_balance": "Monthly Balance",
   "dashboard.income": "Income",
   "dashboard.expenses": "Expenses",
-  "dashboard.top_categories": "Top Categories"
+  "dashboard.top_categories": "Top Categories",
+
+  "billing.nav_link": "Plan",
+  "billing.settings_title": "Billing & Plan",
+  "billing.current_plan": "Current Plan",
+  "billing.plan_free": "Free",
+  "billing.plan_pro": "Pro",
+  "billing.plan_family_plus": "Family Plus",
+  "billing.status_active": "Active",
+  "billing.status_past_due": "Past Due",
+  "billing.status_canceled": "Canceled",
+  "billing.upgrade": "Upgrade",
+  "billing.upgrade_description": "Unlock premium features for your household",
+  "billing.manage_subscription": "Manage Subscription",
+  "billing.renews_on": "Renews on",
+  "billing.cancels_on": "Cancels on",
+  "billing.payment_issue_warning": "There is an issue with your payment. Please update your payment method.",
+  "billing.free_features": "Core calendar & budget, 1 custom category, basic shopping list",
+  "billing.pro_features": "Unlimited categories, expense charts, advanced NLP/OCR, priority support",
+  "billing.family_plus_features": "Everything in Pro + extended storage, email alerts, priority email support",
+  "billing.per_month": "/month",
+  "billing.choose_plan": "Choose Plan"
 }
