@@ -18,10 +18,10 @@
   Plans:
   - [ ] 28-01-PLAN.md — Commercial license terms, monetization docs, NOTICE
   - [ ] 28-02-PLAN.md — LICENSE verification, README licensing section
-- [ ] Phase 29: Billing, Plans, and Entitlements Core (2 plans)
+- [x] Phase 29: Billing, Plans, and Entitlements Core (2 plans) — completed 2026-03-23
   Plans:
-  - [ ] 29-01-PLAN.md — Billing data model, Stripe checkout, webhook handler
-  - [ ] 29-02-PLAN.md — Entitlement dependencies, billing settings page, i18n
+  - [x] 29-01-PLAN.md — Billing data model, Stripe checkout, webhook handler
+  - [x] 29-02-PLAN.md — Entitlement dependencies, billing settings page, i18n
 - [ ] Phase 30: SaaS Production Platform and Operations
 - [ ] Phase 31: Paid Self-Hosted Distribution
 - [ ] Phase 32: Mobile Distribution Path (PWA + Android Wrapper)
