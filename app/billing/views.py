@@ -11,7 +11,16 @@ from app.database.database import get_db
 from app.i18n import inject_template_i18n, set_locale_cookie_if_param
 
 router = APIRouter(prefix="/billing", tags=["billing-views"])
+public_router = APIRouter(tags=["billing-public"])
 templates = Jinja2Templates(directory="app/templates")
+
+
+@public_router.get("/pricing", response_class=HTMLResponse)
+async def pricing_page(request: Request):
+    context = inject_template_i18n(request, {"request": request})
+    response = templates.TemplateResponse(request=request, name="pricing.html", context=context)
+    set_locale_cookie_if_param(response, request)
+    return response
 
 
 @router.get("/settings", response_class=HTMLResponse)

@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('pricing.title') }} - {{ t('app.name') }}{% endblock %}
+
+{% block page_heading %}{{ t('pricing.title') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-10">
+
+  {# Header #}
+  <div class="text-center space-y-3">
+    <h2 class="text-3xl font-bold" style="font-family: var(--font-display);">{{ t('pricing.title') }}</h2>
+    <p class="text-gray-400 text-lg">{{ t('pricing.subtitle') }}</p>
+  </div>
+
+  {# Billing period toggle #}
+  <div class="flex items-center justify-center gap-4">
+    <span id="label-monthly" class="text-sm font-medium text-white">{{ t('pricing.monthly') }}</span>
+    <button id="billing-toggle" type="button" role="switch" aria-checked="false"
+            class="relative inline-flex h-7 w-12 items-center rounded-full bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#0f0a2e]"
+            onclick="toggleBilling()">
+      <span id="toggle-dot" class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform translate-x-1"></span>
+    </button>
+    <span id="label-annual" class="text-sm font-medium text-gray-400">{{ t('pricing.annual') }}</span>
+    <span id="save-badge" class="hidden px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-medium">{{ t('pricing.save') }}</span>
+  </div>
+
+  {# SaaS tier cards #}
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    {# Free #}
+    <div class="glass rounded-2xl p-6 flex flex-col border border-white/10 hover:scale-[1.02] transition-transform">
+      <h3 class="text-xl font-bold mb-1" style="font-family: var(--font-display);">{{ t('pricing.free_title') }}</h3>
+      <p class="text-gray-400 text-sm mb-4">{{ t('pricing.free_desc') }}</p>
+      <div class="text-3xl font-bold mb-6">0 <span class="text-base font-normal text-gray-400">zł</span></div>
+      <ul class="space-y-2 mb-8 flex-1">
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.free_f1') }}
+        </li>
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.free_f2') }}
+        </li>
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.free_f3') }}
+        </li>
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.free_f4') }}
+        </li>
+      </ul>
+      <a href="/auth/login" class="glass-btn-secondary rounded-xl px-4 py-3 text-center text-sm font-medium w-full block">{{ t('pricing.start_free') }}</a>
+    </div>
+
+    {# Pro (highlighted) #}
+    <div class="glass rounded-2xl p-6 flex flex-col border-2 border-indigo-500 relative hover:scale-[1.02] transition-transform shadow-lg shadow-indigo-500/10">
+      <span class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-indigo-500 text-white text-xs font-bold">{{ t('pricing.recommended') }}</span>
+      <h3 class="text-xl font-bold mb-1" style="font-family: var(--font-display);">{{ t('pricing.pro_title') }}</h3>
+      <p class="text-gray-400 text-sm mb-4">{{ t('pricing.pro_desc') }}</p>
+      <div class="text-3xl font-bold mb-6">
+        <span id="pro-price">19</span> <span class="text-base font-normal text-gray-400">zł{{ t('pricing.per_month') }}</span>
+      </div>
+      <ul class="space-y-2 mb-8 flex-1">
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-indigo-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.pro_f1') }}
+        </li>
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-indigo-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.pro_f2') }}
+        </li>
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-indigo-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.pro_f3') }}
+        </li>
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-indigo-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.pro_f4') }}
+        </li>
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-indigo-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.pro_f5') }}
+        </li>
+      </ul>
+      <button onclick="checkout('pro')" class="glass-btn-primary rounded-xl px-4 py-3 text-center text-sm font-medium w-full">{{ t('pricing.get_started') }}</button>
+    </div>
+
+    {# Family Plus #}
+    <div class="glass rounded-2xl p-6 flex flex-col border border-white/10 hover:scale-[1.02] transition-transform">
+      <h3 class="text-xl font-bold mb-1" style="font-family: var(--font-display);">{{ t('pricing.family_title') }}</h3>
+      <p class="text-gray-400 text-sm mb-4">{{ t('pricing.family_desc') }}</p>
+      <div class="text-3xl font-bold mb-6">
+        <span id="family-price">29</span> <span class="text-base font-normal text-gray-400">zł{{ t('pricing.per_month') }}</span>
+      </div>
+      <ul class="space-y-2 mb-8 flex-1">
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.family_f1') }}
+        </li>
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.family_f2') }}
+        </li>
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.family_f3') }}
+        </li>
+        <li class="flex items-start gap-2 text-sm text-gray-300">
+          <svg class="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ t('pricing.family_f4') }}
+        </li>
+      </ul>
+      <button onclick="checkout('family_plus')" class="glass-btn-secondary rounded-xl px-4 py-3 text-center text-sm font-medium w-full">{{ t('pricing.get_started') }}</button>
+    </div>
+  </div>
+
+  {# Self-Hosted card #}
+  <div class="glass rounded-2xl p-6 border border-white/10 hover:scale-[1.01] transition-transform">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div class="flex-1 space-y-2">
+        <div class="flex items-center gap-3">
+          <h3 class="text-xl font-bold" style="font-family: var(--font-display);">{{ t('pricing.self_hosted_title') }}</h3>
+          <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-medium">{{ t('pricing.one_time') }}</span>
+        </div>
+        <p class="text-gray-400 text-sm">{{ t('pricing.self_hosted_desc') }}</p>
+        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+          <li class="flex items-center gap-2 text-sm text-gray-300">
+            <svg class="w-4 h-4 text-amber-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            {{ t('pricing.sh_f1') }}
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-300">
+            <svg class="w-4 h-4 text-amber-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            {{ t('pricing.sh_f2') }}
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-300">
+            <svg class="w-4 h-4 text-amber-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            {{ t('pricing.sh_f3') }}
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-300">
+            <svg class="w-4 h-4 text-amber-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            {{ t('pricing.sh_f4') }}
+          </li>
+        </ul>
+      </div>
+      <div class="text-center md:text-right space-y-3 flex-shrink-0">
+        <div class="text-3xl font-bold">199 <span class="text-base font-normal text-gray-400">zł</span></div>
+        <button onclick="checkout('self_hosted')" class="glass-btn-primary rounded-xl px-6 py-3 text-sm font-medium whitespace-nowrap">{{ t('pricing.buy_license') }}</button>
+      </div>
+    </div>
+  </div>
+
+  {# Feature comparison #}
+  <details class="glass rounded-2xl border border-white/10">
+    <summary class="px-6 py-4 cursor-pointer text-lg font-semibold flex items-center justify-between" style="font-family: var(--font-display);">
+      {{ t('pricing.compare_features') }}
+      <svg class="w-5 h-5 text-gray-400 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </summary>
+    <div class="px-6 pb-6 overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-white/10">
+            <th class="text-left py-3 text-gray-400 font-medium">{{ t('pricing.feature') }}</th>
+            <th class="text-center py-3 text-gray-400 font-medium">{{ t('pricing.free_title') }}</th>
+            <th class="text-center py-3 text-indigo-400 font-medium">{{ t('pricing.pro_title') }}</th>
+            <th class="text-center py-3 text-gray-400 font-medium">{{ t('pricing.family_title') }}</th>
+            <th class="text-center py-3 text-amber-400 font-medium">{{ t('pricing.self_hosted_title') }}</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-300">
+          <tr class="border-b border-white/5"><td class="py-2.5">{{ t('pricing.cmp_calendar') }}</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+          <tr class="border-b border-white/5"><td class="py-2.5">{{ t('pricing.cmp_budget') }}</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+          <tr class="border-b border-white/5"><td class="py-2.5">{{ t('pricing.cmp_shopping') }}</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+          <tr class="border-b border-white/5"><td class="py-2.5">{{ t('pricing.cmp_google_sync') }}</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+          <tr class="border-b border-white/5"><td class="py-2.5">{{ t('pricing.cmp_categories') }}</td><td class="text-center">1</td><td class="text-center">∞</td><td class="text-center">∞</td><td class="text-center">∞</td></tr>
+          <tr class="border-b border-white/5"><td class="py-2.5">{{ t('pricing.cmp_charts') }}</td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+          <tr class="border-b border-white/5"><td class="py-2.5">{{ t('pricing.cmp_nlp') }}</td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+          <tr class="border-b border-white/5"><td class="py-2.5">{{ t('pricing.cmp_notifications') }}</td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+          <tr class="border-b border-white/5"><td class="py-2.5">{{ t('pricing.cmp_self_hosted') }}</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">✓</td></tr>
+          <tr><td class="py-2.5">{{ t('pricing.cmp_support') }}</td><td class="text-center">{{ t('pricing.community') }}</td><td class="text-center">{{ t('pricing.email_support') }}</td><td class="text-center">{{ t('pricing.priority_support') }}</td><td class="text-center">{{ t('pricing.email_support') }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+</div>
+
+<script>
+let isAnnual = false;
+
+function toggleBilling() {
+  isAnnual = !isAnnual;
+  const toggle = document.getElementById('billing-toggle');
+  const dot = document.getElementById('toggle-dot');
+  const badge = document.getElementById('save-badge');
+  const labelM = document.getElementById('label-monthly');
+  const labelA = document.getElementById('label-annual');
+
+  toggle.setAttribute('aria-checked', isAnnual);
+  dot.classList.toggle('translate-x-1', !isAnnual);
+  dot.classList.toggle('translate-x-6', isAnnual);
+  toggle.classList.toggle('bg-indigo-500', isAnnual);
+  toggle.classList.toggle('bg-white/20', !isAnnual);
+  badge.classList.toggle('hidden', !isAnnual);
+  labelM.classList.toggle('text-white', !isAnnual);
+  labelM.classList.toggle('text-gray-400', isAnnual);
+  labelA.classList.toggle('text-white', isAnnual);
+  labelA.classList.toggle('text-gray-400', !isAnnual);
+
+  document.getElementById('pro-price').textContent = isAnnual ? '15' : '19';
+  document.getElementById('family-price').textContent = isAnnual ? '24' : '29';
+}
+
+async function checkout(plan) {
+  const period = (plan === 'self_hosted') ? 'monthly' : (isAnnual ? 'annual' : 'monthly');
+  try {
+    const res = await fetch('/api/billing/checkout', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({plan: plan, billing_period: period})
+    });
+    if (!res.ok) {
+      if (res.status === 401) {
+        window.location.href = '/auth/login';
+        return;
+      }
+      const err = await res.json().catch(() => ({}));
+      alert(err.detail || 'Checkout failed');
+      return;
+    }
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+  } catch (e) {
+    alert('Network error. Please try again.');
+  }
+}
+</script>
+{% endblock %}
