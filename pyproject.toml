@@ -1,6 +1,6 @@
 [project]
 name = "synco"
-version = "1.0.0"
+version = "3.0.0"
 description = "Shared household calendar & budget planner with Google Calendar sync"
 readme = "README.md"
 requires-python = ">=3.10"
