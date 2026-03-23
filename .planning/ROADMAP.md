@@ -96,7 +96,7 @@
 | 28. Licensing and Commercial Terms Foundation | 2/2 | Complete    | 2026-03-23 | - |
 | 29. Billing, Plans, and Entitlements Core | v4.0 | 0/2 | Planned | - |
 | 30. SaaS Production Platform and Operations | v4.0 | 2/2 | Complete | 2026-03-23 |
-| 31. Paid Self-Hosted Distribution | v4.0 | 0/2 | Planned | - |
+| 31. Paid Self-Hosted Distribution | v4.0 | Complete    | 2026-03-23 | - |
 | 32. Mobile Distribution Path (PWA + Android Wrapper) | v4.0 | 0/0 | Planned | - |
 | 33. Go-to-Market, Pricing, and Launch Funnel | v4.0 | 0/0 | Planned | - |
 
