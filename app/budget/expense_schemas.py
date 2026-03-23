@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, field_validator, model_validator
+from typing import Optional
+
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class ExpenseCreate(BaseModel):
@@ -9,6 +11,7 @@ class ExpenseCreate(BaseModel):
     name: str
     amount: float
     recurring: bool = False
+    category_id: Optional[str] = None
 
     @field_validator("year")
     @classmethod
@@ -54,6 +57,7 @@ class ExpenseUpdate(BaseModel):
     name: str | None = None
     amount: float | None = None
     month: int | None = None
+    category_id: Optional[str] = None
 
     @field_validator("month")
     @classmethod
@@ -89,9 +93,26 @@ class ExpenseResponse(BaseModel):
     name: str
     amount: float
     recurring: bool
+    category_id: Optional[str] = None
 
     model_config = {"from_attributes": True}
 
 
 class BulkExpenseCreate(BaseModel):
     expenses: list[ExpenseCreate]
+
+
+class ExpenseCategoryCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=50)
+    color: str = Field(pattern=r'^#[0-9a-fA-F]{6}$')
+
+
+class ExpenseCategoryResponse(BaseModel):
+    id: str
+    calendar_id: str
+    name: str
+    color: str
+    is_preset: bool
+    sort_order: int
+
+    model_config = {"from_attributes": True}

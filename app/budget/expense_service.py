@@ -21,6 +21,7 @@ class ExpenseService:
                 "amount": e.amount,
                 "month": e.month,
                 "recurring": e.recurring,
+                "category_id": e.category_id,
             }
             if e.month == 0 or e.recurring:
                 recurring.append(entry)
@@ -50,3 +51,17 @@ class ExpenseService:
 
     def delete_all_onetime(self, calendar_id: str, year: int) -> int:
         return self.repo.delete_by_year_onetime(calendar_id, year)
+
+    # ── Category methods ─────────────────────────────────────────────────
+
+    def list_categories(self, calendar_id: str):
+        categories = self.repo.list_categories(calendar_id)
+        if not categories:
+            categories = self.repo.seed_preset_categories(calendar_id)
+        return categories
+
+    def create_category(self, calendar_id: str, name: str, color: str):
+        return self.repo.create_category(calendar_id, name, color)
+
+    def get_category_breakdown(self, calendar_id: str, year: int) -> list[dict]:
+        return self.repo.get_expenses_by_category(calendar_id, year)

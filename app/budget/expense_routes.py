@@ -2,7 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.auth.dependencies import get_current_user
 from app.budget.expense_repository import ExpenseRepository
-from app.budget.expense_schemas import BulkExpenseCreate, ExpenseCreate, ExpenseResponse, ExpenseUpdate
+from app.budget.expense_schemas import (
+    BulkExpenseCreate,
+    ExpenseCategoryCreate,
+    ExpenseCategoryResponse,
+    ExpenseCreate,
+    ExpenseResponse,
+    ExpenseUpdate,
+)
 from app.budget.expense_service import ExpenseService
 from app.database.database import get_db
 
@@ -11,6 +18,33 @@ router = APIRouter(prefix="/api/budget/expenses", tags=["expenses"])
 
 def _service(db) -> ExpenseService:
     return ExpenseService(ExpenseRepository(db))
+
+
+@router.get("/categories")
+async def list_expense_categories(user=Depends(get_current_user), db=Depends(get_db)):
+    if not user.calendar_id:
+        raise HTTPException(status_code=400, detail="No calendar linked")
+    service = _service(db)
+    categories = service.list_categories(user.calendar_id)
+    return {"data": [ExpenseCategoryResponse.model_validate(c, from_attributes=True).model_dump() for c in categories]}
+
+
+@router.post("/categories", status_code=201)
+async def create_expense_category(payload: ExpenseCategoryCreate, user=Depends(get_current_user), db=Depends(get_db)):
+    if not user.calendar_id:
+        raise HTTPException(status_code=400, detail="No calendar linked")
+    service = _service(db)
+    category = service.create_category(user.calendar_id, payload.name, payload.color)
+    return {"data": ExpenseCategoryResponse.model_validate(category, from_attributes=True).model_dump()}
+
+
+@router.get("/by-category")
+async def get_expenses_by_category(year: int, user=Depends(get_current_user), db=Depends(get_db)):
+    if not user.calendar_id:
+        raise HTTPException(status_code=400, detail="No calendar linked")
+    service = _service(db)
+    breakdown = service.get_category_breakdown(user.calendar_id, year)
+    return {"data": breakdown}
 
 
 @router.get("")

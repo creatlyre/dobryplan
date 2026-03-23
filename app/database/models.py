@@ -127,6 +127,18 @@ class AdditionalEarning:
 
 
 @dataclass
+class ExpenseCategory:
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    calendar_id: str = ""
+    name: str = ""
+    color: str = "#6366f1"
+    is_preset: bool = False
+    sort_order: int = 0
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+@dataclass
 class Expense:
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     calendar_id: str = ""
@@ -135,6 +147,7 @@ class Expense:
     name: str = ""
     amount: float = 0.0
     recurring: bool = False
+    category_id: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
