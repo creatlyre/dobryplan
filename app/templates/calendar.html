@@ -711,6 +711,24 @@ eventEntryModal.addEventListener('click', (event) => {
   }
 });
 
+// Escape closes topmost visible modal
+// E opens manual event-entry modal only outside typing contexts.
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const eventEntryVisible = !eventEntryModal.classList.contains('hidden');
+    if (eventEntryVisible) closeEventEntryModal();
+  }
+  if (e.key === 'e' || e.key === 'E') {
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (['input', 'textarea', 'select'].includes(tag) || e.target.isContentEditable) return;
+    const eventEntryVisible = !eventEntryModal.classList.contains('hidden');
+    if (!eventEntryVisible) {
+      e.preventDefault();
+      document.getElementById('event-entry-open-btn')?.click();
+    }
+  }
+});
+
 async function submitEventForm(event) {
   event.preventDefault();
   await submitEventEntry(false);

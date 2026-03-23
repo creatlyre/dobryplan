@@ -1,5 +1,33 @@
 # Milestones
 
+## v3.0 Dashboard, Notifications & Categories (Shipped: 2026-03-23)
+
+**Phases completed:** 5 phases (23-27), 11 plans
+
+**Key accomplishments:**
+
+- Event categories & colors: preset + custom categories with curated palette, color-coded calendar grid indicators, category filtering
+- Expense categories & charts: expense categorization, CSS-only pie/bar charts on stats page, smart keyword auto-detection
+- Shared shopping list: Biedronka store-section auto-grouping, multi-item paste, keyword learning, section picker UI
+- In-app notifications: bell icon with unread badge, partner change alerts for events/expenses/income, SMTP email toggle, event reminder notifications
+- Dashboard home page: today's events, 7-day preview, budget snapshot with monthly balance, quick-add buttons, responsive 2-column grid
+- 331 tests passing across all subsystems
+
+**Stats:**
+
+- 164 files changed, 9,992 insertions, 12,336 deletions
+- Timeline: 2026-03-22 → 2026-03-23 (2 days)
+- 60 commits
+
+**Git range:** v2.1 → v3.0
+
+**Known tech debt:** (from milestone audit)
+- No VERIFICATION.md for any v3.0 phase
+- Missing SUMMARY frontmatter in phases 25, 27
+- Bulk endpoints skip notification hooks (by design — prevent spam on import)
+
+---
+
 ## v2.1 Privacy, Reminders & Multi-Year Budget (Shipped: 2026-03-22)
 
 **Phases completed:** 5 phases (18-22), 7 plans
