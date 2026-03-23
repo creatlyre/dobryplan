@@ -286,4 +286,4 @@ Milestone archives and planning artifacts live under `.planning/`.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [GNU AGPL-3.0](LICENSE). If you host a modified version as a network service, you must publish your changes under the same license.
