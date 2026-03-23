@@ -10,8 +10,9 @@ A shared calendar both partners can edit that stays in sync with Google Calendar
 
 ## Current State
 
-- v4.0 monetization milestone in progress (Phase 28 complete as of 2026-03-23).
+- v4.0 monetization milestone in progress (Phases 28-31 complete as of 2026-03-23).
 - Licensing foundation: AGPL-3.0 dual-license model with commercial terms (COMMERCIAL-LICENSE.md, MONETIZATION.md, NOTICE).
+- Self-hosted distribution: Docker Compose package with HMAC license key verification, setup guide, upgrade docs.
 - Dashboard home page: today's events, 7-day preview, budget snapshot, quick-add buttons.
 - In-app notifications: bell icon with unread badge, partner change alerts, SMTP email toggle, event reminders.
 - Event categories & colors: preset + custom categories, curated palette, color-coded calendar grid, category filtering.
@@ -22,7 +23,7 @@ A shared calendar both partners can edit that stays in sync with Google Calendar
 - Multi-year budget: year navigation with carry-forward balance, manual override, year bounds.
 - Full household budget tracker: income calculation from 3 hourly rates, expense management, 12-month year overview.
 - Full Polish/English localization with language switcher, persisted preference, and locale-aware NLP/OCR parsing.
-- 331 tests passing across auth, events, calendar, NLP, sync, budget, shopping, dashboard, and performance.
+- 354 tests passing across auth, events, calendar, NLP, sync, budget, shopping, dashboard, licensing, and performance.
 - ~10,686 LOC Python (6,106 app + 4,580 tests), plus HTML templates, CSS, and JSON locale files.
 - Planning artifacts for v1.0, v1.1, v2.0, v2.1, v3.0 archived under `.planning/milestones/`.
 
@@ -76,6 +77,10 @@ A shared calendar both partners can edit that stays in sync with Google Calendar
 - ✓ Repository license is AGPL-3.0 for the core product (MON-01) — v4.0
 - ✓ Commercial license exception terms defined (COMMERCIAL-LICENSE.md) (MON-02) — v4.0
 - ✓ Monetization docs explain free vs paid vs AGPL obligations (MONETIZATION.md) (MON-03) — v4.0
+- ✓ Docker Compose self-hosted package with app + postgres + postgrest + caddy (SHS-01) — v4.0
+- ✓ HMAC-based license key generation/validation, no phone-home (SHS-02) — v4.0
+- ✓ Versioned upgrade path with backup/rollback procedure (SHS-03) — v4.0
+- ✓ Buyer-facing setup guide covering prerequisites through first login (SHS-04) — v4.0
 
 ### Active
 
@@ -159,5 +164,9 @@ A shared calendar both partners can edit that stays in sync with Google Calendar
 | Licensing strategy: AGPL core + commercial option | Protect open-source core from hosted forks while enabling paid license exceptions | ✓ Selected for v4.0 |
 | Product surface priority | Web app first; PWA and Android wrapper before native iOS/Android rewrite | ✓ Selected for v4.0 |
 
+| HMAC license keys for self-hosted | Offline validation, no phone-home, simple hex format | ✓ Shipped v4.0 |
+| Docker Compose with PostgREST | Supabase-compatible REST API for self-hosted without full Supabase stack | ✓ Shipped v4.0 |
+| Caddy for auto-HTTPS | Zero-config TLS via Let's Encrypt | ✓ Shipped v4.0 |
+
 ---
-*Last updated: 2026-03-23 for v4.0 monetization milestone kickoff*
+*Last updated: 2026-03-23 — Phase 31 self-hosted distribution complete*
