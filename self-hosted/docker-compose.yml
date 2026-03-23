@@ -2,9 +2,8 @@ version: "3.8"
 
 services:
   app:
-    build:
-      context: ..
-      dockerfile: Dockerfile
+    # TODO: Replace OWNER with the GitHub username/org
+    image: ghcr.io/OWNER/synco:latest
     env_file: .env
     environment:
       - ENVIRONMENT=self-hosted

@@ -12,18 +12,23 @@ Complete guide to deploy Synco on your own server with Docker Compose.
 
 ## Quick Start
 
-### 1. Extract the package
+### 1. Pull the image
+
+The production Docker image is published to GitHub Container Registry:
 
 ```bash
-# If you received a zip/tarball:
-unzip synco-self-hosted.zip
-cd synco-self-hosted
+# TODO: Replace OWNER with the GitHub username/org
+docker pull ghcr.io/OWNER/synco:latest
+```
 
-# Or clone and use the self-hosted directory:
+### 2. Extract the package
+
+```bash
+# Clone and use the self-hosted directory:
 cd self-hosted
 ```
 
-### 2. Configure environment
+### 3. Configure environment
 
 ```bash
 cp .env.template .env
@@ -40,13 +45,13 @@ Edit `.env` and fill in:
 | `PGRST_JWT_SECRET` | Random base64 secret (`openssl rand -base64 32`) |
 | `SITE_DOMAIN` | Your domain (e.g., `calendar.example.com`) |
 
-### 3. Start services
+### 4. Start services
 
 ```bash
 docker compose up -d
 ```
 
-### 4. Wait for health checks
+### 5. Wait for health checks
 
 ```bash
 docker compose ps
@@ -54,7 +59,7 @@ docker compose ps
 
 All services should show `healthy` or `running`.
 
-### 5. Open your domain
+### 6. Open your domain
 
 Navigate to `https://your-domain.com` and create your first user account.
 
