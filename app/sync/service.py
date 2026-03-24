@@ -174,6 +174,14 @@ class GoogleSyncService:
             try:
                 parsed = datetime.fromisoformat(iso)
                 if parsed.tzinfo is not None:
+                    tz_name = raw.get("timeZone")
+                    if tz_name:
+                        try:
+                            from zoneinfo import ZoneInfo
+                            target_tz = ZoneInfo(tz_name)
+                            return parsed.astimezone(target_tz).replace(tzinfo=None)
+                        except (KeyError, Exception):
+                            pass
                     return parsed.astimezone(timezone.utc).replace(tzinfo=None)
                 return parsed
             except ValueError:

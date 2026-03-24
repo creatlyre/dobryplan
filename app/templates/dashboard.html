@@ -154,6 +154,53 @@
           </div>
         {% endif %}
 
+        <!-- One-time expenses for current month -->
+        <div class="mb-4">
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-eyebrow">{{ t('dashboard.onetime_expenses') }}</p>
+            <button type="button" id="dash-add-expense-toggle" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">+ {{ t('dashboard.add_expense') }}</button>
+          </div>
+
+          {% if onetime_expenses %}
+            <div class="space-y-2 mb-2" id="dash-onetime-list">
+              {% for exp in onetime_expenses %}
+                <div class="flex items-center justify-between text-sm p-2 rounded-lg glass-subtle">
+                  <div class="flex items-center gap-2 min-w-0">
+                    {% if exp.category_id and exp.category_id in expense_categories and expense_categories[exp.category_id].color %}
+                      <span class="cat-dot" style="background-color: {{ expense_categories[exp.category_id].color }}"></span>
+                    {% else %}
+                      <span class="cat-dot bg-white/30"></span>
+                    {% endif %}
+                    <span class="truncate">{{ exp.name }}</span>
+                  </div>
+                  <span class="font-medium flex-shrink-0 ml-2">{{ exp.amount | int }} PLN</span>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="text-xs opacity-60 text-right">
+              {{ t('dashboard.onetime_total') }}: <span class="font-semibold">{{ onetime_expenses | sum(attribute='amount') | int }} PLN</span>
+            </div>
+          {% else %}
+            <p class="text-xs opacity-40">{{ t('dashboard.no_onetime') }}</p>
+          {% endif %}
+
+          <!-- Inline add expense form (hidden by default) -->
+          <div id="dash-expense-form" class="hidden mt-3 p-3 rounded-xl glass-subtle">
+            <div class="space-y-2">
+              <input type="text" id="dash-exp-name" placeholder="{{ t('budget.expenses_name') }}" class="glass-input w-full rounded-lg px-3 py-2 text-sm">
+              <div class="flex gap-2">
+                <input type="number" id="dash-exp-amount" placeholder="{{ t('budget.expenses_amount') }}" step="0.01" min="0.01" class="glass-input flex-1 rounded-lg px-3 py-2 text-sm">
+                <button type="button" id="dash-exp-submit" class="glass-btn-primary rounded-lg px-4 py-2 text-sm">{{ t('dashboard.add_expense') }}</button>
+              </div>
+              <details class="text-xs opacity-60">
+                <summary class="cursor-pointer hover:opacity-100 transition-opacity">{{ t('dashboard.bulk_paste') }}</summary>
+                <textarea id="dash-exp-bulk" rows="3" placeholder="{{ t('dashboard.bulk_paste_hint') }}" class="glass-input w-full rounded-lg px-3 py-2 text-sm mt-1"></textarea>
+                <button type="button" id="dash-exp-bulk-submit" class="glass-btn-info rounded-lg px-3 py-1.5 text-xs mt-1">{{ t('dashboard.bulk_add') }}</button>
+              </details>
+            </div>
+          </div>
+        </div>
+
         <a href="/budget/overview" class="block text-center text-sm text-indigo-400 hover:text-indigo-300 transition-colors py-1">
           {{ t('dashboard.view_overview') }}
         </a>
@@ -172,4 +219,67 @@
 
   </div>
 </div>
+
+<script>
+(function() {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth() + 1;
+
+  // Toggle add expense form
+  const toggle = document.getElementById('dash-add-expense-toggle');
+  const form = document.getElementById('dash-expense-form');
+  if (toggle && form) {
+    toggle.addEventListener('click', () => form.classList.toggle('hidden'));
+  }
+
+  // Single expense add
+  const submitBtn = document.getElementById('dash-exp-submit');
+  if (submitBtn) {
+    submitBtn.addEventListener('click', async () => {
+      const name = document.getElementById('dash-exp-name').value.trim();
+      const amount = parseFloat(document.getElementById('dash-exp-amount').value);
+      if (!name || !amount || amount <= 0) return;
+      try {
+        const resp = await fetch('/api/budget/expenses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ year, month, name, amount, recurring: false }),
+        });
+        if (resp.ok) location.reload();
+      } catch (e) { /* ignore */ }
+    });
+  }
+
+  // Bulk paste add
+  const bulkBtn = document.getElementById('dash-exp-bulk-submit');
+  if (bulkBtn) {
+    bulkBtn.addEventListener('click', async () => {
+      const raw = document.getElementById('dash-exp-bulk').value.trim();
+      if (!raw) return;
+      const lines = raw.split('\n').filter(l => l.trim());
+      const expenses = [];
+      for (const line of lines) {
+        // Support "Name Amount" or "Name\tAmount" format
+        const match = line.match(/^(.+?)\s+([\d.,]+)\s*$/);
+        if (match) {
+          const amt = parseFloat(match[2].replace(',', '.'));
+          if (amt > 0) {
+            expenses.push({ year, month, name: match[1].trim(), amount: amt, recurring: false });
+          }
+        }
+      }
+      if (!expenses.length) return;
+      try {
+        const resp = await fetch('/api/budget/expenses/bulk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ expenses }),
+        });
+        if (resp.ok) location.reload();
+      } catch (e) { /* ignore */ }
+    });
+  }
+})();
+</script>
 {% endblock %}

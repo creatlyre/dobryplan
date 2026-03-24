@@ -370,7 +370,9 @@ function parseDateTimeParts(dateValue, timeValue) {
   if (!dateValue || !timeValue) {
     return null;
   }
-  return new Date(`${dateValue}T${timeValue}`);
+  const [y, m, d] = dateValue.split('-').map(Number);
+  const [h, min] = timeValue.split(':').map(Number);
+  return new Date(Date.UTC(y, m - 1, d, h, min, 0));
 }
 
 function dateToYmd(dateObj) {
@@ -378,7 +380,9 @@ function dateToYmd(dateObj) {
 }
 
 function dateToHm(dateObj) {
-  return dateObj.toTimeString().slice(0, 5);
+  const h = String(dateObj.getUTCHours()).padStart(2, '0');
+  const m = String(dateObj.getUTCMinutes()).padStart(2, '0');
+  return `${h}:${m}`;
 }
 
 function clearEventEntryErrorState() {
@@ -454,16 +458,15 @@ function updateEventEntryValidation() {
 }
 
 function populateEventEntryFromDateTimeLocal(startAt, endAt) {
-  const startDate = startAt ? new Date(startAt) : null;
-  const endDate = endAt ? new Date(endAt) : null;
-
-  if (startDate && !Number.isNaN(startDate.getTime())) {
-    eventEntryStartDateInput.value = dateToYmd(startDate);
-    eventEntryStartTimeInput.value = dateToHm(startDate);
+  if (startAt && startAt.includes('T')) {
+    const [datePart, timePart] = startAt.split('T');
+    eventEntryStartDateInput.value = datePart;
+    eventEntryStartTimeInput.value = timePart.slice(0, 5);
   }
 
-  if (endDate && !Number.isNaN(endDate.getTime())) {
-    eventEntryEndTimeInput.value = dateToHm(endDate);
+  if (endAt && endAt.includes('T')) {
+    const [, timePart] = endAt.split('T');
+    eventEntryEndTimeInput.value = timePart.slice(0, 5);
   }
 }
 
@@ -636,10 +639,10 @@ async function submitEventEntry(keepOpen) {
     }
 
     const saved = await response.json();
-    const savedDate = new Date(saved.start_at);
-    currentYear = savedDate.getUTCFullYear();
-    currentMonth = savedDate.getUTCMonth() + 1;
-    currentDay = savedDate.getUTCDate();
+    const parts = (saved.start_at || '').split(/[-T]/);
+    currentYear = parseInt(parts[0], 10) || currentYear;
+    currentMonth = parseInt(parts[1], 10) || currentMonth;
+    currentDay = parseInt(parts[2], 10) || currentDay;
     await refreshPanels();
     showToast(I18N.eventSaved);
 

@@ -42,6 +42,7 @@ Previous milestone archived. See `.planning/milestones/v3.0-ROADMAP.md` for full
 
 - Define detailed phase plans for phases 28-33
 - Start execution with `/gsd-plan-phase 28`
+- Add filtered one-time expenses to main dashboard (2026-03-24)
 
 ## Session Continuity
 

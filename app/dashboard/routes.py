@@ -30,6 +30,15 @@ async def dashboard_page(
     category_map = service.get_event_categories(user.calendar_id)
     budget_snapshot = service.get_budget_snapshot(user.calendar_id)
     top_categories = service.get_top_expense_categories(user.calendar_id)
+    onetime_expenses = service.get_onetime_expenses(user.calendar_id)
+
+    # Build expense category map for display
+    expense_categories = {}
+    try:
+        cats = service.expense_service.list_categories(user.calendar_id)
+        expense_categories = {c.id: c for c in cats}
+    except Exception:
+        pass
 
     # Build category name → i18n key map for translation
     _CAT_I18N_SLUGS = {
@@ -66,6 +75,8 @@ async def dashboard_page(
             "category_map": category_map,
             "budget_snapshot": budget_snapshot,
             "top_categories": top_categories,
+            "onetime_expenses": onetime_expenses,
+            "expense_categories": expense_categories,
             "cat_i18n": {},  # placeholder, filled after inject
             "budget_month_key": month_keys[now.month - 1],
             "budget_year": now.year,

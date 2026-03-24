@@ -86,3 +86,15 @@ class DashboardService:
         except Exception:
             return []
         return breakdown[:limit]
+
+    def get_onetime_expenses(self, calendar_id: str) -> list[dict]:
+        """Return one-time expenses for the current month."""
+        now = datetime.utcnow()
+        try:
+            data = self.expense_service.get_year_data(calendar_id, now.year)
+        except Exception:
+            return []
+        return [
+            e for e in data.get("onetime_expenses", [])
+            if e.get("month") == now.month
+        ]
