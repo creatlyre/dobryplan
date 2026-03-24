@@ -139,6 +139,147 @@ def test_register_page_has_google_oauth_button(test_client):
     assert "auth/login?provider=google" in body
 
 
+def test_forgot_password_page_renders(test_client):
+    """GET /auth/forgot-password renders an email form."""
+    response = test_client.get("/auth/forgot-password", follow_redirects=False)
+    assert response.status_code == 200
+    assert "text/html" in response.headers.get("content-type", "")
+    assert "forgot-password" in response.text
+
+
+def test_forgot_password_submit_returns_success(test_client, monkeypatch):
+    """POST /auth/forgot-password returns 200 when Supabase sends the reset email."""
+    import app.auth.routes as auth_routes
+
+    async def _mock_reset(email, redirect_to):
+        return {}
+
+    monkeypatch.setattr(auth_routes, "supabase_request_password_reset", _mock_reset)
+    monkeypatch.setattr(auth_routes, "is_supabase_auth_enabled", lambda s=None: True)
+
+    response = test_client.post(
+        "/auth/forgot-password",
+        json={"email": "test@example.com"},
+    )
+    assert response.status_code == 200
+    assert "message" in response.json()
+
+
+def test_forgot_password_nonexistent_email_still_succeeds(test_client, monkeypatch):
+    """POST /auth/forgot-password never reveals whether an email exists (security)."""
+    import app.auth.routes as auth_routes
+
+    async def _mock_reset(email, redirect_to):
+        raise ValueError("User not found")
+
+    monkeypatch.setattr(auth_routes, "supabase_request_password_reset", _mock_reset)
+    monkeypatch.setattr(auth_routes, "is_supabase_auth_enabled", lambda s=None: True)
+
+    response = test_client.post(
+        "/auth/forgot-password",
+        json={"email": "nonexistent@example.com"},
+    )
+    assert response.status_code == 200
+
+
+def test_confirm_callback_recovery_redirects_to_update_password(test_client, monkeypatch):
+    """GET /auth/confirm?type=recovery creates session and redirects to update-password."""
+    import app.auth.routes as auth_routes
+
+    async def _mock_verify(token_hash, type_):
+        return {"access_token": "recovered_token", "refresh_token": "refresh_123"}
+
+    async def _mock_fetch_user(token):
+        return {"id": "uid-1", "email": "user@example.com", "user_metadata": {"full_name": "Test User"}}
+
+    monkeypatch.setattr(auth_routes, "supabase_verify_otp", _mock_verify)
+    monkeypatch.setattr(auth_routes, "fetch_supabase_user", _mock_fetch_user)
+
+    response = test_client.get(
+        "/auth/confirm?token_hash=abc123&type=recovery",
+        follow_redirects=False,
+    )
+    assert response.status_code == 302
+    assert "/auth/update-password" in response.headers.get("location", "")
+    assert "session=" in response.headers.get("set-cookie", "")
+
+
+def test_confirm_callback_signup_redirects_to_home(test_client, monkeypatch):
+    """GET /auth/confirm?type=signup creates session and redirects to /."""
+    import app.auth.routes as auth_routes
+
+    async def _mock_verify(token_hash, type_):
+        return {"access_token": "signup_token", "refresh_token": "refresh_456"}
+
+    async def _mock_fetch_user(token):
+        return {"id": "uid-2", "email": "new@example.com", "user_metadata": {"full_name": "New User"}}
+
+    monkeypatch.setattr(auth_routes, "supabase_verify_otp", _mock_verify)
+    monkeypatch.setattr(auth_routes, "fetch_supabase_user", _mock_fetch_user)
+
+    response = test_client.get(
+        "/auth/confirm?token_hash=def456&type=signup",
+        follow_redirects=False,
+    )
+    assert response.status_code == 302
+    assert response.headers.get("location") == "/"
+    assert "session=" in response.headers.get("set-cookie", "")
+
+
+def test_confirm_callback_missing_params_redirects_to_login(test_client):
+    """GET /auth/confirm without token_hash/type redirects to login."""
+    response = test_client.get("/auth/confirm", follow_redirects=False)
+    assert response.status_code == 302
+    assert "/auth/login" in response.headers.get("location", "")
+
+
+def test_update_password_page_requires_session(test_client):
+    """GET /auth/update-password without session redirects to login."""
+    response = test_client.get("/auth/update-password", follow_redirects=False)
+    assert response.status_code == 302
+    assert "/auth/login" in response.headers.get("location", "")
+
+
+def test_update_password_page_renders_with_session(test_client):
+    """GET /auth/update-password with session cookie renders the form."""
+    test_client.cookies.set("session", "fake_session_token")
+    response = test_client.get("/auth/update-password", follow_redirects=False)
+    assert response.status_code == 200
+    assert "text/html" in response.headers.get("content-type", "")
+    assert "update-password" in response.text
+    test_client.cookies.clear()
+
+
+def test_update_password_submit(test_client, monkeypatch):
+    """POST /auth/update-password with valid password succeeds."""
+    import app.auth.routes as auth_routes
+
+    async def _mock_update(token, password):
+        return {"id": "uid-1", "email": "user@example.com"}
+
+    monkeypatch.setattr(auth_routes, "supabase_update_user_password", _mock_update)
+
+    test_client.cookies.set("session", "valid_token")
+    response = test_client.post(
+        "/auth/update-password",
+        json={"password": "newpassword123"},
+    )
+    assert response.status_code == 200
+    assert "message" in response.json()
+    test_client.cookies.clear()
+
+
+def test_update_password_too_short(test_client):
+    """POST /auth/update-password with short password returns 400."""
+    test_client.cookies.set("session", "valid_token")
+    response = test_client.post(
+        "/auth/update-password",
+        json={"password": "abc"},
+    )
+    assert response.status_code == 400
+    test_client.cookies.clear()
+
+
 def test_unauthenticated_post_to_protected_route_redirects_as_get(test_client):
     """Unauthenticated request to dashboard should redirect with 302 (not 307) to avoid 405."""
     resp = test_client.get("/dashboard", follow_redirects=False)
