@@ -22,6 +22,13 @@
   Plans:
   - [ ] 34-01-PLAN.md — Enhanced hero, social proof, SEO meta, i18n + tests
 
+- [ ] Phase 35: Fix Logout Redirect — Replace Raw JSON With Proper Page Redirect (1 plan)
+  **Goal:** After clicking logout, users currently see a raw JSON response (`{"message":"Wylogowano"}`) instead of being redirected to the login or landing page. Fix the logout endpoint to redirect the browser properly.
+  **Depends on:** Phase 33
+  **Plans:** 1 plan
+  Plans:
+  - [ ] 35-01-PLAN.md — Fix logout endpoint redirect + tests
+
 <details>
 <summary>✅ v4.0 Monetization Foundation (Phases 28-33) — SHIPPED 2026-03-23</summary>
 
@@ -123,6 +130,16 @@
 | 33. Go-to-Market, Pricing, and Launch Funnel | v4.0 | 3/3 | Complete | 2026-03-23 |
 
 | 34. Hero Landing Page | 1/1 | Complete   | 2026-03-24 | — |
+
+### Phase 1: Fix Logout Redirect — Replace Raw JSON With Proper Page Redirect
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 0
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 1 to break down)
 
 ---
 

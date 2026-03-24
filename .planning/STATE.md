@@ -41,6 +41,7 @@ Previous milestone archived. See `.planning/milestones/v3.0-ROADMAP.md` for full
 ### Roadmap Evolution
 
 - Phase 34 added: Hero Landing Page — Pre-Login Marketing & Conversion (v5.0)
+- Phase 35 added: Fix Logout Redirect — Replace Raw JSON With Proper Page Redirect (v5.0)
 
 ### Pending Todos
 
