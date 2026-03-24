@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="synco-grad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <!-- Calendar body with rounded corners -->
+  <rect x="3" y="7" width="26" height="22" rx="4" fill="url(#synco-grad)"/>
+  <!-- Calendar pins -->
+  <rect x="9.5" y="3" width="2.4" height="7" rx="1.2" fill="url(#synco-grad)"/>
+  <rect x="20.1" y="3" width="2.4" height="7" rx="1.2" fill="url(#synco-grad)"/>
+  <!-- Divider line under header -->
+  <line x1="6" y1="13.5" x2="26" y2="13.5" stroke="white" stroke-opacity="0.3" stroke-width="0.8"/>
+  <!-- Sync circle with arrows - centered in grid area -->
+  <circle cx="16" cy="21.5" r="5.5" stroke="white" stroke-width="0" fill="rgba(255,255,255,0.12)"/>
+  <path d="M12.5 19.2a5 5 0 0 1 7.8 1" stroke="white" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+  <polygon points="20.5,19.2 21.6,21.2 19.3,21" fill="white"/>
+  <path d="M19.5 23.8a5 5 0 0 1-7.8-1" stroke="white" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+  <polygon points="11.5,23.8 10.4,21.8 12.7,22" fill="white"/>
+</svg>
