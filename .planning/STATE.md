@@ -42,6 +42,7 @@ Previous milestone archived. See `.planning/milestones/v3.0-ROADMAP.md` for full
 
 - Phase 34 added: Hero Landing Page — Pre-Login Marketing & Conversion (v5.0)
 - Phase 35 added: Fix Logout Redirect — Replace Raw JSON With Proper Page Redirect (v5.0)
+- Phase 2 added: Eliminate Method Not Allowed errors and browser confirmation dialogs on public pages
 
 ### Quick Tasks Completed
 

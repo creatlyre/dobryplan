@@ -141,6 +141,16 @@
 Plans:
 - [ ] TBD (run /gsd-plan-phase 1 to break down)
 
+### Phase 2: Eliminate Method Not Allowed errors and browser confirmation dialogs on public pages
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 1
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 2 to break down)
+
 ---
 
 *Roadmap updated: 2026-03-24 — Phase 34 added for v5.0 Growth & Conversion*
