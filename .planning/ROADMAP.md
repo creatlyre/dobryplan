@@ -143,13 +143,13 @@ Plans:
 
 ### Phase 2: Eliminate Method Not Allowed errors and browser confirmation dialogs on public pages
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Fix 307→302 redirects in auth middleware/exception handler to prevent 405 errors, convert logout POST form to GET link to eliminate browser resubmission dialogs, and replace native alert() with inline toast on pricing page.
+**Requirements**: [FIX-01, FIX-02]
 **Depends on:** Phase 1
-**Plans:** 0 plans
+**Plans:** 1 plan
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 2 to break down)
+- [ ] 02-01-PLAN.md — Fix redirects, logout link, pricing toast + tests
 
 ---
 
