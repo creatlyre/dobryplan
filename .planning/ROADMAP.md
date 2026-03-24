@@ -8,8 +8,18 @@
 - [x] v2.1 milestone — Privacy, Reminders & Multi-Year Budget - Phases 18-22 shipped 2026-03-22 (270 tests passing). Archive: .planning/milestones/v2.1-ROADMAP.md
 - [x] v3.0 milestone — Dashboard, Notifications & Categories - Phases 23-27 shipped 2026-03-23 (331 tests passing). Archive: .planning/milestones/v3.0-ROADMAP.md
 - [x] v4.0 milestone — Monetization Foundation (SaaS primary + self-hosted purchase option) - Phases 28-33 shipped 2026-03-23 (446 tests passing)
+- [ ] v5.0 milestone — Growth & Conversion — Phases 34+
 
 ## Phases
+
+### v5.0 Growth & Conversion (Phase 34+)
+
+- [ ] Phase 34: Hero Landing Page — Pre-Login Marketing & Conversion
+  **Goal:** A stunning, conversion-focused hero/landing page at `/` that showcases CalendarPlanner's value proposition to visitors before they sign up. Includes CTA buttons to `/login` and `/register`, feature highlights, social proof, and pricing teaser. First impression that sells.
+  **Requirements:** TBD
+  **Depends on:** Phase 33
+  Plans:
+  - [ ] TBD (run /gsd-plan-phase 34 to break down)
 
 <details>
 <summary>✅ v4.0 Monetization Foundation (Phases 28-33) — SHIPPED 2026-03-23</summary>
@@ -111,6 +121,8 @@
 | 32. Mobile Distribution Path (PWA + Android Wrapper) | v4.0 | 2/2 | Complete | 2026-03-23 |
 | 33. Go-to-Market, Pricing, and Launch Funnel | v4.0 | 3/3 | Complete | 2026-03-23 |
 
+| 34. Hero Landing Page | v5.0 | 0/0 | Not planned | — |
+
 ---
 
-*Roadmap updated: 2026-03-23 for v4.0 monetization planning*
+*Roadmap updated: 2026-03-24 — Phase 34 added for v5.0 Growth & Conversion*

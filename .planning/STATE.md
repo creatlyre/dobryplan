@@ -38,17 +38,19 @@ Previous milestone archived. See `.planning/milestones/v3.0-ROADMAP.md` for full
 
 (Archived to PROJECT.md Key Decisions table)
 
+### Roadmap Evolution
+
+- Phase 34 added: Hero Landing Page — Pre-Login Marketing & Conversion (v5.0)
+
 ### Pending Todos
 
-- Define detailed phase plans for phases 28-33
-- Start execution with `/gsd-plan-phase 28`
 - Add filtered one-time expenses to main dashboard (2026-03-24)
 
 ## Session Continuity
 
-Last session: 2026-03-23
-Stopped at: Phase 33 complete
-Next action: v4.0 milestone shipped — ready for v5.0 planning or launch execution
+Last session: 2026-03-24
+Stopped at: Phase 34 added to v5.0 milestone
+Next action: `/gsd-plan-phase 34` — plan the Hero Landing Page
 
 ## Session Log
 
