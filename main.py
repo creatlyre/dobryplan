@@ -50,6 +50,7 @@ from app.billing.routes import router as billing_router
 from app.billing.views import router as billing_views_router
 from app.billing.views import public_router as billing_public_router
 from app.admin.routes import router as admin_router
+from app.admin.views import router as admin_views_router
 
 app = FastAPI(
     title="Synco",
@@ -200,6 +201,7 @@ app.include_router(billing_router)
 app.include_router(billing_views_router)
 app.include_router(billing_public_router)
 app.include_router(admin_router)
+app.include_router(admin_views_router)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -278,6 +280,10 @@ async def auth_redirect_handler(request: Request, exc: HTTPException):
         from fastapi.responses import RedirectResponse
 
         return RedirectResponse(url="/auth/login", status_code=302)
+    if exc.status_code == 403 and request.url.path.startswith("/admin"):
+        from fastapi.responses import RedirectResponse
+
+        return RedirectResponse(url="/dashboard", status_code=302)
     return await http_exception_handler(request, exc)
 
 

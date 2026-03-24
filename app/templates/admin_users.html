@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('admin.users_title') }} - {{ t('app.name') }}{% endblock %}
+{% block page_heading %}{{ t('admin.users_title') }}{% endblock %}
+
+{% block content %}
+<!-- Search -->
+<div class="glass rounded-2xl p-5 mb-6">
+  <form method="get" action="/admin/users" class="flex gap-3">
+    <input type="text" name="search" value="{{ search }}"
+           placeholder="{{ t('admin.search_placeholder') }}"
+           class="flex-1 rounded-xl bg-white/10 border border-white/20 px-4 py-2.5 text-sm placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-indigo-400/50 min-h-[44px]">
+    <button type="submit" class="glass-btn-primary rounded-xl px-5 py-2.5 text-sm font-medium min-h-[44px]">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+  </form>
+</div>
+
+<!-- User Table -->
+<div class="glass rounded-2xl overflow-hidden mb-6">
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-white/10">
+          <th class="text-left px-5 py-3 font-semibold opacity-70">{{ t('admin.email') }}</th>
+          <th class="text-left px-5 py-3 font-semibold opacity-70 hidden sm:table-cell">{{ t('admin.name') }}</th>
+          <th class="text-left px-5 py-3 font-semibold opacity-70">{{ t('admin.plan') }}</th>
+          <th class="text-left px-5 py-3 font-semibold opacity-70 hidden md:table-cell">{{ t('admin.admin_status') }}</th>
+          <th class="text-left px-5 py-3 font-semibold opacity-70 hidden lg:table-cell">{{ t('admin.created') }}</th>
+          <th class="text-right px-5 py-3 font-semibold opacity-70">{{ t('admin.actions') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+          <td class="px-5 py-3">
+            <div class="truncate max-w-[200px]">{{ u.email }}</div>
+          </td>
+          <td class="px-5 py-3 hidden sm:table-cell">{{ u.name or '—' }}</td>
+          <td class="px-5 py-3">
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+              {% if u.id in _plan_map and _plan_map[u.id] == 'pro' %}bg-indigo-500/20 text-indigo-300
+              {% elif u.id in _plan_map and _plan_map[u.id] == 'family_plus' %}bg-emerald-500/20 text-emerald-300
+              {% else %}bg-white/10 text-white/60{% endif %}">
+              {{ (_plan_map.get(u.id, 'free') if _plan_map is defined else 'free')|replace('_', ' ')|capitalize }}
+            </span>
+          </td>
+          <td class="px-5 py-3 hidden md:table-cell">
+            {% if u.is_admin %}
+              <span class="inline-flex items-center gap-1 text-amber-300 text-xs font-medium">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                {{ t('admin.yes') }}
+              </span>
+            {% else %}
+              <span class="text-xs opacity-40">{{ t('admin.no') }}</span>
+            {% endif %}
+          </td>
+          <td class="px-5 py-3 hidden lg:table-cell text-xs opacity-60 font-mono">
+            {{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '—' }}
+          </td>
+          <td class="px-5 py-3 text-right">
+            <a href="/admin/users/{{ u.id }}" class="glass-btn-secondary rounded-lg px-3 py-1.5 text-xs font-medium inline-flex items-center gap-1">
+              {{ t('admin.view') }}
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+        {% if not users %}
+        <tr><td colspan="6" class="px-5 py-8 text-center opacity-50">No users found.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Pagination -->
+{% if total > limit %}
+<div class="flex justify-between items-center">
+  {% if offset > 0 %}
+    <a href="/admin/users?offset={{ offset - limit }}&limit={{ limit }}{% if search %}&search={{ search }}{% endif %}"
+       class="glass-btn-secondary rounded-xl px-4 py-2 text-sm">{{ t('admin.previous') }}</a>
+  {% else %}
+    <span></span>
+  {% endif %}
+
+  <span class="text-xs opacity-50">{{ offset + 1 }}–{{ [offset + limit, total]|min }} / {{ total }}</span>
+
+  {% if offset + limit < total %}
+    <a href="/admin/users?offset={{ offset + limit }}&limit={{ limit }}{% if search %}&search={{ search }}{% endif %}"
+       class="glass-btn-secondary rounded-xl px-4 py-2 text-sm">{{ t('admin.next') }}</a>
+  {% else %}
+    <span></span>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- Back to Dashboard -->
+<div class="mt-6">
+  <a href="/admin" class="text-sm opacity-60 hover:opacity-100 transition-opacity">← {{ t('admin.dashboard_title') }}</a>
+</div>
+{% endblock %}

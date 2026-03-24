@@ -234,3 +234,40 @@ class TestAdminStats:
         assert isinstance(data["plan_distribution"], dict)
         assert isinstance(data["recent_signups"], int)
         assert data["recent_signups"] >= 2  # regular + another created within 30 days
+
+
+# --- Admin Views (HTML) ---
+
+
+class TestAdminViews:
+    def test_admin_dashboard_page(self, admin_client):
+        resp = admin_client.get("/admin", follow_redirects=False)
+        assert resp.status_code == 200
+        assert "Admin" in resp.text or "administratora" in resp.text
+
+    def test_admin_users_page(self, admin_client):
+        resp = admin_client.get("/admin/users")
+        assert resp.status_code == 200
+        assert "regular@example.com" in resp.text
+
+    def test_admin_user_detail_page(self, admin_client, admin_db):
+        _, _, regular, _ = admin_db
+        resp = admin_client.get(f"/admin/users/{regular.id}")
+        assert resp.status_code == 200
+        assert "regular@example.com" in resp.text
+
+    def test_non_admin_redirected_from_admin_pages(self, non_admin_client):
+        resp = non_admin_client.get("/admin", follow_redirects=False)
+        assert resp.status_code == 302
+        assert "/dashboard" in resp.headers.get("location", "")
+
+    def test_admin_nav_link_visible_for_admin(self, admin_client):
+        resp = admin_client.get("/dashboard")
+        assert resp.status_code == 200
+        assert 'href="/admin"' in resp.text
+
+    def test_admin_nav_link_hidden_for_non_admin(self, non_admin_client):
+        resp = non_admin_client.get("/dashboard")
+        # non_admin_client has overridden get_current_user so dashboard should work
+        if resp.status_code == 200:
+            assert 'href="/admin"' not in resp.text

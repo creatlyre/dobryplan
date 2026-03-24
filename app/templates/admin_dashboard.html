@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('admin.dashboard_title') }} - {{ t('app.name') }}{% endblock %}
+{% block page_heading %}{{ t('admin.dashboard_title') }}{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+  <!-- Total Users -->
+  <div class="glass rounded-2xl p-6 text-center">
+    <div class="text-4xl font-bold text-indigo-300 mb-2">{{ stats.user_count }}</div>
+    <div class="text-sm opacity-70">{{ t('admin.total_users') }}</div>
+  </div>
+  <!-- Recent Signups -->
+  <div class="glass rounded-2xl p-6 text-center">
+    <div class="text-4xl font-bold text-emerald-300 mb-2">{{ stats.recent_signups }}</div>
+    <div class="text-sm opacity-70">{{ t('admin.recent_signups') }}</div>
+  </div>
+  <!-- Active Subscriptions (non-free) -->
+  {% set paid_count = namespace(val=0) %}
+  {% for plan, count in stats.plan_distribution.items() %}
+    {% if plan != 'free' %}{% set paid_count.val = paid_count.val + count %}{% endif %}
+  {% endfor %}
+  <div class="glass rounded-2xl p-6 text-center">
+    <div class="text-4xl font-bold text-amber-300 mb-2">{{ paid_count.val }}</div>
+    <div class="text-sm opacity-70">{{ t('admin.active_subscriptions') }}</div>
+  </div>
+</div>
+
+<!-- Plan Distribution -->
+<div class="glass rounded-2xl p-6 mb-8">
+  <h2 class="text-lg font-semibold mb-4">{{ t('admin.plan_distribution') }}</h2>
+  {% set total_subs = stats.plan_distribution.values()|sum or 1 %}
+  <div class="space-y-3">
+    {% for plan_name, count in stats.plan_distribution.items() %}
+    <div class="flex items-center gap-4">
+      <span class="text-sm font-medium w-28 capitalize">{{ plan_name|replace('_', ' ') }}</span>
+      <div class="flex-1 h-3 rounded-full bg-white/10 overflow-hidden">
+        <div class="h-full rounded-full transition-all duration-500
+          {% if plan_name == 'free' %}bg-gray-400{% elif plan_name == 'pro' %}bg-indigo-400{% else %}bg-emerald-400{% endif %}"
+          style="width: {{ (count / total_subs * 100)|round(1) }}%"></div>
+      </div>
+      <span class="text-sm font-mono opacity-70 w-10 text-right">{{ count }}</span>
+    </div>
+    {% endfor %}
+    {% if not stats.plan_distribution %}
+    <p class="text-sm opacity-50">No subscription data yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="flex gap-4">
+  <a href="/admin/users" class="glass-btn-primary rounded-xl px-6 py-3 inline-flex items-center gap-2 text-sm font-medium">
+    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    {{ t('admin.manage_users') }}
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('admin.user_detail_title') }} - {{ t('app.name') }}{% endblock %}
+{% block page_heading %}{{ t('admin.user_detail_title') }}{% endblock %}
+
+{% block content %}
+<!-- Back link -->
+<a href="/admin/users" class="text-sm opacity-60 hover:opacity-100 transition-opacity inline-flex items-center gap-1 mb-6">
+  {{ t('admin.back_to_users') }}
+</a>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- User Info Card -->
+  <div class="glass rounded-2xl p-6">
+    <h2 class="text-lg font-semibold mb-4">{{ t('admin.user_info') }}</h2>
+    <div class="space-y-3 text-sm">
+      <div class="flex justify-between">
+        <span class="opacity-60">{{ t('admin.email') }}</span>
+        <span class="font-medium">{{ target_user.email }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="opacity-60">{{ t('admin.name') }}</span>
+        <span class="font-medium">{{ target_user.name or '—' }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="opacity-60">{{ t('admin.created') }}</span>
+        <span class="font-mono text-xs">{{ target_user.created_at.strftime('%Y-%m-%d %H:%M') if target_user.created_at else '—' }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="opacity-60">{{ t('admin.last_login') }}</span>
+        <span class="font-mono text-xs">{{ target_user.last_login.strftime('%Y-%m-%d %H:%M') if target_user.last_login else '—' }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="opacity-60">{{ t('admin.admin_status') }}</span>
+        <span>
+          {% if target_user.is_admin %}
+            <span class="inline-flex items-center gap-1 text-amber-300 text-xs font-medium">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              Admin
+            </span>
+          {% else %}
+            <span class="text-xs opacity-40">User</span>
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan Management Card -->
+  <div class="glass rounded-2xl p-6">
+    <h2 class="text-lg font-semibold mb-4">{{ t('admin.plan_management') }}</h2>
+    <div class="mb-4">
+      <span class="text-sm opacity-60">{{ t('admin.current_plan') }}:</span>
+      <span class="ml-2 inline-flex items-center rounded-full px-3 py-1 text-xs font-medium
+        {% if target_plan == 'pro' %}bg-indigo-500/20 text-indigo-300
+        {% elif target_plan == 'family_plus' %}bg-emerald-500/20 text-emerald-300
+        {% else %}bg-white/10 text-white/60{% endif %}">
+        {{ target_plan|replace('_', ' ')|capitalize }}
+      </span>
+    </div>
+
+    <div class="flex items-end gap-3" id="plan-form">
+      <div class="flex-1">
+        <select id="plan-select"
+                class="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/50 min-h-[44px]">
+          <option value="free" {% if target_plan == 'free' %}selected{% endif %}>Free</option>
+          <option value="pro" {% if target_plan == 'pro' %}selected{% endif %}>Pro</option>
+          <option value="family_plus" {% if target_plan == 'family_plus' %}selected{% endif %}>Family Plus</option>
+        </select>
+      </div>
+      <button type="button" onclick="changePlan('{{ target_user.id }}')"
+              class="glass-btn-primary rounded-xl px-5 py-2.5 text-sm font-medium min-h-[44px]">
+        {{ t('admin.update_plan') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Privileges Card -->
+<div class="glass rounded-2xl p-6 mt-6">
+  <h2 class="text-lg font-semibold mb-4">{{ t('admin.admin_privileges') }}</h2>
+  <div class="flex items-center justify-between">
+    <div>
+      <span class="text-sm">{{ t('admin.admin_status') }}:</span>
+      <span class="ml-2 text-sm font-medium {% if target_user.is_admin %}text-amber-300{% else %}opacity-60{% endif %}">
+        {{ t('admin.yes') if target_user.is_admin else t('admin.no') }}
+      </span>
+    </div>
+    {% if target_user.id == user.id %}
+      <button type="button" disabled
+              class="glass-btn-secondary rounded-xl px-5 py-2.5 text-sm font-medium opacity-30 cursor-not-allowed min-h-[44px]"
+              title="Cannot change your own admin status">
+        {{ t('admin.revoke_admin') if target_user.is_admin else t('admin.grant_admin') }}
+      </button>
+    {% else %}
+      <button type="button" onclick="toggleAdmin('{{ target_user.id }}', {{ 'false' if target_user.is_admin else 'true' }})"
+              class="{% if target_user.is_admin %}glass-btn-secondary{% else %}glass-btn-primary{% endif %} rounded-xl px-5 py-2.5 text-sm font-medium min-h-[44px]">
+        {{ t('admin.revoke_admin') if target_user.is_admin else t('admin.grant_admin') }}
+      </button>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+async function changePlan(userId) {
+  const plan = document.getElementById('plan-select').value;
+  try {
+    const resp = await fetch(`/api/admin/users/${userId}/plan`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({plan})
+    });
+    const data = await resp.json();
+    if (resp.ok) {
+      if (typeof showToast === 'function') showToast('{{ t("admin.plan_updated") }}', 'success');
+      setTimeout(() => location.reload(), 800);
+    } else {
+      if (typeof showToast === 'function') showToast(data.detail || 'Error', 'error');
+    }
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Network error', 'error');
+  }
+}
+
+async function toggleAdmin(userId, setAdmin) {
+  try {
+    const resp = await fetch(`/api/admin/users/${userId}/admin`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({is_admin: setAdmin})
+    });
+    const data = await resp.json();
+    if (resp.ok) {
+      if (typeof showToast === 'function') showToast('{{ t("admin.admin_updated") }}', 'success');
+      setTimeout(() => location.reload(), 800);
+    } else {
+      if (typeof showToast === 'function') showToast(data.detail || 'Error', 'error');
+    }
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Network error', 'error');
+  }
+}
+</script>
+{% endblock %}
