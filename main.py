@@ -49,6 +49,7 @@ from app.dashboard.routes import router as dashboard_router
 from app.billing.routes import router as billing_router
 from app.billing.views import router as billing_views_router
 from app.billing.views import public_router as billing_public_router
+from app.admin.routes import router as admin_router
 
 app = FastAPI(
     title="Synco",
@@ -198,6 +199,7 @@ app.include_router(dashboard_router)
 app.include_router(billing_router)
 app.include_router(billing_views_router)
 app.include_router(billing_public_router)
+app.include_router(admin_router)
 
 
 @app.get("/", response_class=HTMLResponse)
