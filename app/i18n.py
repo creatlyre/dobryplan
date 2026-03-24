@@ -1,5 +1,5 @@
 import json
-from functools import lru_cache
+import time
 from pathlib import Path
 from typing import Any, Callable
 
@@ -10,6 +10,9 @@ SUPPORTED_LOCALES = {"pl", "en"}
 BCP47_BY_LOCALE = {"pl": "pl-PL", "en": "en-US"}
 
 _LOCALES_DIR = Path(__file__).resolve().parent / "locales"
+
+# Locale cache: invalidates when the JSON file's mtime changes.
+_locale_cache: dict[str, tuple[float, dict[str, str]]] = {}
 
 
 def normalize_locale(raw: str | None) -> str:
@@ -24,16 +27,21 @@ def normalize_locale(raw: str | None) -> str:
     return DEFAULT_LOCALE
 
 
-@lru_cache(maxsize=8)
 def _load_locale(locale: str) -> dict[str, str]:
     locale_file = _LOCALES_DIR / f"{locale}.json"
     if not locale_file.exists():
         return {}
+    mtime = locale_file.stat().st_mtime
+    cached = _locale_cache.get(locale)
+    if cached and cached[0] == mtime:
+        return cached[1]
     with locale_file.open("r", encoding="utf-8") as fh:
         data = json.load(fh)
     if not isinstance(data, dict):
         return {}
-    return {str(k): str(v) for k, v in data.items()}
+    result = {str(k): str(v) for k, v in data.items()}
+    _locale_cache[locale] = (mtime, result)
+    return result
 
 
 def resolve_locale(request: Request) -> str:
