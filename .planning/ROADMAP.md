@@ -7,17 +7,17 @@
 - [x] v2.0 milestone — Budget Tracker - Phases 12-17 shipped 2026-03-20 (230 tests passing). Archive: .planning/milestones/v2.0-ROADMAP.md
 - [x] v2.1 milestone — Privacy, Reminders & Multi-Year Budget - Phases 18-22 shipped 2026-03-22 (270 tests passing). Archive: .planning/milestones/v2.1-ROADMAP.md
 - [x] v3.0 milestone — Dashboard, Notifications & Categories - Phases 23-27 shipped 2026-03-23 (331 tests passing). Archive: .planning/milestones/v3.0-ROADMAP.md
-- [ ] v4.0 milestone — Monetization Foundation (SaaS primary + self-hosted purchase option) - Phases 28-33 planned
+- [x] v4.0 milestone — Monetization Foundation (SaaS primary + self-hosted purchase option) - Phases 28-33 shipped 2026-03-23 (446 tests passing)
 
 ## Phases
 
 <details>
-<summary>🚧 v4.0 Monetization Foundation (Phases 28-33) — PLANNED</summary>
+<summary>✅ v4.0 Monetization Foundation (Phases 28-33) — SHIPPED 2026-03-23</summary>
 
-- [ ] Phase 28: Licensing and Commercial Terms Foundation (2 plans)
+- [x] Phase 28: Licensing and Commercial Terms Foundation (2 plans) — completed 2026-03-23
   Plans:
-  - [ ] 28-01-PLAN.md — Commercial license terms, monetization docs, NOTICE
-  - [ ] 28-02-PLAN.md — LICENSE verification, README licensing section
+  - [x] 28-01-PLAN.md — Commercial license terms, monetization docs, NOTICE
+  - [x] 28-02-PLAN.md — LICENSE verification, README licensing section
 - [x] Phase 29: Billing, Plans, and Entitlements Core (2 plans) — completed 2026-03-23
   Plans:
   - [x] 29-01-PLAN.md — Billing data model, Stripe checkout, webhook handler
@@ -104,12 +104,12 @@
 | 25. Shopping List | v3.0 | 2/2 | Complete | 2026-03-23 |
 | 26. Notifications | v3.0 | 3/3 | Complete | 2026-03-23 |
 | 27. Dashboard | v3.0 | 2/2 | Complete | 2026-03-23 |
-| 28. Licensing and Commercial Terms Foundation | 2/2 | Complete    | 2026-03-23 | - |
-| 29. Billing, Plans, and Entitlements Core | v4.0 | 0/2 | Planned | - |
+| 28. Licensing and Commercial Terms Foundation | v4.0 | 2/2 | Complete | 2026-03-23 |
+| 29. Billing, Plans, and Entitlements Core | v4.0 | 2/2 | Complete | 2026-03-23 |
 | 30. SaaS Production Platform and Operations | v4.0 | 2/2 | Complete | 2026-03-23 |
-| 31. Paid Self-Hosted Distribution | v4.0 | Complete    | 2026-03-23 | - |
-| 32. Mobile Distribution Path (PWA + Android Wrapper) | v4.0 | Complete    | 2026-03-23 | - |
-| 33. Go-to-Market, Pricing, and Launch Funnel | 2/3 | In Progress|  | - |
+| 31. Paid Self-Hosted Distribution | v4.0 | 2/2 | Complete | 2026-03-23 |
+| 32. Mobile Distribution Path (PWA + Android Wrapper) | v4.0 | 2/2 | Complete | 2026-03-23 |
+| 33. Go-to-Market, Pricing, and Launch Funnel | v4.0 | 3/3 | Complete | 2026-03-23 |
 
 ---
 
