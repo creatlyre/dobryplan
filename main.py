@@ -59,6 +59,8 @@ from app.licensing.telemetry import (
     TelemetryReporter,
 )
 
+logger = logging.getLogger(__name__)
+
 app = FastAPI(
     title="Synco",
     description="Shared household calendar & budget planner with Google Calendar sync",
