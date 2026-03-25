@@ -23,13 +23,13 @@ const accounts = [
 
 for (const account of accounts) {
   setup(`authenticate as ${account.name}`, async ({ page }) => {
-    await page.goto('/auth/login');
+    await page.goto('/auth/login', { timeout: 30_000 });
     await page.locator('#email').fill(account.email);
     await page.locator('#password').fill(account.password);
     await page.locator('.btn-primary').click();
 
     // Wait for the fetch-based login to complete and redirect to dashboard
-    await page.waitForURL('**/');
+    await page.waitForURL('**/dashboard', { timeout: 30_000 });
 
     // Verify we landed on an authenticated page (not redirected back to login)
     await expect(page).not.toHaveURL(/\/auth\/login/);

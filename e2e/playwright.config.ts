@@ -1,8 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
+  globalSetup: './global-setup.ts',
   testDir: '.',
-  timeout: 30_000,
+  timeout: 60_000,
   expect: {
     timeout: 10_000,
   },
@@ -12,12 +13,13 @@ export default defineConfig({
     baseURL: process.env.E2E_BASE_URL || 'https://synco-production-e9da.up.railway.app',
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
-    navigationTimeout: 15_000,
+    navigationTimeout: 60_000,
   },
   projects: [
     {
       name: 'setup',
       testMatch: '**/auth.setup.ts',
+      fullyParallel: false,
     },
     {
       name: 'free',

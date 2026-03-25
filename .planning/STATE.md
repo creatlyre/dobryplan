@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v5.1
 milestone_name: Stripe E2E Verification
-status: planning
-last_updated: "2026-03-25T11:54:28.112Z"
+status: executing
+last_updated: "2026-03-25T12:03:44.239Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 4
+  total_plans: 5
   completed_plans: 2
   percent: 0
 ---
@@ -20,13 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** A shared calendar both partners can edit that stays in sync with Google Calendar.
-**Current focus:** Phase 36 — e2e-test-infrastructure
+**Current focus:** Phase 37 — core-app-e2e-tests
 
 ## Position
 
 **Milestone:** v5.1 Stripe E2E Verification
 **Phase:** 36 of 39 (E2E Test Infrastructure)
-**Status:** Ready to plan
+**Status:** Executing Phase 37
 Last activity: 2026-03-25
 
 Progress: [░░░░░░░░░░] 0%
