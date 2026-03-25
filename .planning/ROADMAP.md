@@ -73,7 +73,10 @@ Plans:
   3. Billing settings page shows current plan; portal API returns billing.stripe.com URL for paid users
   4. Unauthenticated or expired session requests redirect to login page
   5. API endpoints return proper error JSON for invalid requests
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 39-01-PLAN.md — Billing E2E tests (pricing, checkout, settings, portal)
+- [ ] 39-02-PLAN.md — Error resilience E2E tests (auth redirects, API errors)
 
 ## Progress
 
@@ -82,7 +85,7 @@ Plans:
 | 36. E2E Test Infrastructure | 0/? | Not started | - |
 | 37. Core App E2E Tests | 0/2 | Planned | - |
 | 38. Gated Features & Entitlements E2E | 0/? | Not started | - |
-| 39. Billing, Stripe & Error Resilience E2E | 0/? | Not started | - |
+| 39. Billing, Stripe & Error Resilience E2E | 0/2 | Planned | - |
 
 <details>
 <summary>✅ v5.0 Growth & Conversion (Phases 34-35) — SHIPPED 2026-03-25</summary>
