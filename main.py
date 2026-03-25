@@ -10,6 +10,7 @@ from fastapi import Depends, FastAPI, Request
 from fastapi.exception_handlers import http_exception_handler
 from fastapi.exceptions import HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
+from starlette.responses import Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -130,6 +131,56 @@ async def pwa_service_worker():
         media_type="application/javascript",
         headers={"Cache-Control": "no-cache", "Service-Worker-Allowed": "/"},
     )
+
+
+SITE_URL = "https://dobryplan.app"
+
+
+@app.get("/robots.txt", include_in_schema=False)
+async def robots_txt():
+    content = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /auth/\n"
+        "Disallow: /admin/\n"
+        "Disallow: /billing/\n"
+        "Disallow: /api/\n"
+        f"\nSitemap: {SITE_URL}/sitemap.xml\n"
+    )
+    return Response(content=content, media_type="text/plain")
+
+
+@app.get("/sitemap.xml", include_in_schema=False)
+async def sitemap_xml():
+    from datetime import date
+
+    today = date.today().isoformat()
+    urls = [
+        (f"{SITE_URL}/", "1.0", "weekly"),
+        (f"{SITE_URL}/pricing", "0.8", "monthly"),
+        (f"{SITE_URL}/terms", "0.3", "yearly"),
+        (f"{SITE_URL}/privacy", "0.3", "yearly"),
+        (f"{SITE_URL}/refund", "0.3", "yearly"),
+        (f"{SITE_URL}/auth/login", "0.5", "monthly"),
+        (f"{SITE_URL}/auth/register", "0.6", "monthly"),
+    ]
+    items = ""
+    for loc, priority, freq in urls:
+        items += (
+            f"  <url>\n"
+            f"    <loc>{loc}</loc>\n"
+            f"    <lastmod>{today}</lastmod>\n"
+            f"    <changefreq>{freq}</changefreq>\n"
+            f"    <priority>{priority}</priority>\n"
+            f"  </url>\n"
+        )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{items}"
+        "</urlset>\n"
+    )
+    return Response(content=xml, media_type="application/xml")
 
 
 app.mount("/static", StaticFiles(directory="public"), name="static")

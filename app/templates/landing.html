@@ -22,6 +22,27 @@
     <link rel="icon" type="image/png" sizes="512x512" href="/static/icons/logo-app-512.png">
     <link rel="icon" type="image/svg+xml" href="/static/icons/logo.svg">
     <title>{{ t('app.name') }} — {{ t('landing.hero_title') }}</title>
+    <link rel="canonical" href="https://dobryplan.app/">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Dobry Plan",
+      "url": "https://dobryplan.app",
+      "description": "{{ t('landing.meta_desc') }}",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "Web, iOS, Android",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "PLN"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Wojciech"
+      }
+    }
+    </script>
     <link rel="preload" as="image" href="/static/images/hero-bg.webp" type="image/webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
