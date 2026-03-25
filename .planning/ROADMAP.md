@@ -163,10 +163,10 @@ Plans:
 **Goal:** [To be planned]
 **Requirements**: TBD
 **Depends on:** Phase 39
-**Plans:** 0 plans
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 40 to break down)
+- [x] TBD (run /gsd-plan-phase 40 to break down) (completed 2026-03-25)
 
 ### Phase 41: i18n and copy fixes - hardcoded Polish text, landing mockup localization, meta description i18n, brand name tagline
 
