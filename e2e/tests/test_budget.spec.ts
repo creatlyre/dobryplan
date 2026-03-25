@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+// Budget page render tests — all authenticated, ungated routes return 200 for pro user.
+// Budget stats (/budget/stats) is gated (pro/family_plus) and also verified here.
+
 test.describe('Budget Pages — Render Verification', () => {
   test.use({ storageState: 'e2e/playwright/.auth/pro.json' });
 
