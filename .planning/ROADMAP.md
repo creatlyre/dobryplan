@@ -45,7 +45,10 @@ Plans:
   2. Calendar month and day views render with navigation and event creation modal
   3. Dashboard loads as home page with today's events, budget snapshot, and quick-add chooser
   4. Notification bell appears in navbar and feed page loads notification list
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 37-01-PLAN.md — Auth flow + calendar view E2E tests
+- [ ] 37-02-PLAN.md — Dashboard + notification UI E2E tests
 
 ### Phase 38: Gated Features & Entitlements E2E
 **Goal**: Plan-gated features enforce correct access control and render properly for authorized users
@@ -75,7 +78,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 36. E2E Test Infrastructure | 0/? | Not started | - |
-| 37. Core App E2E Tests | 0/? | Not started | - |
+| 37. Core App E2E Tests | 0/2 | Planned | - |
 | 38. Gated Features & Entitlements E2E | 0/? | Not started | - |
 | 39. Billing, Stripe & Error Resilience E2E | 0/? | Not started | - |
 
