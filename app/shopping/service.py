@@ -21,7 +21,13 @@ def _normalize(text: str) -> str:
 def _load_keywords() -> dict[str, list[str]]:
     with open(_KEYWORDS_PATH, encoding="utf-8") as f:
         data = json.load(f)
-    return {k: v for k, v in data.items() if not k.startswith("_")}
+    # Pre-normalize keywords at module load time to avoid expensive
+    # unicodedata.normalize calls inside hot categorization loops.
+    return {
+        k: [_normalize(kw) for kw in v]
+        for k, v in data.items()
+        if not k.startswith("_")
+    }
 
 
 SECTION_KEYWORDS: dict[str, list[str]] = _load_keywords()
@@ -151,8 +157,7 @@ class ShoppingService:
         for section_name, keywords in SECTION_KEYWORDS.items():
             if section_name not in section_by_name:
                 continue
-            for kw in keywords:
-                norm_kw = _normalize(kw)
+            for norm_kw in keywords:
                 if norm_kw in norm:
                     return section_by_name[section_name]
                 # Reverse match for short item names

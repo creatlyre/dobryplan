@@ -22,7 +22,13 @@ def _load_keywords() -> dict[str, list[str]]:
     with open(_KEYWORDS_PATH, encoding="utf-8") as f:
         data = json.load(f)
     # Strip _meta key — only category entries
-    return {k: v for k, v in data.items() if not k.startswith("_")}
+    # Pre-normalize keywords at module load time to avoid expensive
+    # unicodedata.normalize calls inside hot categorization loops.
+    return {
+        k: [_normalize(kw) for kw in v]
+        for k, v in data.items()
+        if not k.startswith("_")
+    }
 
 
 # Loaded once at module import
@@ -98,9 +104,9 @@ class ExpenseService:
         for cat_name, keywords in CATEGORY_KEYWORDS.items():
             if cat_name not in cat_by_name:
                 continue
-            for kw in keywords:
+            for norm_kw in keywords:
                 for w in words:
-                    if kw in w or (len(w) >= 3 and w in kw):
+                    if norm_kw in w or (len(w) >= 3 and w in norm_kw):
                         return cat_by_name[cat_name]
         return None
 
