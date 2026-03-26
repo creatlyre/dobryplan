@@ -28,6 +28,12 @@ def _load_keywords() -> dict[str, list[str]]:
 # Loaded once at module import
 CATEGORY_KEYWORDS: dict[str, list[str]] = _load_keywords()
 
+# Pre-normalize keywords to avoid O(N) unicodedata.normalize overhead in hot loops
+NORMALIZED_CATEGORY_KEYWORDS: dict[str, list[str]] = {
+    cat: [_normalize(kw) for kw in keywords]
+    for cat, keywords in CATEGORY_KEYWORDS.items()
+}
+
 
 class ExpenseService:
     def __init__(self, repo: ExpenseRepository):
@@ -95,12 +101,13 @@ class ExpenseService:
         norm = _normalize(name)
         words = norm.split()
         cat_by_name = {c.name: c.id for c in categories}
-        for cat_name, keywords in CATEGORY_KEYWORDS.items():
+        # Use pre-normalized keywords for performance
+        for cat_name, norm_keywords in NORMALIZED_CATEGORY_KEYWORDS.items():
             if cat_name not in cat_by_name:
                 continue
-            for kw in keywords:
+            for norm_kw in norm_keywords:
                 for w in words:
-                    if kw in w or (len(w) >= 3 and w in kw):
+                    if norm_kw in w or (len(w) >= 3 and w in norm_kw):
                         return cat_by_name[cat_name]
         return None
 

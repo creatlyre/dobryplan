@@ -26,6 +26,12 @@ def _load_keywords() -> dict[str, list[str]]:
 
 SECTION_KEYWORDS: dict[str, list[str]] = _load_keywords()
 
+# Pre-normalize keywords to avoid O(N) unicodedata.normalize overhead in hot loops
+NORMALIZED_SECTION_KEYWORDS: dict[str, list[str]] = {
+    section: [_normalize(kw) for kw in keywords]
+    for section, keywords in SECTION_KEYWORDS.items()
+}
+
 
 class ShoppingService:
     def __init__(self, repo: ShoppingRepository):
@@ -147,12 +153,11 @@ class ShoppingService:
             if ovr.keyword in norm or norm in ovr.keyword:
                 return ovr.section_id
 
-        # 2. Check built-in keyword map
-        for section_name, keywords in SECTION_KEYWORDS.items():
+        # 2. Check built-in keyword map (using pre-normalized for performance)
+        for section_name, norm_keywords in NORMALIZED_SECTION_KEYWORDS.items():
             if section_name not in section_by_name:
                 continue
-            for kw in keywords:
-                norm_kw = _normalize(kw)
+            for norm_kw in norm_keywords:
                 if norm_kw in norm:
                     return section_by_name[section_name]
                 # Reverse match for short item names
