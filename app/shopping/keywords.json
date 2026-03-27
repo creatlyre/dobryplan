@@ -16,7 +16,10 @@
     "koper", "bazylia", "mięta", "mieta", "tymianek", "rozmaryn", "oregano",
     "lubczyk", "kolendra", "imbir", "kurkuma", "rzodkiewka", "cukinia",
     "papryka", "fasolka szpar", "groch", "bob ", "ciecierzyc", "soczewic",
-    "bataty", "jarmuż", "jarmuz", "endywia", "pac choi", "bok choy"
+    "bataty", "jarmuż", "jarmuz", "endywia", "pac choi", "bok choy",
+    "daktyl", "figa", "granat", "liczi", "marakuja", "papaja",
+    "szparag", "karczoch", "kalarepa", "oliwki", "oliwka", "kapary",
+    "warzywa mieszane", "jarzynk", "szczaw", "chrzan"
   ],
 
   "Lada Tradycyjna / Mięso": [
@@ -28,7 +31,11 @@
     "golonk", "rostbef", "antrykot", "filet z kur", "filet z ind",
     "pierś z ind", "piers z ind", "gulasz", "kotlet", "zraz",
     "pałk", "palk", "kaczk", "gęś", "ges", "królicz", "krolicz",
-    "cielęc", "cielec", "jagnięc", "jagniec"
+    "cielęc", "cielec", "jagnięc", "jagniec",
+    "smalec", "słonina", "slonina", "bekon", "hamburger",
+    "baleron", "metka", "krakowska", "żywiecka", "zywiecka",
+    "podwawelska", "kiszka", "kaszanka", "flaki", "ozorki",
+    "stek", "steak", "kości rosołow", "kosci rosolow"
   ],
 
   "Ryby": [
@@ -36,7 +43,10 @@
     "makrela", "pstrąg", "pstrag", "sandacz", "karp", "krewetk", "małż", "malz",
     "owoce morza", "tilapia", "halibut", "sardynk", "szprot", "flądra",
     "flądra", "fladra", "sum ", "szczupak", "okoń", "okon", "mintaj",
-    "surimi", "paluszki krab", "paluszki rybne"
+    "surimi", "paluszki krab", "paluszki rybne",
+    "morszczuk", "anchois", "filet rybny", "matjas",
+    "śledzik", "sledzik", "ryba wędzon", "ryba wedzon",
+    "kawior", "ikra"
   ],
 
   "Nabiał i Lodówki": [
@@ -47,7 +57,13 @@
     "tortill", "hummus", "tofu", "kremówk", "budyń goto", "budyn goto",
     "deser mlecz", "kisiel goto", "śmietan", "smietan", "maślank", "maslank",
     "mleko roślin", "mleko roslin", "mleko sojow", "mleko migdał", "mleko kokos",
-    "mleko owsian", "bita śmieta", "bita smieta", "lody"
+    "mleko owsian", "bita śmieta", "bita smieta", "lody",
+    "pierogi", "naleśnik", "nalesnik", "pizza", "krokiet",
+    "pyzy", "knedle", "sałatka gotow", "salatka gotow",
+    "danie gotow", "kanapk", "wrap", "mrożonk", "mrozonk",
+    "parmezan", "cheddar", "serek wiejsk", "serek homogeniz",
+    "serek topion", "serek kanapkow", "nuggets", "nugetsy",
+    "frytki", "panna cotta", "tiramisu"
   ],
 
   "Puszki, Sosy, Przetwory": [
@@ -60,7 +76,14 @@
     "herbat", "kaw", "kakao", "cukierk", "czipsy", "chipsy", "krakery",
     "paluszki solone", "precle", "sól", "sol", "pieprz", "przypraw",
     "cynamon", "curry", "papryka mielona", "majeranek", "ziele angielskie",
-    "liść laurow", "lisc laurow", "kminek", "kmin", "lubczyk"
+    "liść laurow", "lisc laurow", "kminek", "kmin", "lubczyk",
+    "bulion", "kostka rosołow", "kostka rosolow", "zupa instant", "zupka",
+    "baton", "batonik", "żelki", "zelki", "lizak",
+    "guma do żucia", "guma do zucia", "popcorn", "prażynk", "prazynk",
+    "sos sojow", "pesto", "tahini", "tabasco", "wasabi",
+    "galaretka", "lane kluski", "makaron instant",
+    "panierka", "bułka tart", "bulka tart", "soda oczyszczon",
+    "wafle"
   ],
 
   "Pieczenie / Bakalie": [
@@ -70,21 +93,32 @@
     "nutell", "krem orzechow", "wiórk kokos", "wiork kokos", "sezam",
     "słonecznik", "slonecznik", "pestki dyni", "mak niebiesk", "masa krokant",
     "polewa", "posypka", "lukier", "marcepan", "masa makow", "krakersy graham",
-    "biszkopty", "wafelki", "herbatniki"
+    "biszkopty", "wafelki", "herbatniki",
+    "chleb", "bułka", "bułki", "rogal", "rogalik", "bagietka",
+    "croissant", "drożdżówka", "drozdżówka", "pączek", "pączki",
+    "tort", "ciasto", "sernik", "szarlotka", "babka",
+    "makowiec", "chleb tostow", "graham", "wafle ryżow", "wafle ryzow",
+    "ciastka", "ciasteczk", "kwasek cytryn", "cukier wanili",
+    "aromat", "esencja", "piernik", "chałka", "chalka"
   ],
 
   "Dział Dziecięcy": [
     "pampers", "pieluch", "pielucha", "chusteczk", "dziecięc", "dzieciec",
     "bobovit", "hipp", "gerber", "aptamil", "smoczek", "butelk dziec",
     "kaszk", "tubk", "deserek", "mleko modyfik", "mleko następ",
-    "mleko nastep", "mleko pocz", "julia", "słoik julia", "słoiczek"
+    "mleko nastep", "mleko pocz", "julia", "słoik julia", "słoiczek",
+    "krem pod pieluszk", "oliwka dla dziec", "kąpiel dziec", "kapiel dziec",
+    "gryzak", "śliniaczek", "sliniaczek", "herbatka dla dziec"
   ],
 
   "Napoje": [
     "sok", "woda", "napój", "napoj", "cola", "pepsi", "fanta", "sprite",
     "ice tea", "kompot", "nektar", "lemoniada", "oranżada", "oranzada",
     "woda gaz", "woda niegaz", "woda mineral", "tonic", "schweppes",
-    "red bull", "tiger", "energetyk", "isotonic", "powerade", "gatorade"
+    "red bull", "tiger", "energetyk", "isotonic", "powerade", "gatorade",
+    "smoothie", "koktajl", "woda smakow", "syrop do wody",
+    "herbata mrożon", "herbata mrozon", "yerba", "mate",
+    "kawa rozpuszczal", "napój izotonicz", "napoj izotonicz", "woda kokosow"
   ],
 
   "Alkohol": [
@@ -92,7 +126,9 @@
     "szampan", "prosecco", "cydr", "aperol", "vermut", "brandy",
     "koniak", "absynt", "sake", "tequila", "bourbon", "scotch",
     "beefeater", "finlandia", "żubrówk", "zubrowk", "soplica",
-    "lech", "tyskie", "żywiec", "zywiec", "perła", "perla"
+    "lech", "tyskie", "żywiec", "zywiec", "perła", "perla",
+    "piwo bezalkoholow", "piwo 0%", "radler", "wino musując",
+    "nalewka", "miód pitny", "miod pitny", "drink"
   ],
 
   "Chemia / Higiena": [
@@ -107,6 +143,15 @@
     "golarki", "maszynka do gol", "żyletk", "zyletk", "tampon", "podpask",
     "płyn micelar", "plyn micelar", "tonik", "serum", "peeling",
     "foli alumin", "foli spo", "woreczk", "reklamówk", "reklamowk",
-    "serwetki", "zapałki", "zapalki", "świeczk", "swieczk", "baterie"
+    "serwetki", "zapałki", "zapalki", "świeczk", "swieczk", "baterie",
+    "karma", "żwirek", "zwirek", "przysmak dla",
+    "tabletki do zmywark", "płyn do płukan", "plyn do plukan",
+    "kapsułki do prani", "kapsulki do prani", "odplamiacz",
+    "spray do szyb", "płyn do podłóg", "plyn do podlog",
+    "kostka do wc", "żel do wc", "zel do wc", "odkamieniacz",
+    "żarówka", "zarowka", "rękawice gumow", "rekawice gumow",
+    "żel do włos", "zel do wlos", "lakier do włos", "pianka do włos",
+    "plaster", "opatrunek", "bandaż", "bandaz",
+    "rajstopy", "skarpet"
   ]
 }
