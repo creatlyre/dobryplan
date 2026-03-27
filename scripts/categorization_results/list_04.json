@@ -1,0 +1,524 @@
+{
+  "list_number": 4,
+  "total": 103,
+  "categorized": 103,
+  "uncategorized_count": 0,
+  "rate": 100.0,
+  "items": [
+    {
+      "name": "mleko",
+      "normalized": "mleko",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "jogurt owocowy",
+      "normalized": "jogurt owocowy",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "serek homogenizowany",
+      "normalized": "serek homogenizowany",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "kefir",
+      "normalized": "kefir",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "jajka",
+      "normalized": "jajka",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "masło",
+      "normalized": "maslo",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "chleb",
+      "normalized": "chleb",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "bułki",
+      "normalized": "bulki",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "rogaliki",
+      "normalized": "rogaliki",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "ser żółty",
+      "normalized": "ser zolty",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "szynka",
+      "normalized": "szynka",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "parówki",
+      "normalized": "parowki",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "kiełbasa",
+      "normalized": "kielbasa",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "pasztet",
+      "normalized": "pasztet",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "kurczak",
+      "normalized": "kurczak",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "mięso mielone",
+      "normalized": "mieso mielone",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "pierś z kurczaka",
+      "normalized": "piers z kurczaka",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "ziemniaki",
+      "normalized": "ziemniaki",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "marchewka",
+      "normalized": "marchewka",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "pomidory",
+      "normalized": "pomidory",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "ogórki",
+      "normalized": "ogorki",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "sałata",
+      "normalized": "salata",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "jabłka",
+      "normalized": "jablka",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "banany",
+      "normalized": "banany",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "truskawki",
+      "normalized": "truskawki",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "maliny",
+      "normalized": "maliny",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "gruszki",
+      "normalized": "gruszki",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "mandarynki",
+      "normalized": "mandarynki",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "winogrona",
+      "normalized": "winogrona",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "brzoskwinie",
+      "normalized": "brzoskwinie",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "arbuz",
+      "normalized": "arbuz",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "makaron",
+      "normalized": "makaron",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ryż",
+      "normalized": "ryz",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "kasza",
+      "normalized": "kasza",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "płatki śniadaniowe",
+      "normalized": "platki sniadaniowe",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "musli",
+      "normalized": "musli",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "mleko czekoladowe",
+      "normalized": "mleko czekoladowe",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "kakao",
+      "normalized": "kakao",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "herbata",
+      "normalized": "herbata",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "sok jabłkowy",
+      "normalized": "sok jablkowy",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "woda",
+      "normalized": "woda",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "lemoniada",
+      "normalized": "lemoniada",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "kompot",
+      "normalized": "kompot",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "nektar",
+      "normalized": "nektar",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "pierogi",
+      "normalized": "pierogi",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "naleśniki",
+      "normalized": "nalesniki",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "pizza mrożona",
+      "normalized": "pizza mrozona",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "nuggetsy",
+      "normalized": "nuggetsy",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "frytki",
+      "normalized": "frytki",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "krokiety",
+      "normalized": "krokiety",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "pyzy",
+      "normalized": "pyzy",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "knedle",
+      "normalized": "knedle",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "lody",
+      "normalized": "lody",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "budyń",
+      "normalized": "budyn",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "dżem",
+      "normalized": "dzem",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "nutella",
+      "normalized": "nutella",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "miód",
+      "normalized": "miod",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "cukier",
+      "normalized": "cukier",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "mąka",
+      "normalized": "maka",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ciasteczka",
+      "normalized": "ciasteczka",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "żelki",
+      "normalized": "zelki",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "lizaki",
+      "normalized": "lizaki",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "baton",
+      "normalized": "baton",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "czekolada",
+      "normalized": "czekolada",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "wafelki",
+      "normalized": "wafelki",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "chipsy",
+      "normalized": "chipsy",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "popcorn",
+      "normalized": "popcorn",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "guma do żucia",
+      "normalized": "guma do zucia",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ketchup",
+      "normalized": "ketchup",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "majonez",
+      "normalized": "majonez",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "sos",
+      "normalized": "sos",
+      "section_matched": "Ryby"
+    },
+    {
+      "name": "sól",
+      "normalized": "sol",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "pieprz",
+      "normalized": "pieprz",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "olej",
+      "normalized": "olej",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ocet",
+      "normalized": "ocet",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "musztarda",
+      "normalized": "musztarda",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "koncentrat pomidorowy",
+      "normalized": "koncentrat pomidorowy",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "pampers",
+      "normalized": "pampers",
+      "section_matched": "Dział Dziecięcy"
+    },
+    {
+      "name": "chusteczki",
+      "normalized": "chusteczki",
+      "section_matched": "Dział Dziecięcy"
+    },
+    {
+      "name": "krem pod pieluszkę",
+      "normalized": "krem pod pieluszke",
+      "section_matched": "Dział Dziecięcy"
+    },
+    {
+      "name": "gryzak",
+      "normalized": "gryzak",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "kaszka",
+      "normalized": "kaszka",
+      "section_matched": "Dział Dziecięcy"
+    },
+    {
+      "name": "słoiczek",
+      "normalized": "sloiczek",
+      "section_matched": "Dział Dziecięcy"
+    },
+    {
+      "name": "deserek",
+      "normalized": "deserek",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "mleko modyfikowane",
+      "normalized": "mleko modyfikowane",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "papier toaletowy",
+      "normalized": "papier toaletowy",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "ręcznik papierowy",
+      "normalized": "recznik papierowy",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "mydło",
+      "normalized": "mydlo",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "szampon",
+      "normalized": "szampon",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "pasta do zębów",
+      "normalized": "pasta do zebow",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "szczoteczka",
+      "normalized": "szczoteczka",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "dezodorant",
+      "normalized": "dezodorant",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "proszek do prania",
+      "normalized": "proszek do prania",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "płyn do naczyń",
+      "normalized": "plyn do naczyn",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "worki na śmieci",
+      "normalized": "worki na smieci",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "gąbka",
+      "normalized": "gabka",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "zmywak",
+      "normalized": "zmywak",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "ściereczka",
+      "normalized": "sciereczka",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "serwetki",
+      "normalized": "serwetki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "baterie",
+      "normalized": "baterie",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "żarówka",
+      "normalized": "zarowka",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "folia spożywcza",
+      "normalized": "folia spozywcza",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "woreczki",
+      "normalized": "woreczki",
+      "section_matched": "Chemia / Higiena"
+    }
+  ]
+}

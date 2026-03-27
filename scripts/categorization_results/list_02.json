@@ -1,0 +1,534 @@
+{
+  "list_number": 2,
+  "total": 105,
+  "categorized": 105,
+  "uncategorized_count": 0,
+  "rate": 100.0,
+  "items": [
+    {
+      "name": "mąka pszenna",
+      "normalized": "maka pszenna",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "mąka tortowa",
+      "normalized": "maka tortowa",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "cukier puder",
+      "normalized": "cukier puder",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "cukier wanilinowy",
+      "normalized": "cukier wanilinowy",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "drożdże",
+      "normalized": "drozdze",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "proszek do pieczenia",
+      "normalized": "proszek do pieczenia",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "żelatyna",
+      "normalized": "zelatyna",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "kakao",
+      "normalized": "kakao",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "czekolada gorzka",
+      "normalized": "czekolada gorzka",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "czekolada mleczna",
+      "normalized": "czekolada mleczna",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "orzechy włoskie",
+      "normalized": "orzechy wloskie",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "migdały",
+      "normalized": "migdaly",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "pistacje",
+      "normalized": "pistacje",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "rodzynki",
+      "normalized": "rodzynki",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "wiórki kokosowe",
+      "normalized": "wiorki kokosowe",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "sezam",
+      "normalized": "sezam",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "słonecznik",
+      "normalized": "slonecznik",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "marcepan",
+      "normalized": "marcepan",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "lukier",
+      "normalized": "lukier",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "posypka",
+      "normalized": "posypka",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "polewa czekoladowa",
+      "normalized": "polewa czekoladowa",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "masa makowa",
+      "normalized": "masa makowa",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "biszkopty",
+      "normalized": "biszkopty",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "jajka",
+      "normalized": "jajka",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "masło",
+      "normalized": "maslo",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "śmietana",
+      "normalized": "smietana",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "mleko",
+      "normalized": "mleko",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "serek mascarpone",
+      "normalized": "serek mascarpone",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "twaróg",
+      "normalized": "twarog",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "ricotta",
+      "normalized": "ricotta",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "cukier",
+      "normalized": "cukier",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "wanilia",
+      "normalized": "wanilia",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "aromat",
+      "normalized": "aromat",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "esencja",
+      "normalized": "esencja",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "ser",
+      "normalized": "ser",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "jogurt grecki",
+      "normalized": "jogurt grecki",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "budyń waniliowy",
+      "normalized": "budyn waniliowy",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "kisiel",
+      "normalized": "kisiel",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "herbatniki",
+      "normalized": "herbatniki",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "wafelki",
+      "normalized": "wafelki",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "krakersy",
+      "normalized": "krakersy",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "tort",
+      "normalized": "tort",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "ciasto",
+      "normalized": "ciasto",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "sernik",
+      "normalized": "sernik",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "szarlotka",
+      "normalized": "szarlotka",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "babka",
+      "normalized": "babka",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "makowiec",
+      "normalized": "makowiec",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "pączki",
+      "normalized": "paczki",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "drożdżówka",
+      "normalized": "drozdzowka",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "rogal",
+      "normalized": "rogal",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "bułka",
+      "normalized": "bulka",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "chleb",
+      "normalized": "chleb",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "bagietka",
+      "normalized": "bagietka",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "croissant",
+      "normalized": "croissant",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "graham",
+      "normalized": "graham",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "wafle ryżowe",
+      "normalized": "wafle ryzowe",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ciasteczka",
+      "normalized": "ciasteczka",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "kwasek cytrynowy",
+      "normalized": "kwasek cytrynowy",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "soda oczyszczona",
+      "normalized": "soda oczyszczona",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "olej",
+      "normalized": "olej",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "oliwa",
+      "normalized": "oliwa",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "miód",
+      "normalized": "miod",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "dżem truskawkowy",
+      "normalized": "dzem truskawkowy",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "marmolada",
+      "normalized": "marmolada",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "powid",
+      "normalized": "powid",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "syrop klonowy",
+      "normalized": "syrop klonowy",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "płatki owsiane",
+      "normalized": "platki owsiane",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "kasza manna",
+      "normalized": "kasza manna",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ryż",
+      "normalized": "ryz",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "makaron",
+      "normalized": "makaron",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "koncentrat pomidorowy",
+      "normalized": "koncentrat pomidorowy",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "passata",
+      "normalized": "passata",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "pelati",
+      "normalized": "pelati",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "bulion",
+      "normalized": "bulion",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "kostka rosołowa",
+      "normalized": "kostka rosolowa",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "zupa instant",
+      "normalized": "zupa instant",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "makaron instant",
+      "normalized": "makaron instant",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "kuskus",
+      "normalized": "kuskus",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "soczewica",
+      "normalized": "soczewica",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "ciecierzyca",
+      "normalized": "ciecierzyca",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "fasola",
+      "normalized": "fasola",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "groszek",
+      "normalized": "groszek",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "kukurydza",
+      "normalized": "kukurydza",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ogórki konserwowe",
+      "normalized": "ogorki konserwowe",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "kapusta kiszona",
+      "normalized": "kapusta kiszona",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "ocet",
+      "normalized": "ocet",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "sos",
+      "normalized": "sos",
+      "section_matched": "Ryby"
+    },
+    {
+      "name": "ketchup",
+      "normalized": "ketchup",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "musztarda",
+      "normalized": "musztarda",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "majonez",
+      "normalized": "majonez",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "sól",
+      "normalized": "sol",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "pieprz",
+      "normalized": "pieprz",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "cynamon",
+      "normalized": "cynamon",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "curry",
+      "normalized": "curry",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "papryka mielona",
+      "normalized": "papryka mielona",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "oregano",
+      "normalized": "oregano",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "bazylia",
+      "normalized": "bazylia",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "tymianek",
+      "normalized": "tymianek",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "rozmaryn",
+      "normalized": "rozmaryn",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "kminek",
+      "normalized": "kminek",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "liść laurowy",
+      "normalized": "lisc laurowy",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ziele angielskie",
+      "normalized": "ziele angielskie",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "majeranek",
+      "normalized": "majeranek",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "piernik",
+      "normalized": "piernik",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "chalka",
+      "normalized": "chalka",
+      "section_matched": "Pieczenie / Bakalie"
+    }
+  ]
+}

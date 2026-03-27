@@ -1,0 +1,79 @@
+{
+  "total_items": 1038,
+  "total_categorized": 1038,
+  "total_uncategorized": 0,
+  "overall_rate": 100.0,
+  "per_list_rates": [
+    {
+      "list": 1,
+      "total": 104,
+      "categorized": 104,
+      "uncategorized": 0,
+      "rate": 100.0
+    },
+    {
+      "list": 2,
+      "total": 105,
+      "categorized": 105,
+      "uncategorized": 0,
+      "rate": 100.0
+    },
+    {
+      "list": 3,
+      "total": 105,
+      "categorized": 105,
+      "uncategorized": 0,
+      "rate": 100.0
+    },
+    {
+      "list": 4,
+      "total": 103,
+      "categorized": 103,
+      "uncategorized": 0,
+      "rate": 100.0
+    },
+    {
+      "list": 5,
+      "total": 101,
+      "categorized": 101,
+      "uncategorized": 0,
+      "rate": 100.0
+    },
+    {
+      "list": 6,
+      "total": 98,
+      "categorized": 98,
+      "uncategorized": 0,
+      "rate": 100.0
+    },
+    {
+      "list": 7,
+      "total": 107,
+      "categorized": 107,
+      "uncategorized": 0,
+      "rate": 100.0
+    },
+    {
+      "list": 8,
+      "total": 106,
+      "categorized": 106,
+      "uncategorized": 0,
+      "rate": 100.0
+    },
+    {
+      "list": 9,
+      "total": 104,
+      "categorized": 104,
+      "uncategorized": 0,
+      "rate": 100.0
+    },
+    {
+      "list": 10,
+      "total": 105,
+      "categorized": 105,
+      "uncategorized": 0,
+      "rate": 100.0
+    }
+  ],
+  "all_uncategorized_items": []
+}

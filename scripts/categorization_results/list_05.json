@@ -1,0 +1,514 @@
+{
+  "list_number": 5,
+  "total": 101,
+  "categorized": 101,
+  "uncategorized_count": 0,
+  "rate": 100.0,
+  "items": [
+    {
+      "name": "piwo",
+      "normalized": "piwo",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "wino czerwone",
+      "normalized": "wino czerwone",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "wino białe",
+      "normalized": "wino biale",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "prosecco",
+      "normalized": "prosecco",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "szampan",
+      "normalized": "szampan",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "wódka",
+      "normalized": "wodka",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "gin",
+      "normalized": "gin",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "rum",
+      "normalized": "rum",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "whisky",
+      "normalized": "whisky",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "tequila",
+      "normalized": "tequila",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "aperol",
+      "normalized": "aperol",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "vermut",
+      "normalized": "vermut",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "cydr",
+      "normalized": "cydr",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "likier",
+      "normalized": "likier",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "nalewka",
+      "normalized": "nalewka",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "piwo bezalkoholowe",
+      "normalized": "piwo bezalkoholowe",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "radler",
+      "normalized": "radler",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "drink",
+      "normalized": "drink",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "miód pitny",
+      "normalized": "miod pitny",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "cola",
+      "normalized": "cola",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "fanta",
+      "normalized": "fanta",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "sprite",
+      "normalized": "sprite",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "schweppes",
+      "normalized": "schweppes",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "tonic",
+      "normalized": "tonic",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "ice tea",
+      "normalized": "ice tea",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "woda gazowana",
+      "normalized": "woda gazowana",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "woda niegazowana",
+      "normalized": "woda niegazowana",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "sok pomarańczowy",
+      "normalized": "sok pomaranczowy",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "lemoniada",
+      "normalized": "lemoniada",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "red bull",
+      "normalized": "red bull",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "energetyk",
+      "normalized": "energetyk",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "chipsy",
+      "normalized": "chipsy",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "orzeszki solone",
+      "normalized": "orzeszki solone",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "prażynki",
+      "normalized": "prazynki",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "paluszki solone",
+      "normalized": "paluszki solone",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "krakersy",
+      "normalized": "krakersy",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "oliwki",
+      "normalized": "oliwki",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "hummus",
+      "normalized": "hummus",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "salami",
+      "normalized": "salami",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "szynka parmeńska",
+      "normalized": "szynka parmenska",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "ser brie",
+      "normalized": "ser brie",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "ser camembert",
+      "normalized": "ser camembert",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "mozzarella",
+      "normalized": "mozzarella",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "feta",
+      "normalized": "feta",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "parmezan",
+      "normalized": "parmezan",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "tortilla",
+      "normalized": "tortilla",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "nachosy",
+      "normalized": "nachosy",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "sos salsa",
+      "normalized": "sos salsa",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "guacamole",
+      "normalized": "guacamole",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ogórki konserwowe",
+      "normalized": "ogorki konserwowe",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "papryka marynowana",
+      "normalized": "papryka marynowana",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "baguette",
+      "normalized": "baguette",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "chleb",
+      "normalized": "chleb",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "bułki",
+      "normalized": "bulki",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "croissant",
+      "normalized": "croissant",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "pomidory koktajlowe",
+      "normalized": "pomidory koktajlowe",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "ogórek",
+      "normalized": "ogorek",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "rzodkiewki",
+      "normalized": "rzodkiewki",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "sałata",
+      "normalized": "salata",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "cytryny",
+      "normalized": "cytryny",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "limonki",
+      "normalized": "limonki",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "mięta",
+      "normalized": "mieta",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "pomarańcze",
+      "normalized": "pomarancze",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "łosoś wędzony",
+      "normalized": "losos wedzony",
+      "section_matched": "Ryby"
+    },
+    {
+      "name": "krewetki",
+      "normalized": "krewetki",
+      "section_matched": "Ryby"
+    },
+    {
+      "name": "tuńczyk",
+      "normalized": "tunczyk",
+      "section_matched": "Ryby"
+    },
+    {
+      "name": "śledzie",
+      "normalized": "sledzie",
+      "section_matched": "Ryby"
+    },
+    {
+      "name": "kiełbasa",
+      "normalized": "kielbasa",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "kabanosy",
+      "normalized": "kabanosy",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "boczek",
+      "normalized": "boczek",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "kurczak",
+      "normalized": "kurczak",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "żeberka",
+      "normalized": "zeberka",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "grillowane warzywa",
+      "normalized": "grillowane warzywa",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "szaszłyki",
+      "normalized": "szaszlyki",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "ketchup",
+      "normalized": "ketchup",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "musztarda",
+      "normalized": "musztarda",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "majonez",
+      "normalized": "majonez",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "sos sojowy",
+      "normalized": "sos sojowy",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "tabasco",
+      "normalized": "tabasco",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "wasabi",
+      "normalized": "wasabi",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ciasto",
+      "normalized": "ciasto",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "tort",
+      "normalized": "tort",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "sernik",
+      "normalized": "sernik",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "tiramisu",
+      "normalized": "tiramisu",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "panna cotta",
+      "normalized": "panna cotta",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "lody",
+      "normalized": "lody",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "czekolada",
+      "normalized": "czekolada",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "żelki",
+      "normalized": "zelki",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "baton",
+      "normalized": "baton",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ciasteczka",
+      "normalized": "ciasteczka",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "serwetki",
+      "normalized": "serwetki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "kubeczki",
+      "normalized": "kubeczki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "talerzyki",
+      "normalized": "talerzyki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "sztućce jednorazowe",
+      "normalized": "sztucce jednorazowe",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "świeczki",
+      "normalized": "swieczki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "zapałki",
+      "normalized": "zapalki",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "folia aluminiowa",
+      "normalized": "folia aluminiowa",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "woreczki",
+      "normalized": "woreczki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "papier toaletowy",
+      "normalized": "papier toaletowy",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "ręcznik papierowy",
+      "normalized": "recznik papierowy",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "mydło",
+      "normalized": "mydlo",
+      "section_matched": "Chemia / Higiena"
+    }
+  ]
+}

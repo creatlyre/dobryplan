@@ -1,0 +1,529 @@
+{
+  "list_number": 9,
+  "total": 104,
+  "categorized": 104,
+  "uncategorized_count": 0,
+  "rate": 100.0,
+  "items": [
+    {
+      "name": "karma dla kota",
+      "normalized": "karma dla kota",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "karma dla psa",
+      "normalized": "karma dla psa",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "żwirek",
+      "normalized": "zwirek",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "przysmak dla psa",
+      "normalized": "przysmak dla psa",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "papier toaletowy",
+      "normalized": "papier toaletowy",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "ręcznik papierowy",
+      "normalized": "recznik papierowy",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "mydło",
+      "normalized": "mydlo",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "szampon",
+      "normalized": "szampon",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "żel pod prysznic",
+      "normalized": "zel pod prysznic",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "pasta do zębów",
+      "normalized": "pasta do zebow",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "dezodorant",
+      "normalized": "dezodorant",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "balsam",
+      "normalized": "balsam",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "krem do rąk",
+      "normalized": "krem do rak",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "krem do twarzy",
+      "normalized": "krem do twarzy",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "odżywka",
+      "normalized": "odzywka",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "peeling",
+      "normalized": "peeling",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "proszek do prania",
+      "normalized": "proszek do prania",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "płyn do prania",
+      "normalized": "plyn do prania",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "kapsułki do prania",
+      "normalized": "kapsulki do prania",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "płyn do naczyń",
+      "normalized": "plyn do naczyn",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "tabletki do zmywarki",
+      "normalized": "tabletki do zmywarki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "płyn do płukania",
+      "normalized": "plyn do plukania",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "spray do szyb",
+      "normalized": "spray do szyb",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "płyn do podłóg",
+      "normalized": "plyn do podlog",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "odplamiacz",
+      "normalized": "odplamiacz",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "odkamieniacz",
+      "normalized": "odkamieniacz",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "odświeżacz",
+      "normalized": "odswiezacz",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "kostka do wc",
+      "normalized": "kostka do wc",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "żel do wc",
+      "normalized": "zel do wc",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "wybielacz",
+      "normalized": "wybielacz",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "worki na śmieci",
+      "normalized": "worki na smieci",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "gąbka",
+      "normalized": "gabka",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "zmywak",
+      "normalized": "zmywak",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "ściereczka",
+      "normalized": "sciereczka",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "rękawice gumowe",
+      "normalized": "rekawice gumowe",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "folia aluminiowa",
+      "normalized": "folia aluminiowa",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "folia spożywcza",
+      "normalized": "folia spozywcza",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "woreczki",
+      "normalized": "woreczki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "serwetki",
+      "normalized": "serwetki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "zapałki",
+      "normalized": "zapalki",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "świeczki",
+      "normalized": "swieczki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "baterie",
+      "normalized": "baterie",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "żarówka",
+      "normalized": "zarowka",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "plaster",
+      "normalized": "plaster",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "bandaż",
+      "normalized": "bandaz",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "aspiryna",
+      "normalized": "aspiryna",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "mleko",
+      "normalized": "mleko",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "chleb",
+      "normalized": "chleb",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "masło",
+      "normalized": "maslo",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "jajka",
+      "normalized": "jajka",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "ser żółty",
+      "normalized": "ser zolty",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "szynka",
+      "normalized": "szynka",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "kurczak",
+      "normalized": "kurczak",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "mięso mielone",
+      "normalized": "mieso mielone",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "ziemniaki",
+      "normalized": "ziemniaki",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "marchewka",
+      "normalized": "marchewka",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "cebula",
+      "normalized": "cebula",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "pomidory",
+      "normalized": "pomidory",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "jabłka",
+      "normalized": "jablka",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "banany",
+      "normalized": "banany",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "pomarańcze",
+      "normalized": "pomarancze",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "mandarynki",
+      "normalized": "mandarynki",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "makaron",
+      "normalized": "makaron",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ryż",
+      "normalized": "ryz",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "kasza",
+      "normalized": "kasza",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "płatki owsiane",
+      "normalized": "platki owsiane",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "herbata",
+      "normalized": "herbata",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "kawa",
+      "normalized": "kawa",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "sok",
+      "normalized": "sok",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "woda",
+      "normalized": "woda",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "piwo",
+      "normalized": "piwo",
+      "section_matched": "Alkohol"
+    },
+    {
+      "name": "wino",
+      "normalized": "wino",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "cola",
+      "normalized": "cola",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "woda gazowana",
+      "normalized": "woda gazowana",
+      "section_matched": "Napoje"
+    },
+    {
+      "name": "chipsy",
+      "normalized": "chipsy",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "czekolada",
+      "normalized": "czekolada",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "ciasteczka",
+      "normalized": "ciasteczka",
+      "section_matched": "Pieczenie / Bakalie"
+    },
+    {
+      "name": "żelki",
+      "normalized": "zelki",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "dżem",
+      "normalized": "dzem",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "miód",
+      "normalized": "miod",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "ketchup",
+      "normalized": "ketchup",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "musztarda",
+      "normalized": "musztarda",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "sól",
+      "normalized": "sol",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "pieprz",
+      "normalized": "pieprz",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "olej",
+      "normalized": "olej",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "oliwa",
+      "normalized": "oliwa",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    },
+    {
+      "name": "jogurt",
+      "normalized": "jogurt",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "kefir",
+      "normalized": "kefir",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "śmietana",
+      "normalized": "smietana",
+      "section_matched": "Warzywa i Owoce"
+    },
+    {
+      "name": "twaróg",
+      "normalized": "twarog",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "pierogi",
+      "normalized": "pierogi",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "pizza",
+      "normalized": "pizza",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "lody",
+      "normalized": "lody",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "nuggetsy",
+      "normalized": "nuggetsy",
+      "section_matched": "Nabiał i Lodówki"
+    },
+    {
+      "name": "rajstopy",
+      "normalized": "rajstopy",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "skarpetki",
+      "normalized": "skarpetki",
+      "section_matched": "Ryby"
+    },
+    {
+      "name": "reklamówki",
+      "normalized": "reklamowki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "lakier do włosów",
+      "normalized": "lakier do wlosow",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "żel do włosów",
+      "normalized": "zel do wlosow",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "pianka do włosów",
+      "normalized": "pianka do wlosow",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "maszynka do golenia",
+      "normalized": "maszynka do golenia",
+      "section_matched": "Lada Tradycyjna / Mięso"
+    },
+    {
+      "name": "żyletki",
+      "normalized": "zyletki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "waciki",
+      "normalized": "waciki",
+      "section_matched": "Chemia / Higiena"
+    },
+    {
+      "name": "płatki kosmetyczne",
+      "normalized": "platki kosmetyczne",
+      "section_matched": "Puszki, Sosy, Przetwory"
+    }
+  ]
+}
