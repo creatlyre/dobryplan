@@ -249,6 +249,7 @@
       expenseNetworkError: {{ t('qa.expense_network_error')|tojson }},
       expenseCategoryNone: {{ t('qa.expense_category_none')|tojson }},
       expenseRemoveRow: {{ t('qa.expense_remove_row')|tojson }},
+      chooserExpense: {{ t('qa.chooser_expense')|tojson }},
       errPastWhat: {{ t('qa.err_past_what')|tojson }},
       errPastWhy: {{ t('qa.err_past_why')|tojson }},
       errPastFix: {{ t('qa.err_past_fix')|tojson }},
@@ -1079,6 +1080,7 @@
 
       let expenseCategoriesCache = [];
       let _expenseSaving = false;
+      let _expenseTrigger = null;
 
       // ── Category loading ─────────────────────────────────────────
       async function loadExpenseCategories() {
@@ -1110,6 +1112,7 @@
 
       // ── Open / Close ─────────────────────────────────────────────
       function openExpenseModal() {
+        _expenseTrigger = document.activeElement;
         resetExpenseForm();
         loadExpenseCategories();
         modal.classList.remove('hidden');
@@ -1123,6 +1126,10 @@
         modal.classList.add('hidden');
         modal.classList.remove('flex');
         resetExpenseForm();
+        if (_expenseTrigger && typeof _expenseTrigger.focus === 'function') {
+          _expenseTrigger.focus();
+          _expenseTrigger = null;
+        }
       }
 
       window.qaOpenExpenseModal = openExpenseModal;
@@ -1150,26 +1157,36 @@
         const firstRow = rowsContainer.querySelector('.qa-expense-row');
         const newRow = firstRow.cloneNode(true);
         const count = rowsContainer.querySelectorAll('.qa-expense-row').length + 1;
-        newRow.setAttribute('aria-label', (I18N.expenseCategoryNone ? 'Expense' : 'Expense') + ' ' + count);
-        newRow.querySelector('legend').textContent = 'Expense ' + count;
+        const expenseLabel = I18N.chooserExpense || 'Expense';
+        newRow.setAttribute('aria-label', expenseLabel + ' ' + count);
+        newRow.querySelector('legend').textContent = expenseLabel + ' ' + count;
+        // Update IDs for label/input association
+        newRow.querySelectorAll('[id]').forEach(function(el) {
+          el.id = el.id.replace(/-\d+$/, '-' + count);
+        });
+        newRow.querySelectorAll('label[for]').forEach(function(lbl) {
+          lbl.setAttribute('for', lbl.getAttribute('for').replace(/-\d+$/, '-' + count));
+        });
         newRow.querySelector('.qa-expense-name').value = '';
         newRow.querySelector('.qa-expense-amount').value = '';
         newRow.querySelector('.qa-expense-category').value = '';
+        // Clear any aria-invalid from cloned fields
+        newRow.querySelectorAll('[aria-invalid]').forEach(function(el) { el.removeAttribute('aria-invalid'); });
         // Keep same month/year as first
-        const now = new Date();
+        var now = new Date();
         newRow.querySelector('.qa-expense-month').value = String(now.getMonth() + 1);
         newRow.querySelector('.qa-expense-year').value = String(now.getFullYear());
         // Add remove button
-        const removeBtn = document.createElement('button');
+        var removeBtn = document.createElement('button');
         removeBtn.type = 'button';
-        removeBtn.className = 'absolute top-2 right-2 text-red-400 hover:text-red-300 rounded-lg p-1 min-h-[32px] min-w-[32px] flex items-center justify-center';
+        removeBtn.className = 'absolute top-2 right-2 text-red-400 hover:text-red-300 rounded-lg p-1 min-h-[44px] min-w-[44px] flex items-center justify-center';
         removeBtn.setAttribute('aria-label', I18N.expenseRemoveRow || 'Remove');
         removeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>';
-        removeBtn.addEventListener('click', () => {
+        removeBtn.addEventListener('click', function() {
           newRow.remove();
           renumberRows();
         });
-        newRow.style.position = 'relative';
+        newRow.classList.add('relative');
         newRow.appendChild(removeBtn);
         // Populate categories
         populateExpenseCategoryDropdowns();
@@ -1178,9 +1195,18 @@
       }
 
       function renumberRows() {
-        rowsContainer.querySelectorAll('.qa-expense-row').forEach((row, i) => {
-          row.setAttribute('aria-label', 'Expense ' + (i + 1));
-          row.querySelector('legend').textContent = 'Expense ' + (i + 1);
+        var expenseLabel = I18N.chooserExpense || 'Expense';
+        rowsContainer.querySelectorAll('.qa-expense-row').forEach(function(row, i) {
+          var num = i + 1;
+          row.setAttribute('aria-label', expenseLabel + ' ' + num);
+          row.querySelector('legend').textContent = expenseLabel + ' ' + num;
+          // Update IDs for label/input association
+          row.querySelectorAll('[id]').forEach(function(el) {
+            el.id = el.id.replace(/-\d+$/, '-' + num);
+          });
+          row.querySelectorAll('label[for]').forEach(function(lbl) {
+            lbl.setAttribute('for', lbl.getAttribute('for').replace(/-\d+$/, '-' + num));
+          });
         });
       }
 
@@ -1201,21 +1227,29 @@
       // ── Validation ────────────────────────────────────────────────
       function validateRows() {
         const rows = rowsContainer.querySelectorAll('.qa-expense-row');
+        // Clear previous aria-invalid states
+        rows.forEach(function(row) {
+          row.querySelectorAll('[aria-invalid]').forEach(function(el) { el.removeAttribute('aria-invalid'); });
+        });
         const expenses = [];
         for (const row of rows) {
-          const name = row.querySelector('.qa-expense-name').value.trim();
-          const amountStr = row.querySelector('.qa-expense-amount').value;
+          const nameInput = row.querySelector('.qa-expense-name');
+          const amountInput = row.querySelector('.qa-expense-amount');
+          const name = nameInput.value.trim();
+          const amountStr = amountInput.value;
           const amount = parseFloat(amountStr);
           const month = parseInt(row.querySelector('.qa-expense-month').value, 10);
           const year = parseInt(row.querySelector('.qa-expense-year').value, 10);
           const categoryId = row.querySelector('.qa-expense-category').value || null;
 
           if (!name) {
-            row.querySelector('.qa-expense-name').focus();
+            nameInput.setAttribute('aria-invalid', 'true');
+            nameInput.focus();
             return { ok: false, msg: I18N.expenseNameRequired };
           }
           if (!amountStr || isNaN(amount) || amount === 0) {
-            row.querySelector('.qa-expense-amount').focus();
+            amountInput.setAttribute('aria-invalid', 'true');
+            amountInput.focus();
             return { ok: false, msg: I18N.expenseAmountRequired };
           }
           expenses.push({
