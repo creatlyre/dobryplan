@@ -154,6 +154,8 @@
             <a href="/privacy" class="hover:text-gray-300 transition-colors">{{ t('footer.privacy') }}</a>
             <span>·</span>
             <a href="/refund" class="hover:text-gray-300 transition-colors">{{ t('footer.refund') }}</a>
+            <span>·</span>
+            <button id="pwa-help-btn" type="button" class="hover:text-gray-300 transition-colors" aria-label="{{ t('pwa_help.trigger_label') }}">?</button>
         </div>
     </footer>
 
@@ -231,6 +233,8 @@
     {% include "partials/quick_add_modal.html" %}
     {% include "partials/quick_add_expense_modal.html" %}
     {% endif %}
+
+    {% include "partials/pwa_help_modal.html" %}
 
     <script>
     // ── Quick Add I18N (available globally) ─────────────────────────────────
@@ -1449,6 +1453,21 @@
       });
 
       initTheme();
+    </script>
+    <script>
+    (function() {
+      var helpModal = document.getElementById('pwa-help-modal');
+      var helpBtn = document.getElementById('pwa-help-btn');
+      function openHelp() { helpModal.classList.remove('hidden'); helpModal.classList.add('flex'); }
+      function closeHelp() { helpModal.classList.add('hidden'); helpModal.classList.remove('flex'); }
+      if (helpBtn && helpModal) {
+        helpBtn.addEventListener('click', openHelp);
+        document.getElementById('pwa-help-close-btn').addEventListener('click', closeHelp);
+        document.getElementById('pwa-help-close-btn-bottom').addEventListener('click', closeHelp);
+        helpModal.addEventListener('click', function(e) { if (e.target === helpModal) closeHelp(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && !helpModal.classList.contains('hidden')) closeHelp(); });
+      }
+    })();
     </script>
     <script>
     (function() {

@@ -28,3 +28,23 @@ async def expenses_page(
     response = templates.TemplateResponse(request=request, name="budget_expenses.html", context=context)
     set_locale_cookie_if_param(response, request)
     return response
+
+
+@router.get("/quick-expense", response_class=HTMLResponse)
+async def quick_expense_page(
+    request: Request,
+    user=Depends(get_current_user),
+    db=Depends(get_db),
+):
+    context = inject_template_i18n(
+        request,
+        {
+            "request": request,
+            "user": user,
+            "user_plan": get_user_plan_for_template(user, db),
+            "auto_open_quick_expense": True,
+        },
+    )
+    response = templates.TemplateResponse(request=request, name="budget_expenses.html", context=context)
+    set_locale_cookie_if_param(response, request)
+    return response

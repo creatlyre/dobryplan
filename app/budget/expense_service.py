@@ -65,6 +65,11 @@ class ExpenseService:
         }
 
     def create_expense(self, calendar_id: str, payload: ExpenseCreate) -> Expense:
+        if not payload.category_id:
+            categories = self.list_categories(calendar_id)
+            detected = self._detect_category(payload.name, categories)
+            if detected:
+                payload.category_id = detected
         return self.repo.create(calendar_id, payload)
 
     def update_expense(self, expense_id: str, payload: ExpenseUpdate) -> Expense | None:
@@ -74,6 +79,14 @@ class ExpenseService:
         return self.repo.delete(expense_id)
 
     def bulk_create(self, calendar_id: str, items: list[ExpenseCreate]) -> list[Expense]:
+        categories = None
+        for item in items:
+            if not item.category_id:
+                if categories is None:
+                    categories = self.list_categories(calendar_id)
+                detected = self._detect_category(item.name, categories)
+                if detected:
+                    item.category_id = detected
         return [self.repo.create(calendar_id, item) for item in items]
 
     def delete_all_recurring(self, calendar_id: str, year: int) -> int:

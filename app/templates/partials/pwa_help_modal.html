@@ -1,0 +1,66 @@
+<!-- PWA Install Help Modal -->
+<div id="pwa-help-modal"
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="pwa-help-title">
+
+  <div class="relative glass shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl mx-4">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-white/20 px-6 py-4">
+      <h2 id="pwa-help-title" class="text-section-title text-white">{{ t('pwa_help.title') }}</h2>
+      <button id="pwa-help-close-btn" type="button"
+              class="rounded-lg p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white"
+              aria-label="{{ t('pwa_help.close') }}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="px-6 py-5 space-y-6">
+      <p class="text-sm text-white/70">{{ t('pwa_help.intro') }}</p>
+
+      <!-- Chrome Section -->
+      <section>
+        <h3 class="text-sm font-semibold text-white mb-2">{{ t('pwa_help.chrome_title') }}</h3>
+        <ol class="list-decimal list-inside space-y-1.5 text-sm text-white/80">
+          <li>{{ t('pwa_help.chrome_step1') }}</li>
+          <li>{{ t('pwa_help.chrome_step2') }}</li>
+          <li>{{ t('pwa_help.chrome_step3') }}</li>
+          <li>{{ t('pwa_help.chrome_step4') }}</li>
+        </ol>
+      </section>
+
+      <!-- Firefox Section -->
+      <section>
+        <h3 class="text-sm font-semibold text-white mb-2">{{ t('pwa_help.firefox_title') }}</h3>
+        <ol class="list-decimal list-inside space-y-1.5 text-sm text-white/80">
+          <li>{{ t('pwa_help.firefox_step1') }}</li>
+          <li>{{ t('pwa_help.firefox_step2') }}</li>
+          <li>{{ t('pwa_help.firefox_step3') }}</li>
+        </ol>
+      </section>
+
+      <!-- Shortcut Tip -->
+      <div class="rounded-xl border border-cyan-400/20 bg-cyan-900/10 px-4 py-3">
+        <p class="text-xs text-cyan-300">
+          <svg class="inline-block w-4 h-4 -mt-0.5 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+          {{ t('pwa_help.shortcut_tip') }}
+        </p>
+      </div>
+
+      <!-- Close button -->
+      <div class="flex justify-end">
+        <button id="pwa-help-close-btn-bottom" type="button"
+                class="glass-btn-secondary rounded-xl px-5 py-2.5 text-sm font-medium min-h-[44px]">
+          {{ t('pwa_help.close') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

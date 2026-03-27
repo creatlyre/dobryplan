@@ -458,22 +458,25 @@ class TestExpenseCategoryAdvanced:
         """POST /auto-categorize matches uncategorized expenses to categories by keyword."""
         # Seed categories
         authenticated_client.get("/api/budget/expenses/categories")
-        # Create uncategorized expenses with keyword-matching names
-        authenticated_client.post(
+        # Create expenses with keyword-matching names — these are now
+        # auto-categorized on creation, so verify that first.
+        r1 = authenticated_client.post(
             "/api/budget/expenses",
             json={"year": 2026, "month": 1, "name": "Lidl zakupy", "amount": 200},
         )
-        authenticated_client.post(
+        r2 = authenticated_client.post(
             "/api/budget/expenses",
             json={"year": 2026, "month": 2, "name": "Netflix", "amount": 50},
         )
-        # Run auto-categorize
+        assert r1.json()["data"]["category_id"] is not None, "Auto-categorize on create should assign category"
+        assert r2.json()["data"]["category_id"] is not None, "Auto-categorize on create should assign category"
+        # Run auto-categorize — should find 0 uncategorized (already assigned on create)
         res = authenticated_client.post("/api/budget/expenses/auto-categorize?year=2026")
         assert res.status_code == 200
         result = res.json()["data"]
-        assert result["total"] == 2
-        assert result["updated"] == 2
-        # Verify expenses now have categories
+        assert result["total"] == 0
+        assert result["updated"] == 0
+        # Verify expenses still have categories
         year_data = authenticated_client.get("/api/budget/expenses?year=2026").json()["data"]
         onetime = year_data["onetime_expenses"]
         assert all(e["category_id"] is not None for e in onetime)

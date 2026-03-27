@@ -1000,4 +1000,17 @@
   init();
 })();
 </script>
+{% if auto_open_quick_expense is defined and auto_open_quick_expense %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var modal = document.getElementById('qa-expense-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    var firstInput = modal.querySelector('input[type="text"]');
+    if (firstInput) firstInput.focus();
+  }
+});
+</script>
+{% endif %}
 {% endblock %}
