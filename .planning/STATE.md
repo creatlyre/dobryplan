@@ -49,6 +49,7 @@ Previous milestones archived. See `.planning/milestones/` for full history.
 | 260327-jbv | Add PWA install help and quick-add expense widget for Android homescreen | 2026-03-27 | ff2540a | [260327-jbv-add-pwa-install-help-and-quick-add-expen](./quick/260327-jbv-add-pwa-install-help-and-quick-add-expen/) |
 | 260327-jif | Full coverage shopping item categorization for Biedronka | 2026-03-27 | 6216426 | [260327-jif-full-coverage-shopping-item-categorizati](./quick/260327-jif-full-coverage-shopping-item-categorizati/) |
 | 260327-jg3 | Expense categorization coverage research — 120 keywords added, 100% hit rate on 1000 test items | 2026-03-27 | 952e08e | [260327-jg3-expense-categorization-coverage-research](./quick/260327-jg3-expense-categorization-coverage-research/) |
+| 260327-ko6 | Fix mobile navigation tabs overflow — raise breakpoints from md to lg (1024px) | 2026-03-27 | 7b56ff4 | [260327-ko6-fix-mobile-navigation-tabs-overflow-tab-](./quick/260327-ko6-fix-mobile-navigation-tabs-overflow-tab-/) |
 
 ### Pending Todos
 
