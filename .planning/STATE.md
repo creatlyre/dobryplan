@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Milestone:** None (v5.1 shipped 2026-03-25)
 **Status:** Idle — ready for next milestone
-Last activity: 2026-03-27 - Completed quick task 260327-jif: Full coverage shopping item categorization for Biedronka
+Last activity: 2026-03-27 - Completed quick task 260327-jg3: Expense categorization coverage research + validation (100% hit rate)
 
 ## Accumulated Context
 
@@ -48,6 +48,7 @@ Previous milestones archived. See `.planning/milestones/` for full history.
 | 260327-h6o | Quick Add modal: Event and Expense options from top navbar button | 2026-03-27 | 7d0f8b1 | [260327-h6o-quick-add-modal-event-and-expense-option](./quick/260327-h6o-quick-add-modal-event-and-expense-option/) |
 | 260327-jbv | Add PWA install help and quick-add expense widget for Android homescreen | 2026-03-27 | ff2540a | [260327-jbv-add-pwa-install-help-and-quick-add-expen](./quick/260327-jbv-add-pwa-install-help-and-quick-add-expen/) |
 | 260327-jif | Full coverage shopping item categorization for Biedronka | 2026-03-27 | 6216426 | [260327-jif-full-coverage-shopping-item-categorizati](./quick/260327-jif-full-coverage-shopping-item-categorizati/) |
+| 260327-jg3 | Expense categorization coverage research — 120 keywords added, 100% hit rate on 1000 test items | 2026-03-27 | 952e08e | [260327-jg3-expense-categorization-coverage-research](./quick/260327-jg3-expense-categorization-coverage-research/) |
 
 ### Pending Todos
 
