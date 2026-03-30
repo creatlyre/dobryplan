@@ -74,9 +74,8 @@ jobs:
       - name: Build APK with Bubblewrap
         run: |
           cd android
-          yes n | bubblewrap build --skipPwaValidation || true
-          # Verify APK was actually produced
-          test -f app-release-signed.apk
+          # Answer "n" to the checksum regeneration prompt, then let Gradle run uninterrupted
+          (echo "n"; cat /dev/null) | bubblewrap build --skipPwaValidation
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
