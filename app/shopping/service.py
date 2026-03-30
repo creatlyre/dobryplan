@@ -84,14 +84,16 @@ class ShoppingService:
         sections_out = []
         for s in sections:
             section_items = grouped.get(s.id, [])
-            sections_out.append({
-                "id": s.id,
-                "name": s.name,
-                "emoji": s.emoji,
-                "sort_order": s.sort_order,
-                "is_preset": s.is_preset,
-                "items": section_items,
-            })
+            sections_out.append(
+                {
+                    "id": s.id,
+                    "name": s.name,
+                    "emoji": s.emoji,
+                    "sort_order": s.sort_order,
+                    "is_preset": s.is_preset,
+                    "items": section_items,
+                }
+            )
 
         return {
             "sections": sections_out,
@@ -109,10 +111,16 @@ class ShoppingService:
         items_text = re.split(r"[,\n]+", text)
         names = [t.strip() for t in items_text if t.strip()]
 
+        # Pre-fetch required data outside the loop to avoid N+1 query patterns
+        sections = self.ensure_sections(calendar_id)
+        overrides = self.repo.get_overrides(calendar_id)
+
         created: list[ShoppingItem] = []
         uncategorized_names: list[str] = []
         for name in names:
-            section_id = self._categorize_item(calendar_id, name)
+            section_id = self._categorize_item(
+                calendar_id, name, sections=sections, overrides=overrides
+            )
             item = self.repo.create_item(calendar_id, name, section_id)
             created.append(item)
             if not section_id:
@@ -134,21 +142,23 @@ class ShoppingService:
 
     # ── Keyword learning ─────────────────────────────────────────────────
 
-    def learn_keyword(
-        self, calendar_id: str, item_name: str, section_id: str
-    ) -> None:
+    def learn_keyword(self, calendar_id: str, item_name: str, section_id: str) -> None:
         normalized = _normalize(item_name)
         self.repo.upsert_override(calendar_id, normalized, section_id)
 
     # ── Auto-categorization ──────────────────────────────────────────────
 
-    def _categorize_item(self, calendar_id: str, item_name: str) -> str | None:
+    def _categorize_item(
+        self, calendar_id: str, item_name: str, sections=None, overrides=None
+    ) -> str | None:
         norm = _normalize(item_name)
-        sections = self.ensure_sections(calendar_id)
+        if sections is None:
+            sections = self.ensure_sections(calendar_id)
         section_by_name = {s.name: s.id for s in sections}
 
         # 1. Check user overrides first (learned keywords take priority)
-        overrides = self.repo.get_overrides(calendar_id)
+        if overrides is None:
+            overrides = self.repo.get_overrides(calendar_id)
         for ovr in overrides:
             if ovr.keyword in norm or norm in ovr.keyword:
                 return ovr.section_id
