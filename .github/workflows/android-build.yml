@@ -45,6 +45,9 @@ jobs:
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli
 
+      - name: Configure Bubblewrap JDK and SDK paths
+        run: bubblewrap updateConfig --jdkPath="${JAVA_HOME}" --androidSdkPath="${ANDROID_HOME}"
+
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses || true
 
@@ -68,7 +71,7 @@ jobs:
       - name: Build APK with Bubblewrap
         run: |
           cd android
-          echo "n" | bubblewrap build --skipPwaValidation
+          bubblewrap build --skipPwaValidation
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
