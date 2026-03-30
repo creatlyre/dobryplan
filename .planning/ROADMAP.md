@@ -119,13 +119,14 @@ Plans:
 
 ### Phase 3: Migrate TWA to Capacitor Native Shell with MCP-Verified Build
 
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 2
-**Plans:** 0 plans
+**Goal:** Replace the Chrome-dependent TWA Android wrapper with a Capacitor native shell using server.url mode (pointing at production backend), bundle an offline fallback in the APK, retain the existing keystore/signing config, update CI/CD from Bubblewrap to Capacitor sync+Gradle, and verify the build installs and launches standalone on a physical device.
+**Requirements**: [CAP-01: Remove Chrome dependency — Capacitor uses Android System WebView not Chrome Custom Tabs, CAP-02: Bundle offline fallback assets in APK via www/ webDir, CAP-03: Offline fallback via server.errorPath + existing service worker, CAP-04: Retain existing keystore and signing config (same package ID app.dobryplan.twa), CAP-05: CI/CD pipeline updated — cap sync + Gradle replaces Bubblewrap, CAP-06: Digital Asset Links still functional (same package + keystore = unchanged), CAP-07: Verification — install on physical device and confirm standalone fullscreen launch with no browser bar]
+**Depends on:** Phase 1
+**Plans:** 2 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 3 to break down)
+- [ ] 03-01-PLAN.md — Capacitor project initialization + Android native shell
+- [ ] 03-02-PLAN.md — CI/CD pipeline update + device verification checkpoint
 
 ---
 
