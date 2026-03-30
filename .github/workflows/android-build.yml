@@ -92,9 +92,3 @@ jobs:
             Android APK build from commit ${{ github.sha }}
             Version: ${{ env.APP_VERSION }} (code: ${{ env.VERSION_CODE }})
           files: android/app/build/outputs/apk/release/app-release.apk
-
-            Install: Download dobryplan.apk and sideload on your Android device.
-          files: android/app-release-signed.apk
-          make_latest: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
