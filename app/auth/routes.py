@@ -54,9 +54,9 @@ def _set_session_cookie(response: Response, session_token: str) -> None:
         key="session",
         value=session_token,
         httponly=True,
-        secure=False,
+        secure=settings.ENVIRONMENT != "development",
         samesite="lax",
-        max_age=settings.JWT_EXPIRY_HOURS * 3600,
+        max_age=settings.SESSION_COOKIE_MAX_AGE,
     )
 
 
@@ -66,9 +66,9 @@ def _set_refresh_cookie(response: Response, refresh_token: str) -> None:
         key="supabase_refresh",
         value=refresh_token,
         httponly=True,
-        secure=False,
+        secure=settings.ENVIRONMENT != "development",
         samesite="lax",
-        max_age=max(settings.JWT_EXPIRY_HOURS * 3600 * 4, 86400),
+        max_age=settings.REFRESH_COOKIE_MAX_AGE,
     )
 
 

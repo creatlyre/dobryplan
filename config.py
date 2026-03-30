@@ -35,6 +35,8 @@ class Settings(BaseSettings):
 
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRY_HOURS: int = 8
+    SESSION_COOKIE_MAX_AGE: int = 604800      # 7 days in seconds
+    REFRESH_COOKIE_MAX_AGE: int = 2592000     # 30 days in seconds
     DB_ENCRYPTION_KEY: str
 
     SMTP_HOST: str = ""

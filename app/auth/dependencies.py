@@ -14,6 +14,7 @@ from app.database.database import get_db
 from app.database.models import User
 from app.users.repository import UserRepository
 from app.users.service import UserService
+from config import Settings
 
 
 class AuthenticatedUser(BaseModel):
@@ -32,6 +33,8 @@ async def get_current_user(
     db=Depends(get_db),
 ) -> User | AuthenticatedUser:
     repo = UserRepository(db)
+    settings = Settings()
+    _secure = settings.ENVIRONMENT != "development"
 
     if not session:
         if not supabase_refresh:
@@ -44,8 +47,8 @@ async def get_current_user(
         session = refreshed.get("access_token")
         new_refresh = refreshed.get("refresh_token") or supabase_refresh
         if response and session:
-            response.set_cookie("session", session, httponly=True, secure=False, samesite="lax")
-            response.set_cookie("supabase_refresh", new_refresh, httponly=True, secure=False, samesite="lax")
+            response.set_cookie("session", session, httponly=True, secure=_secure, samesite="lax", max_age=settings.SESSION_COOKIE_MAX_AGE)
+            response.set_cookie("supabase_refresh", new_refresh, httponly=True, secure=_secure, samesite="lax", max_age=settings.REFRESH_COOKIE_MAX_AGE)
 
     legacy_payload = decode_legacy_session_token(session)
     if legacy_payload:
@@ -65,8 +68,8 @@ async def get_current_user(
             session = refreshed.get("access_token")
             new_refresh = refreshed.get("refresh_token") or supabase_refresh
             if response and session:
-                response.set_cookie("session", session, httponly=True, secure=False, samesite="lax")
-                response.set_cookie("supabase_refresh", new_refresh, httponly=True, secure=False, samesite="lax")
+                response.set_cookie("session", session, httponly=True, secure=_secure, samesite="lax", max_age=settings.SESSION_COOKIE_MAX_AGE)
+                response.set_cookie("supabase_refresh", new_refresh, httponly=True, secure=_secure, samesite="lax", max_age=settings.REFRESH_COOKIE_MAX_AGE)
             supabase_user = await fetch_supabase_user(session)
 
     if not supabase_user:

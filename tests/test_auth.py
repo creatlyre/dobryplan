@@ -28,6 +28,10 @@ def test_oauth_callback_creates_user(test_db, test_client, monkeypatch):
     assert response.headers.get("location") == "/dashboard"
     assert "session=" in response.headers.get("set-cookie", "")
 
+    # Verify session cookie has 7-day max_age (not the old 8-hour value)
+    set_cookie = response.headers.get("set-cookie", "")
+    assert "Max-Age=604800" in set_cookie or "max-age=604800" in set_cookie.lower()
+
     user = UserRepository(test_db).get_user_by_email("newuser@example.com")
     assert user is not None
     assert user.calendar_id is not None
