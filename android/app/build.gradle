@@ -1,0 +1,41 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'app.dobryplan.twa'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "app.dobryplan.twa"
+        minSdk 24
+        targetSdk 34
+        versionCode project.hasProperty('appVersionCode') ? Integer.parseInt(project.property('appVersionCode')) : 1
+        versionName project.hasProperty('appVersionName') ? project.property('appVersionName') : '1.0.0'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('../dobryplan-keystore.jks')
+            storePassword System.getenv('KEYSTORE_PASSWORD')
+            keyAlias 'dobryplan'
+            keyPassword System.getenv('KEY_PASSWORD')
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}

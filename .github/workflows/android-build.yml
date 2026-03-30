@@ -1,4 +1,7 @@
-# Build Android APK (TWA wrapper) via Bubblewrap
+# Build Android APK (TWA wrapper) via Gradle
+#
+# Uses a standard Android project with androidbrowserhelper library
+# instead of Bubblewrap CLI, for reliable non-interactive CI builds.
 #
 # Required GitHub Secrets:
 #   KEYSTORE_BASE64    — base64-encoded android/dobryplan-keystore.jks
@@ -14,6 +17,7 @@ on:
       - 'android/**'
       - 'public/manifest.json'
       - 'public/sw.js'
+      - 'public/icons/**'
       - 'pyproject.toml'
   workflow_dispatch:
 
@@ -37,21 +41,16 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Bubblewrap CLI
-        run: npm install -g @bubblewrap/cli
-
-      - name: Configure Bubblewrap JDK and SDK paths
-        run: |
-          mkdir -p "$HOME/.bubblewrap"
-          printf '{"jdkPath":"%s","androidSdkPath":"%s"}' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.bubblewrap/config.json"
-
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses || true
+
+      - name: Install required SDK components
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.5'
 
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/dobryplan-keystore.jks
@@ -63,42 +62,17 @@ jobs:
           echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
           echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
 
-      - name: Update twa-manifest.json with version
+      - name: Prepare Android resources
         run: |
-          cd android
-          jq --arg v "$APP_VERSION" --argjson vc "$VERSION_CODE" \
-            '.appVersion = $v | .appVersionCode = $vc' \
-            twa-manifest.json > twa-manifest-updated.json
-          mv twa-manifest-updated.json twa-manifest.json
+          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+          mkdir -p android/app/src/main/res/drawable
+          cp public/icons/icon-192.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          cp public/icons/icon-512.png android/app/src/main/res/drawable/splash.png
 
-      - name: Build APK with Bubblewrap
-        run: |
-          cd android
-          sudo apt-get install -y expect > /dev/null 2>&1
-          # Step 1: Generate/update the Android project (gradle wrapper, build files)
-          expect -c '
-            set timeout 120
-            spawn bubblewrap update --appVersionName "$env(APP_VERSION)"
-            expect {
-              "*(Y/n)*" { send "Y\r"; exp_continue }
-              eof
-            }
-          '
-          # Step 2: Build the APK with signing
-          expect -c '
-            set timeout 600
-            spawn bubblewrap build --skipPwaValidation
-            expect {
-              "*(Y/n)*" { send "n\r"; exp_continue }
-              "*Key Store*" { send "$env(KEYSTORE_PASSWORD)\r"; exp_continue }
-              "*Password for the Key:*" { send "$env(KEY_PASSWORD)\r"; exp_continue }
-              eof
-            }
-            catch wait result
-            exit [lindex $result 3]
-          '
+      - name: Build release APK
+        working-directory: android
+        run: gradle assembleRelease -PappVersionName="$APP_VERSION" -PappVersionCode="$VERSION_CODE"
         env:
-          APP_VERSION: ${{ env.APP_VERSION }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
@@ -106,7 +80,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dobryplan-apk
-          path: android/app-release-signed.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
           retention-days: 90
 
       - name: Create GitHub Release
@@ -117,6 +91,7 @@ jobs:
           body: |
             Android APK build from commit ${{ github.sha }}
             Version: ${{ env.APP_VERSION }} (code: ${{ env.VERSION_CODE }})
+          files: android/app/build/outputs/apk/release/app-release.apk
 
             Install: Download dobryplan.apk and sideload on your Android device.
           files: android/app-release-signed.apk
