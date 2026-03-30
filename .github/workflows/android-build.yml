@@ -46,7 +46,9 @@ jobs:
         run: npm install -g @bubblewrap/cli
 
       - name: Configure Bubblewrap JDK and SDK paths
-        run: bubblewrap updateConfig --jdkPath="${JAVA_HOME}" --androidSdkPath="${ANDROID_HOME}"
+        run: |
+          mkdir -p "$HOME/.bubblewrap"
+          printf '{"jdkPath":"%s","androidSdkPath":"%s"}' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.bubblewrap/config.json"
 
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses || true
