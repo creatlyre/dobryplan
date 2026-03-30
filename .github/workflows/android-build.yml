@@ -74,8 +74,25 @@ jobs:
       - name: Build APK with Bubblewrap
         run: |
           cd android
-          # Answer "n" to the checksum regeneration prompt, then let Gradle run uninterrupted
-          (echo "n"; cat /dev/null) | bubblewrap build --skipPwaValidation
+          # Install expect to handle interactive prompts
+          sudo apt-get install -y expect > /dev/null 2>&1
+          # Use expect to feed answers to bubblewrap's inquirer prompts:
+          # 1. "n" for checksum regeneration
+          # 2. keystore password
+          # 3. key password
+          expect -c '
+            set timeout 600
+            spawn bubblewrap build --skipPwaValidation
+            expect "*(Y/n)*"
+            send "n\r"
+            expect "*Key Store*"
+            send "$env(KEYSTORE_PASSWORD)\r"
+            expect "*Key*"
+            send "$env(KEY_PASSWORD)\r"
+            expect eof
+            catch wait result
+            exit [lindex $result 3]
+          '
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
