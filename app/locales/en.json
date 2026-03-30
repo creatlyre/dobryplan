@@ -832,6 +832,7 @@
   "upgrade.preview_import_ready": "4 rows ready to import",
   "upgrade.preview_generic": "Premium content",
   "nav.admin": "Admin",
+  "nav.more": "More",
   "admin.dashboard_title": "Admin Dashboard",
   "admin.users_title": "User Management",
   "admin.user_detail_title": "User Detail",

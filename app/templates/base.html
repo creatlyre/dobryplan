@@ -192,8 +192,8 @@
       </a>
       <div class="relative" id="mobile-more-menu-container">
         <button id="mobile-more-btn" type="button" class="{{ 'active' if request.url.path in ['/budget/settings', '/billing/settings'] else '' }}" aria-expanded="false" aria-haspopup="true">
-          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>
-          {{ t('budget.sidebar_settings') if t('budget.sidebar_settings') != 'budget.sidebar_settings' else 'More' }}
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="12" cy="19" r="2"/></svg></span>
+          {{ t('nav.more') if t('nav.more') != 'nav.more' else 'More' }}
         </button>
         <div id="mobile-more-panel" class="absolute bottom-full right-0 mb-2 hidden w-56 rounded-xl overflow-hidden shadow-2xl border border-white/15" role="menu" style="background:rgba(15,10,46,0.97);backdrop-filter:blur(20px);">
           <a href="/billing/settings" class="flex items-center gap-3 px-4 py-3.5 text-sm hover:bg-white/10 transition-colors min-h-[48px]" role="menuitem">
