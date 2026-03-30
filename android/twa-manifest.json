@@ -1,0 +1,25 @@
+{
+  "host": "dobryplan.app",
+  "name": "Dobry Plan",
+  "shortName": "Dobry Plan",
+  "themeColor": "#1e1553",
+  "navigationColor": "#0f0a2e",
+  "backgroundColor": "#0f0a2e",
+  "startUrl": "/dashboard",
+  "iconUrl": "https://dobryplan.app/static/icons/icon-512.png",
+  "maskableIconUrl": "https://dobryplan.app/static/icons/icon-maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "enableNotifications": false,
+  "display": "standalone",
+  "orientation": "any",
+  "packageId": "app.dobryplan.twa",
+  "signingKey": {
+    "path": "dobryplan-keystore.jks",
+    "alias": "dobryplan"
+  },
+  "minSdkVersion": 24,
+  "appVersion": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli"
+}

@@ -63,20 +63,11 @@ jobs:
           echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
           echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
 
-      - name: Initialize Bubblewrap project from manifest
-        run: |
-          cd android
-          bubblewrap init --manifest="https://dobryplan.app/manifest.json" --directory=.
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-
-      - name: Update twa-manifest.json with version and signing key
+      - name: Update twa-manifest.json with version
         run: |
           cd android
           jq --arg v "$APP_VERSION" --argjson vc "$VERSION_CODE" \
-            --arg ksPath "dobryplan-keystore.jks" --arg ksAlias "dobryplan" \
-            '.appVersionCode = $vc | .appVersion = $v | .signingKey.path = $ksPath | .signingKey.alias = $ksAlias' \
+            '.appVersion = $v | .appVersionCode = $vc' \
             twa-manifest.json > twa-manifest-updated.json
           mv twa-manifest-updated.json twa-manifest.json
 
