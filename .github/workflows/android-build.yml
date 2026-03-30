@@ -74,7 +74,9 @@ jobs:
       - name: Build APK with Bubblewrap
         run: |
           cd android
-          bubblewrap build --skipPwaValidation
+          yes n | bubblewrap build --skipPwaValidation || true
+          # Verify APK was actually produced
+          test -f app-release-signed.apk
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
