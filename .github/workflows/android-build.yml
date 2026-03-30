@@ -74,26 +74,31 @@ jobs:
       - name: Build APK with Bubblewrap
         run: |
           cd android
-          # Install expect to handle interactive prompts
           sudo apt-get install -y expect > /dev/null 2>&1
-          # Use expect to feed answers to bubblewrap's inquirer prompts:
-          # 1. "n" for checksum regeneration
-          # 2. keystore password
-          # 3. key password
+          # Step 1: Generate/update the Android project (gradle wrapper, build files)
+          expect -c '
+            set timeout 120
+            spawn bubblewrap update --appVersionName "$env(APP_VERSION)"
+            expect {
+              "*(Y/n)*" { send "Y\r"; exp_continue }
+              eof
+            }
+          '
+          # Step 2: Build the APK with signing
           expect -c '
             set timeout 600
             spawn bubblewrap build --skipPwaValidation
-            expect "*(Y/n)*"
-            send "n\r"
-            expect "*Key Store*"
-            send "$env(KEYSTORE_PASSWORD)\r"
-            expect "*Key*"
-            send "$env(KEY_PASSWORD)\r"
-            expect eof
+            expect {
+              "*(Y/n)*" { send "n\r"; exp_continue }
+              "*Key Store*" { send "$env(KEYSTORE_PASSWORD)\r"; exp_continue }
+              "*Password for the Key:*" { send "$env(KEY_PASSWORD)\r"; exp_continue }
+              eof
+            }
             catch wait result
             exit [lindex $result 3]
           '
         env:
+          APP_VERSION: ${{ env.APP_VERSION }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
