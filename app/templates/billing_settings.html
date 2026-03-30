@@ -117,9 +117,102 @@
   </div>
   {% endif %}
 
+  {# App Version & Updates #}
+  <div class="glass rounded-2xl p-6">
+    <h2 class="text-lg font-semibold mb-4" style="font-family: var(--font-display);">
+      <span class="inline-flex items-center gap-2">
+        <svg class="w-5 h-5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        App Info &amp; Updates
+      </span>
+    </h2>
+
+    <div class="space-y-3">
+      <div class="flex items-center justify-between text-sm">
+        <span class="text-white/60">Current version</span>
+        <span id="dp-current-version" class="font-mono text-white/90">loading...</span>
+      </div>
+      <div id="dp-update-status" class="flex items-center justify-between text-sm">
+        <span class="text-white/60">Status</span>
+        <span id="dp-status-text" class="text-white/70">—</span>
+      </div>
+    </div>
+
+    <div class="mt-4 flex flex-wrap gap-3">
+      <button id="dp-check-update-btn" type="button"
+              class="glass-btn-primary rounded-xl px-4 py-2.5 text-sm font-medium min-h-[44px] inline-flex items-center gap-2">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Check for updates
+      </button>
+      <a id="dp-download-apk-btn" href="#" class="glass-btn-secondary rounded-xl px-4 py-2.5 text-sm font-medium min-h-[44px] inline-flex items-center gap-2 hidden" target="_self">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download latest APK
+      </a>
+    </div>
+  </div>
+
 </div>
 
 <script>
+// --- App Version & Update Checker ---
+(function() {
+  var versionEl = document.getElementById('dp-current-version');
+  var statusEl = document.getElementById('dp-status-text');
+  var checkBtn = document.getElementById('dp-check-update-btn');
+  var downloadBtn = document.getElementById('dp-download-apk-btn');
+
+  function setStatus(text, color) {
+    statusEl.textContent = text;
+    statusEl.style.color = color || '';
+  }
+
+  function doCheck() {
+    checkBtn.disabled = true;
+    checkBtn.querySelector('svg').style.animation = 'spin 1s linear infinite';
+    setStatus('Checking...', '#a5b4fc');
+
+    (window.dpCheckForUpdates ? window.dpCheckForUpdates() : fetch('/api/version').then(function(r) { return r.json(); }))
+      .then(function(data) {
+        versionEl.textContent = 'v' + data.version;
+        var installed = localStorage.getItem('dp-installed-apk-version');
+
+        // Always show download link for latest APK
+        if (data.apk_download_url) {
+          downloadBtn.href = data.apk_download_url;
+          downloadBtn.classList.remove('hidden');
+        }
+
+        if (!installed || installed === data.version) {
+          setStatus('You are up to date ✓', '#34d399');
+          if (!installed) localStorage.setItem('dp-installed-apk-version', data.version);
+        } else {
+          setStatus('Update available: v' + data.version, '#fbbf24');
+          downloadBtn.classList.remove('hidden');
+          // Highlight the download button
+          downloadBtn.classList.remove('glass-btn-secondary');
+          downloadBtn.classList.add('glass-btn-primary');
+          downloadBtn.style.animation = 'pulse 2s infinite';
+        }
+      })
+      .catch(function() {
+        setStatus('Could not check — try again', '#f87171');
+      })
+      .finally(function() {
+        checkBtn.disabled = false;
+        checkBtn.querySelector('svg').style.animation = '';
+      });
+  }
+
+  checkBtn.addEventListener('click', doCheck);
+
+  // Auto-check on page load
+  doCheck();
+})();
+</script>
+
+<style>
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+</style>
 document.querySelectorAll('.billing-checkout-btn').forEach(btn => {
     btn.addEventListener('click', async function() {
         const plan = this.dataset.plan;

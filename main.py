@@ -166,7 +166,7 @@ async def api_version():
         "version": app_version,
         "apk_version": apk_version,
         "apk_version_code": apk_version_code,
-        "apk_download_url": "https://github.com/creatlyre/CalendarPlanner/releases/latest/download/app-release-signed.apk",
+        "apk_download_url": "https://github.com/creatlyre/dobryplan/releases/latest/download/app-release.apk",
     }
 
 
