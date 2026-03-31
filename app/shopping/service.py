@@ -115,16 +115,18 @@ class ShoppingService:
         sections = self.ensure_sections(calendar_id)
         overrides = self.repo.get_overrides(calendar_id)
 
-        created: list[ShoppingItem] = []
         uncategorized_names: list[str] = []
+        items_to_create = []
+
         for name in names:
             section_id = self._categorize_item(
                 calendar_id, name, sections=sections, overrides=overrides
             )
-            item = self.repo.create_item(calendar_id, name, section_id)
-            created.append(item)
+            items_to_create.append({"name": name, "section_id": section_id})
             if not section_id:
                 uncategorized_names.append(name)
+
+        created = self.repo.create_multiple_items(calendar_id, items_to_create)
 
         return {
             "items": [

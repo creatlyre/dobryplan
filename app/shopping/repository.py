@@ -146,6 +146,18 @@ class ShoppingRepository:
         row = self.db.insert("shopping_items", data)
         return _to_item(row)
 
+    def create_multiple_items(self, calendar_id: str, items_data: list[dict]) -> list[ShoppingItem]:
+        if not items_data:
+            return []
+        payloads = []
+        for item in items_data:
+            data = {"calendar_id": calendar_id, "name": item["name"]}
+            if item.get("section_id"):
+                data["section_id"] = item["section_id"]
+            payloads.append(data)
+        rows = self.db.bulk_insert("shopping_items", payloads)
+        return [_to_item(row) for row in rows]
+
     def update_item(self, item_id: str, data: dict) -> ShoppingItem | None:
         data["updated_at"] = datetime.utcnow().isoformat()
         row = self.db.update("shopping_items", {"id": f"eq.{item_id}"}, data)
